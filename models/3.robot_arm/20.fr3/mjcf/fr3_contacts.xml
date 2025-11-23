@@ -1,0 +1,17 @@
+<mujoco model="fr3_contacts">
+
+  <contact>
+    <exclude body1="fr3_link5" body2="fr3_link7"/>
+    <exclude body1="fr3_link6" body2="fr3_link7"/>
+    <exclude body1="fr3_link6" body2="fr3_link8"/>
+    <exclude body1="fr3_link7" body2="fr3_link8"/>
+    <exclude body1="fr3_link7" body2="left_finger"/>
+    <exclude body1="fr3_link7" body2="right_finger"/>
+    <exclude body1="fr3_link8" body2="left_finger"/>
+    <exclude body1="fr3_link8" body2="right_finger"/>
+    <exclude body1="left_finger" body2="right_finger"/>
+    <exclude body1="fr3_link5" body2="fr3_link6"/>
+    <exclude body1="fr3_link5" body2="fr3_link8"/>
+  </contact>
+
+</mujoco>

@@ -1,0 +1,89 @@
+so101:
+  robot_number: 24
+  robot_name: "so101"
+  ee_name: "EE"
+  workspace_radius: 0.52
+  config_path: "/robots/RynnLeRobot/configs/lerobot.yaml"
+  pino_mjcf: "/3.robot_arm/24.so101/mjcf/so101_pinocchio.xml"
+  scene_path:
+    {
+      1: "/3.robot_arm/24.so101/scene/scene.xml",
+      2: "/3.robot_arm/24.so101/scene/scene_tracking.xml",
+      3: "/3.robot_arm/24.so101/scene/scene_pickplace.xml",
+    }
+
+lekiwi:
+  robot_number: 31
+  robot_name: "lekiwi"
+  scene_path:
+    {
+      1: "/lerobot/LeKiwi/scene/scene.xml",
+      2: "/lerobot/LeKiwi/scene/scene_cube.xml",
+    }
+
+xlerobot:
+  robot_number: 32
+  robot_name: "xlerobot"
+  scene_path: { 1: "/lerobot/XLeRobot/scene/scene.xml" }
+
+oneLink:
+  robot_number: 1
+  robot_name: "oneLink"
+  scene_path:
+    {
+      1: "/1.low_dof/01.onelink/scene/scene.xml",
+      2: "/1.low_dof/01.onelink/scene/scene2.xml",
+    }
+
+twoLink:
+  robot_number: 2
+  robot_name: "twoLink"
+  scene_path: { 1: "/1.low_dof/02.twolink/scene/scene.xml" }
+
+franka_fr3:
+  robot_number: 20
+  robot_name: "fr3"
+  ee_name: "EE"
+  workspace_radius: 1.27
+  pino_mjcf: "/3.robot_arm/20.fr3/mjcf/fr3_pinocchio.xml"
+  scene_path:
+    {
+      1: "/3.robot_arm/20.fr3/scene/scene.xml",
+      2: "/3.robot_arm/20.fr3/scene/scene_tracking.xml",
+      3: "/3.robot_arm/20.fr3/scene/scene_tracking.xml",
+      4: "/3.robot_arm/20.fr3/scene/scene_pickplace.xml",
+    }
+
+rm75:
+  robot_number: 23
+  robot_name: "rm75"
+  ee_name: "EE"
+  workspace_radius: 1.0
+  pino_mjcf: "/3.robot_arm/23.rm75/mjcf/rm75_pinocchio.xml"
+  scene_path: { 1: "/3.robot_arm/23.rm75/scene/scene.xml" }
+
+piper:
+  robot_number: 22
+  robot_name: "piper"
+  ee_name: "EE"
+  workspace_radius: 0.83
+  pino_mjcf: "/3.robot_arm/22.piper/mjcf/piper_pinocchio.xml"
+  scene_path:
+    {
+      1: "/3.robot_arm/22.piper/scene/scene.xml",
+      2: "/3.robot_arm/22.piper/scene/scene_pen.xml",
+    }
+
+ur5e:
+  robot_number: 21
+  robot_name: "ur5e"
+  ee_name: "EE"
+  workspace_radius: 1.23
+  pino_mjcf: "/3.robot_arm/21.ur5e/mjcf/ur5e_pinocchio.xml"
+  scene_path: { 1: "/3.robot_arm/21.ur5e/scene/scene.xml" }
+
+eco65:
+  robot_number: 24
+  robot_name: "eco65"
+  scene_path: { 1: "/3.robot_arm/26.eco65/scene/scene.xml" }
+

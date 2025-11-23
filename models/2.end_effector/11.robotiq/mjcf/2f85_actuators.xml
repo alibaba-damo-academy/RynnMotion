@@ -1,0 +1,44 @@
+<mujoco model="2f85_actuators_sensors">
+
+  <contact>
+    <exclude body1="base" body2="left_driver"/>
+    <exclude body1="base" body2="right_driver"/>
+    <exclude body1="base" body2="left_spring_link"/>
+    <exclude body1="base" body2="right_spring_link"/>
+    <exclude body1="right_coupler" body2="right_follower"/>
+    <exclude body1="left_coupler" body2="left_follower"/>
+  </contact>
+
+  <tendon>
+    <fixed name="split">
+      <joint joint="right_driver_joint" coef="0.5"/>
+      <joint joint="left_driver_joint" coef="0.5"/>
+    </fixed>
+  </tendon>
+
+  <equality>
+    <connect anchor="0 0 0" body1="right_follower" body2="right_coupler" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+    <connect anchor="0 0 0" body1="left_follower" body2="left_coupler" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+    <joint joint1="right_driver_joint" joint2="left_driver_joint" polycoef="0 1 0 0 0" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+  </equality>
+
+  <!--
+    The general actuator below is a customized position actuator (with some damping) where
+    gainprm[0] != kp (see http://mujoco.org/book/modeling.html#position).
+    The reason why gainprm[0] != kp is because the control input range has to be re-scaled to
+    [0, 255]. The joint range is currently set at [0, 0.8], the control range is [0, 255] and
+    kp = 100. Tau = Kp * scale * control_input - Kp * error, max(Kp * scale * control_input) = 0.8,
+    hence scale = 0.8 * 100 / 255
+  -->
+
+  <actuator>
+    <position name="2f85_qx" joint="gripper_joint_x" class="gripper_actuator" />
+    <position name="2f85_qy" joint="gripper_joint_y" class="gripper_actuator" />
+    <position name="2f85_qz" joint="gripper_joint_z" class="gripper_actuator" />
+    <position name="2f85_qrx" joint="gripper_joint_rx" class="gripper_rot_actuator" />
+    <position name="2f85_qry" joint="gripper_joint_ry" class="gripper_rot_actuator" />
+    <position name="2f85_qrz" joint="gripper_joint_rz" class="gripper_rot_actuator" />
+    <general class="2f85" name="gripper" tendon="split" forcerange="-5 5" ctrlrange="0 255" gainprm="0.3137255 0 0" biasprm="0 -100 -10"/>
+  </actuator>
+
+</mujoco>

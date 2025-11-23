@@ -1,0 +1,1765 @@
+<mujoco model="multi_dual_robots_scene">
+  <compiler angle="radian" meshdir="../assets" texturedir="../assets" />
+  <option integrator="implicitfast" impratio="10" cone="elliptic" noslip_iterations="2">
+  </option>
+
+  <statistic center="0 -0.1 0.2" extent="1.2" meansize="0.05" />
+
+  <default>
+    <!-- FR3 defaults -->
+    <default class="fr3">
+      <joint armature="0.1" damping="1" />
+      <position inheritrange="1" />
+      <geom type="mesh" group="2" contype="0" conaffinity="0" />
+      <site size="0.001" rgba="0.5 0.5 0.5 0.3" group="4" />
+      <default class="fr3_finger">
+        <joint axis="0 1 0" type="slide" range="0 0.04" />
+      </default>
+      <default class="fr3_collision">
+        <geom type="mesh" group="3" />
+        <default class="fingertip_pad_collision_1">
+          <geom type="box" size="0.0085 0.004 0.0085" pos="0 0.0055 0.0445" />
+        </default>
+        <default class="fingertip_pad_collision_2">
+          <geom type="box" size="0.003 0.002 0.003" pos="0.0055 0.002 0.05" />
+        </default>
+        <default class="fingertip_pad_collision_3">
+          <geom type="box" size="0.003 0.002 0.003" pos="-0.0055 0.002 0.05" />
+        </default>
+        <default class="fingertip_pad_collision_4">
+          <geom type="box" size="0.003 0.002 0.0035" pos="0.0055 0.002 0.0395" />
+        </default>
+        <default class="fingertip_pad_collision_5">
+          <geom type="box" size="0.003 0.002 0.0035" pos="-0.0055 0.002 0.0395" />
+        </default>
+      </default>
+    </default>
+
+    <!-- Piper defaults -->
+    <default class="piper">
+      <joint frictionloss="0.3" armature="0.005" />
+      <position inheritrange="1" forcerange="-100 100" />
+      <default class="piper_finger">
+        <joint frictionloss="0" type="slide" />
+        <position forcerange="-10 10" />
+      </default>
+      <default class="piper_visual">
+        <geom group="2" type="mesh" contype="0" conaffinity="0" density="0" />
+      </default>
+      <default class="piper_collision">
+        <geom group="3" type="capsule" />
+      </default>
+    </default>
+
+    <!-- RM75 defaults -->
+    <default class="rm75">
+      <joint damping="1" />
+      <position inheritrange="1" />
+      <default class="rm75_visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" />
+      </default>
+      <default class="rm75_collision">
+        <geom type="mesh" group="3" />
+      </default>
+    </default>
+
+    <!-- UR5e defaults -->
+    <default class="ur5e">
+      <material specular="0.5" shininess="0.25" />
+      <joint axis="0 1 0" range="-6.28319 6.28319" armature="0.1" />
+      <general gaintype="fixed" biastype="affine" ctrlrange="-6.2831 6.2831" gainprm="2000" biasprm="0 -2000 -400" forcerange="-150 150" />
+      <site size="0.001" rgba="0.5 0.5 0.5 0.3" group="4" />
+      <default class="size3">
+        <joint range="-10 10" />
+        <general ctrlrange="-10 10" />
+        <default class="size3_limited">
+          <joint range="-3.1415 3.1415" />
+          <general ctrlrange="-3.1415 3.1415" />
+        </default>
+      </default>
+      <default class="size1">
+        <general gainprm="500" biasprm="0 -500 -100" forcerange="-28 28" />
+      </default>
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" />
+      </default>
+      <default class="collision">
+        <geom type="capsule" group="3" />
+        <default class="eef_collision">
+          <geom type="cylinder" />
+        </default>
+      </default>
+    </default>
+
+    <!-- 2F85 gripper defaults -->
+    <default class="2f85">
+      <mesh scale="0.001 0.001 0.001" />
+      <general biastype="affine" />
+      <joint axis="1 0 0" />
+      <default class="driver">
+        <joint axis="-1 0 0" range="0 0.8" ref="0.8" armature="0.005" damping="0.1" solimplimit="0.95 0.99 0.001" solreflimit="0.005 1" />
+      </default>
+      <default class="follower">
+        <joint range="-0.872664 0.872664" armature="0.001" pos="0 -0.018 0.0065" solimplimit="0.95 0.99 0.001" solreflimit="0.005 1" />
+      </default>
+      <default class="spring_link">
+        <joint range="-0.29670597283 0.8" armature="0.001" stiffness="0.05" springref="2.62" damping="0.00125" />
+      </default>
+      <default class="coupler">
+        <joint range="-1.57 0" armature="0.001" solimplimit="0.95 0.99 0.001" solreflimit="0.005 1" />
+      </default>
+      <default class="gripper_visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" />
+      </default>
+      <default class="gripper_collision">
+        <geom type="mesh" group="3" />
+        <default class="pad_box1">
+          <geom mass="0" type="box" pos="0 -0.0026 0.028125" size="0.011 0.004 0.009375" friction="0.7" solimp="0.95 0.99 0.001" solref="0.004 1" priority="1" rgba="0.55 0.55 0.55 1" />
+        </default>
+        <default class="pad_box2">
+          <geom mass="0" type="box" pos="0 -0.0026 0.009375" size="0.011 0.004 0.009375" friction="0.6" solimp="0.95 0.99 0.001" solref="0.004 1" priority="1" rgba="0.45 0.45 0.45 1" />
+        </default>
+      </default>
+    </default>
+  </default>
+
+  <visual>
+    <headlight diffuse="0.4 0.4 0.4" ambient="0.2 0.2 0.2" specular="0 0 0" />
+    <rgba haze="0.15 0.25 0.35 1" />
+    <global azimuth="120" elevation="-20" />
+  </visual>
+
+  <asset>
+    <mesh file="tablelegs.obj" />
+    <mesh file="tabletop.obj" />
+
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.2 0.2 0.2" width="512" height="3072" />
+    <texture type="2d" name="groundplane" builtin="flat" mark="edge" rgb1="0.1 0.1 0.1" rgb2="0.3 0.5 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.8" />
+    <texture type="2d" file="small_meta_table_diffuse.png" />
+    <material name="table" texture="small_meta_table_diffuse" />
+
+    <!-- FR3 materials -->
+    <material name="white" rgba="1 1 1 1" />
+    <material name="off_white" rgba="0.901961 0.921569 0.929412 1" />
+    <material name="black" rgba="0.2 0.2 0.2 1" />
+    <material name="metal" rgba="0.58 0.58 0.58 1" />
+    <material name="silicone" rgba="0.1882 0.1882 0.1882 1" />
+    <material name="gray" rgba="0.863156 0.863156 0.863157 1" />
+    <material name="orange" rgba="1.0 0.5 0.0 1" />
+    <material name="red" rgba="1 0.072272 0.039546 1" />
+    <material name="yellow" rgba="1.0 1.0 0.0 1" />
+    <material name="green" rgba="0.0 1.0 0.0 1" />
+    <material name="blue" rgba="0.0 0.0 1.0 1" />
+    <material name="button_green" rgba="0.102241 0.571125 0.102242 1" />
+    <material name="button_red" rgba="0.520996 0.008023 0.013702 1" />
+    <material name="button_blue" rgba="0.024157 0.445201 0.737911 1" />
+    <material name="jointgray" rgba="0.278 0.278 0.278 1" />
+    <material name="linkgray" rgba="0.82 0.82 0.82 1" />
+
+    <!-- Piper materials -->
+    <material name="gray_mat" rgba="0.59 0.59 0.59 1" />
+    <material name="light_gray_mat" rgba="0.98 0.98 0.98 1" />
+    <material name="light_medium_gray_mat" rgba="0.85 0.85 0.85 1" />
+    <material name="dark_gray_mat" rgba="0.086 0.086 0.086 1" />
+    <material name="darker_gray_mat" rgba="0.14 0.14 0.14 1" />
+    <material name="white_mat" rgba="1 1 1 1" />
+    <material name="red_mat" rgba="0.82 0.15 0.15 1" />
+    <material name="black_mat" rgba="0 0 0 1" />
+    <material name="light_blue" rgba="0.79 0.82 0.93 1" />
+
+    <!-- RM75 materials -->
+    <material name="black_rm75" rgba="0.2 0.2 0.2 1" />
+    <material name="white_rm75" rgba="1 1 1 1" />
+    <material name="off_white_rm75" rgba="0.901961 0.921569 0.929412 1" />
+    <material name="metal_rm75" rgba="0.58 0.58 0.58 1" />
+    <material name="silicone_rm75" rgba="0.1882 0.1882 0.1882 1" />
+    <material name="gray_rm75" rgba="0.863156 0.863156 0.863157 1" />
+    <material name="orange_rm75" rgba="1.0 0.5 0.0 1" />
+    <material name="red_rm75" rgba="1 0.072272 0.039546 1" />
+    <material name="yellow_rm75" rgba="1.0 1.0 0.0 1" />
+    <material name="green_rm75" rgba="0.0 1.0 0.0 1" />
+    <material name="blue_rm75" rgba="0.0 0.0 1.0 1" />
+
+    <!-- UR5e materials -->
+    <material name="black_ur5e" rgba="0.033 0.033 0.033 1" />
+    <material name="jointgray_ur5e" rgba="0.278 0.278 0.278 1" />
+    <material name="linkgray_ur5e" rgba="0.82 0.82 0.82 1" />
+    <material name="urblue" rgba="0.49 0.678 0.8 1" />
+    <material name="white_ur5e" rgba="1 1 1 1" />
+    <material name="off_white_ur5e" rgba="0.901961 0.921569 0.929412 1" />
+    <material name="metal_ur5e" rgba="0.58 0.58 0.58 1" />
+    <material name="silicone_ur5e" rgba="0.1882 0.1882 0.1882 1" />
+    <material name="gray_ur5e" rgba="0.863156 0.863156 0.863157 1" />
+    <material name="orange_ur5e" rgba="1.0 0.5 0.0 1" />
+    <material name="red_ur5e" rgba="1 0.072272 0.039546 1" />
+    <material name="yellow_ur5e" rgba="1.0 1.0 0.0 1" />
+    <material name="green_ur5e" rgba="0.0 1.0 0.0 1" />
+    <material name="blue_ur5e" rgba="0.0 0.0 1.0 1" />
+
+    <!-- FR3 meshes -->
+    <mesh file="../../20.fr3/assets/link0_0.obj" />
+    <mesh file="../../20.fr3/assets/link0_1.obj" />
+    <mesh file="../../20.fr3/assets/link0_2.obj" />
+    <mesh file="../../20.fr3/assets/link0_3.obj" />
+    <mesh file="../../20.fr3/assets/link0_4.obj" />
+    <mesh file="../../20.fr3/assets/link0_5.obj" />
+    <mesh file="../../20.fr3/assets/link0_6.obj" />
+    <mesh file="../../20.fr3/assets/link1.obj" />
+    <mesh name="link2.obj" file="../../20.fr3/assets/link2.obj" />
+    <mesh file="../../20.fr3/assets/link3_0.obj" />
+    <mesh file="../../20.fr3/assets/link3_1.obj" />
+    <mesh file="../../20.fr3/assets/link4_0.obj" />
+    <mesh file="../../20.fr3/assets/link4_1.obj" />
+    <mesh file="../../20.fr3/assets/link5_0.obj" />
+    <mesh file="../../20.fr3/assets/link5_1.obj" />
+    <mesh file="../../20.fr3/assets/link5_2.obj" />
+    <mesh file="../../20.fr3/assets/link6_0.obj" />
+    <mesh file="../../20.fr3/assets/link6_1.obj" />
+    <mesh file="../../20.fr3/assets/link6_2.obj" />
+    <mesh file="../../20.fr3/assets/link6_3.obj" />
+    <mesh file="../../20.fr3/assets/link6_4.obj" />
+    <mesh file="../../20.fr3/assets/link6_5.obj" />
+    <mesh file="../../20.fr3/assets/link6_6.obj" />
+    <mesh file="../../20.fr3/assets/link6_7.obj" />
+    <mesh file="../../20.fr3/assets/link7_0.obj" />
+    <mesh file="../../20.fr3/assets/link7_1.obj" />
+    <mesh file="../../20.fr3/assets/link7_2.obj" />
+    <mesh file="../../20.fr3/assets/link7_3.obj" />
+
+    <mesh name="link0_coll" file="../../20.fr3/assets/link0.stl" />
+    <mesh name="link1_coll" file="../../20.fr3/assets/link1.stl" />
+    <mesh name="link2_coll" file="../../20.fr3/assets/link2.stl" />
+    <mesh name="link3_coll" file="../../20.fr3/assets/link3.stl" />
+    <mesh name="link4_coll" file="../../20.fr3/assets/link4.stl" />
+    <mesh name="link5_coll" file="../../20.fr3/assets/link5.stl" />
+    <mesh name="link6_coll" file="../../20.fr3/assets/link6.stl" />
+    <mesh name="link7_coll" file="../../20.fr3/assets/link7.stl" />
+
+    <mesh name="hand_c" file="../../20.fr3/assets/hand.stl" />
+    <mesh file="../../20.fr3/assets/hand_0.obj" />
+    <mesh file="../../20.fr3/assets/hand_1.obj" />
+    <mesh file="../../20.fr3/assets/hand_2.obj" />
+    <mesh file="../../20.fr3/assets/hand_3.obj" />
+    <mesh file="../../20.fr3/assets/hand_4.obj" />
+    <mesh file="../../20.fr3/assets/finger_0.obj" />
+    <mesh file="../../20.fr3/assets/finger_1.obj" />
+
+    <!-- Piper meshes -->
+    <mesh file="../../22.piper/assets/link2_0.obj" />
+    <mesh file="../../22.piper/assets/link2_1.obj" />
+    <mesh file="../../22.piper/assets/link2_2.obj" />
+    <mesh file="../../22.piper/assets/link2_3.obj" />
+    <mesh file="../../22.piper/assets/link2_4.obj" />
+    <mesh file="../../22.piper/assets/link2_5.obj" />
+    <mesh file="../../22.piper/assets/link2_6.obj" />
+    <mesh file="../../22.piper/assets/link2_7.obj" />
+    <mesh file="../../22.piper/assets/link2_8.obj" />
+    <mesh file="../../22.piper/assets/link2_9.obj" />
+    <mesh file="../../22.piper/assets/link2_10.obj" />
+    <mesh file="../../22.piper/assets/link2_11.obj" />
+    <mesh file="../../22.piper/assets/link2_12.obj" />
+    <mesh file="../../22.piper/assets/link2_13.obj" />
+    <mesh file="../../22.piper/assets/link2_14.obj" />
+    <mesh file="../../22.piper/assets/link2_15.obj" />
+    <mesh file="../../22.piper/assets/link2_16.obj" />
+    <mesh file="../../22.piper/assets/link2_17.obj" />
+    <mesh file="../../22.piper/assets/link2_18.obj" />
+    <mesh file="../../22.piper/assets/link2_19.obj" />
+    <mesh file="../../22.piper/assets/link2_20.obj" />
+    <mesh file="../../22.piper/assets/link2_21.obj" />
+    <mesh file="../../22.piper/assets/link2_22.obj" />
+    <mesh file="../../22.piper/assets/link2_23.obj" />
+    <mesh file="../../22.piper/assets/link2_24.obj" />
+    <mesh file="../../22.piper/assets/link2_25.obj" />
+    <mesh file="../../22.piper/assets/link2_26.obj" />
+    <mesh file="../../22.piper/assets/link2_27.obj" />
+    <mesh file="../../22.piper/assets/link2_28.obj" />
+    <mesh file="../../22.piper/assets/link2_29.obj" />
+    <mesh file="../../22.piper/assets/link2_30.obj" />
+    <mesh file="../../22.piper/assets/link2_31.obj" />
+    <mesh name="piper_link3_0" file="../../22.piper/assets/link3_0.obj" />
+    <mesh name="piper_link3_1" file="../../22.piper/assets/link3_1.obj" />
+    <mesh file="../../22.piper/assets/link3_2.obj" />
+    <mesh file="../../22.piper/assets/link3_3.obj" />
+    <mesh file="../../22.piper/assets/link3_4.obj" />
+    <mesh file="../../22.piper/assets/link3_5.obj" />
+    <mesh file="../../22.piper/assets/link3_7.obj" />
+    <mesh file="../../22.piper/assets/link3_8.obj" />
+    <mesh file="../../22.piper/assets/link3_9.obj" />
+    <mesh file="../../22.piper/assets/link3_10.obj" />
+    <mesh file="../../22.piper/assets/link3_11.obj" />
+    <mesh file="../../22.piper/assets/link3_12.obj" />
+    <mesh file="../../22.piper/assets/link3_13.obj" />
+    <mesh file="../../22.piper/assets/link3_14.obj" />
+    <mesh file="../../22.piper/assets/link3_15.obj" />
+    <mesh file="../../22.piper/assets/link3_16.obj" />
+    <mesh file="../../22.piper/assets/link3_17.obj" />
+    <mesh file="../../22.piper/assets/link3_18.obj" />
+    <mesh file="../../22.piper/assets/link3_19.obj" />
+    <mesh file="../../22.piper/assets/link3_20.obj" />
+    <mesh file="../../22.piper/assets/link3_21.obj" />
+    <mesh file="../../22.piper/assets/link3_22.obj" />
+    <mesh file="../../22.piper/assets/link3_23.obj" />
+    <mesh file="../../22.piper/assets/link3_24.obj" />
+    <mesh file="../../22.piper/assets/link3_25.obj" />
+    <mesh file="../../22.piper/assets/link3_26.obj" />
+    <mesh file="../../22.piper/assets/link3_27.obj" />
+    <mesh file="../../22.piper/assets/link3_28.obj" />
+    <mesh file="../../22.piper/assets/link4_2.obj" />
+    <mesh file="../../22.piper/assets/link4_3.obj" />
+    <mesh file="../../22.piper/assets/link4_4.obj" />
+    <mesh file="../../22.piper/assets/link4_5.obj" />
+    <mesh file="../../22.piper/assets/link4_6.obj" />
+    <mesh name="piper_link5_2" file="../../22.piper/assets/link5_2.obj" />
+    <mesh file="../../22.piper/assets/link5_3.obj" />
+    <mesh file="../../22.piper/assets/link5_4.obj" />
+    <mesh file="../../22.piper/assets/link5_5.obj" />
+    <mesh file="../../22.piper/assets/link5_6.obj" />
+    <mesh file="../../22.piper/assets/link5_7.obj" />
+    <mesh file="../../22.piper/assets/link5_8.obj" />
+    <mesh name="base_link" file="../../22.piper/assets/base_link.stl" />
+    <mesh name="piper_link1" file="../../22.piper/assets/link1.stl" />
+    <mesh name="piper_link2" file="../../22.piper/assets/link2.stl" />
+    <mesh name="piper_link2_gray" file="../../22.piper/assets/link2_gray.stl" />
+    <mesh name="piper_link3" file="../../22.piper/assets/link3.stl" />
+    <mesh name="piper_link4" file="../../22.piper/assets/link4.stl" />
+    <mesh name="piper_link5" file="../../22.piper/assets/link5.stl" />
+    <mesh file="../../22.piper/assets/link6.stl" />
+    <mesh file="../../22.piper/assets/link7.stl" />
+    <mesh file="../../22.piper/assets/link8.stl" />
+    <mesh name="wrist_camera" file="../../22.piper/assets/Wrist_Camera.stl" />
+
+    <!-- RM75 meshes -->
+    <mesh name="base_link_rm75" file="../../23.rm75/assets/base_link.STL" />
+    <mesh name="link1_rm75" file="../../23.rm75/assets/link1.STL" />
+    <mesh name="link2_rm75" file="../../23.rm75/assets/link2.STL" />
+    <mesh name="link3_rm75" file="../../23.rm75/assets/link3.STL" />
+    <mesh name="link4_rm75" file="../../23.rm75/assets/link4.STL" />
+    <mesh name="link5_rm75" file="../../23.rm75/assets/link5.STL" />
+    <mesh name="link6_rm75" file="../../23.rm75/assets/link6.STL" />
+    <mesh name="link7_rm75" file="../../23.rm75/assets/link7.STL" />
+
+    <!-- UR5e meshes -->
+    <mesh name="base_0" file="../../21.ur5e/assets/base_0.obj" />
+    <mesh name="base_1" file="../../21.ur5e/assets/base_1.obj" />
+    <mesh name="shoulder_0" file="../../21.ur5e/assets/shoulder_0.obj" />
+    <mesh name="shoulder_1" file="../../21.ur5e/assets/shoulder_1.obj" />
+    <mesh name="shoulder_2" file="../../21.ur5e/assets/shoulder_2.obj" />
+    <mesh name="upperarm_0" file="../../21.ur5e/assets/upperarm_0.obj" />
+    <mesh name="upperarm_1" file="../../21.ur5e/assets/upperarm_1.obj" />
+    <mesh name="upperarm_2" file="../../21.ur5e/assets/upperarm_2.obj" />
+    <mesh name="upperarm_3" file="../../21.ur5e/assets/upperarm_3.obj" />
+    <mesh name="forearm_0" file="../../21.ur5e/assets/forearm_0.obj" />
+    <mesh name="forearm_1" file="../../21.ur5e/assets/forearm_1.obj" />
+    <mesh name="forearm_2" file="../../21.ur5e/assets/forearm_2.obj" />
+    <mesh name="forearm_3" file="../../21.ur5e/assets/forearm_3.obj" />
+    <mesh name="wrist1_0" file="../../21.ur5e/assets/wrist1_0.obj" />
+    <mesh name="wrist1_1" file="../../21.ur5e/assets/wrist1_1.obj" />
+    <mesh name="wrist1_2" file="../../21.ur5e/assets/wrist1_2.obj" />
+    <mesh name="wrist2_0" file="../../21.ur5e/assets/wrist2_0.obj" />
+    <mesh name="wrist2_1" file="../../21.ur5e/assets/wrist2_1.obj" />
+    <mesh name="wrist2_2" file="../../21.ur5e/assets/wrist2_2.obj" />
+    <mesh name="wrist3" file="../../21.ur5e/assets/wrist3.obj" />
+
+    <!-- 2F85 Gripper meshes for RM75 and UR5e -->
+    <mesh name="base_mount" file="../../../2.end_effector/11.robotiq/assets/base_mount.stl" scale="0.001 0.001 0.001" />
+    <mesh name="2f85base" file="../../../2.end_effector/11.robotiq/assets/2f85base.stl" scale="0.001 0.001 0.001" />
+    <mesh name="driver" file="../../../2.end_effector/11.robotiq/assets/driver.stl" scale="0.001 0.001 0.001" />
+    <mesh name="coupler" file="../../../2.end_effector/11.robotiq/assets/coupler.stl" scale="0.001 0.001 0.001" />
+    <mesh name="follower" file="../../../2.end_effector/11.robotiq/assets/follower.stl" scale="0.001 0.001 0.001" />
+    <mesh name="pad" file="../../../2.end_effector/11.robotiq/assets/pad.stl" scale="0.001 0.001 0.001" />
+    <mesh name="silicone_pad" file="../../../2.end_effector/11.robotiq/assets/silicone_pad.stl" scale="0.001 0.001 0.001" />
+    <mesh name="spring_link" file="../../../2.end_effector/11.robotiq/assets/spring_link.stl" scale="0.001 0.001 0.001" />
+  </asset>
+
+  <worldbody>
+    <light pos="0 0.1 2.5" />
+    <geom type="cylinder" size="0.002 0.05" rgba="1 0 0 1" pos="0.05 -0.0 0." euler="0 1.57079 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.05" rgba="0 1 0 1" pos="0 0.05 0." euler="1.57079 0 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.05" rgba="0 0 1 1" pos="0 -0.0 0.05" euler="0 0 0" class="visual" />
+    <geom name="floor" size="0 10 0.125" type="plane" material="groundplane" conaffinity="7" condim="3" friction="1" />
+    <light pos="0 0 10" dir="0 0 -1" directional="true" />
+
+    <!-- Table 1 -->
+    <geom mesh="tabletop" material="table" class="visual" pos="0.3 -0.2 0" euler="0 0 1.57079" />
+    <geom mesh="tablelegs" material="table" class="visual" pos="0.3 -0.2 0" euler="0 0 1.57079" />
+    <geom name="table1_collision" pos="0 -0.2 0.65" size="0.37 1.50 0.1" type="box" class="collision" />
+
+    <!-- Table 2 -->
+    <geom mesh="tabletop" material="table" class="visual" pos="4.3 -0.3 0" euler="0 0 1.57079" />
+    <geom mesh="tablelegs" material="table" class="visual" pos="4.3 -0.3 0" euler="0 0 1.57079" />
+    <geom name="table2_collision" pos="4 -0.3 0.65" size="0.61 0.37 0.1" type="box" class="collision" />
+
+    <!-- Table 3 -->
+    <geom mesh="tabletop" material="table" class="visual" pos="8.3 -0.3 0" euler="0 0 1.57079" />
+    <geom mesh="tablelegs" material="table" class="visual" pos="8.3 -0.3 0" euler="0 0 1.57079" />
+    <geom name="table3_collision" pos="8 -0.3 0.65" size="0.61 0.37 0.1" type="box" class="collision" />
+
+    <!-- Table 4 -->
+    <geom mesh="tabletop" material="table" class="visual" pos="12.3 -0.3 0" euler="0 0 1.57079" />
+    <geom mesh="tablelegs" material="table" class="visual" pos="12.3 -0.3 0" euler="0 0 1.57079" />
+    <geom name="table4_collision" pos="12 -0.3 0.65" size="0.61 0.37 0.1" type="box" class="collision" />
+
+    <!-- Camera for Franka FR3 robot -->
+    <camera name="camera_franka" mode="fixed" pos="0.3 1.05 2.2" xyaxes="-1.000 0.00 0.000 -0.00 -0.683 0.731" />
+
+    <!-- Camera for UR5e robot -->
+    <camera name="camera_ur5e" mode="fixed" pos="4.3 1.05 2.2" xyaxes="-1.000 0.00 0.000 -0.00 -0.683 0.731" />
+
+    <!-- Camera for Piper robot -->
+    <camera name="camera_piper" mode="fixed" pos="8.3 1.05 2.2" xyaxes="-1.000 0.00 0.000 -0.00 -0.683 0.731" />
+
+    <!-- Camera for RM75 robot -->
+    <camera name="camera_rm75" mode="fixed" pos="12.3 1.05 2.2" xyaxes="-1.000 0.00 0.000 -0.00 -0.683 0.731" />
+
+    <!-- FR3 robots on table 1 -->
+    <camera pos="0.350 1.500 1.500" xyaxes="-1.000 0.000 -0.000 -0.000 -0.237 0.972" />
+
+    <body name="fr3_base" pos="0.7 0 0.75" euler="0 0 -1.57079">
+      <body name="fr3_link0" childclass="fr3">
+        <geom mesh="link0_0" material="black" class="visual" />
+        <geom mesh="link0_1" material="white" class="visual" />
+        <geom mesh="link0_2" material="white" class="visual" />
+        <geom mesh="link0_3" material="white" class="visual" />
+        <geom mesh="link0_4" material="white" class="visual" />
+        <geom mesh="link0_5" material="red" class="visual" />
+        <geom mesh="link0_6" material="black" class="visual" />
+        <geom name="fr3_link0_collision" mesh="link0_coll" class="collision" />
+        <body name="fr3_link1" pos="0 0 0.333">
+          <inertial pos="4.128e-07 -0.0181251 -0.0386036" quat="0.999901 0.0021545 0.00429041 0.0132325" mass="2.92747" diaginertia="0.0186043 0.0181194 0.00538716" />
+          <joint name="franka_fr3_joint1" axis="0 0 1" range="-2.7437 2.7437" actuatorfrcrange="-87 87" />
+          <geom name="fr3_link1_collision" class="collision" mesh="link1_coll" />
+          <geom material="white" mesh="link1" class="visual" />
+          <body name="fr3_link2" quat="1 -1 0 0">
+            <inertial pos="0.00318289 -0.0743222 0.00881461" quat="0.356855 0.680818 -0.434812 0.469126" mass="2.93554" diaginertia="0.0299291 0.0299291 0.0299291" />
+            <joint name="franka_fr3_joint2" axis="0 0 1" range="-1.7837 1.7837" actuatorfrcrange="-87 87" />
+            <geom material="white" mesh="link2.obj" class="visual" />
+            <geom name="fr3_link2_collision" class="collision" mesh="link2_coll" />
+            <body name="fr3_link3" pos="0 -0.316 0" quat="1 1 0 0">
+              <inertial pos="0.0407016 -0.00482006 -0.0289731" quat="0.950032 -0.148357 0.229935 0.150201" mass="2.2449" diaginertia="0.0140109 0.0140109 0.0140109" />
+              <joint name="franka_fr3_joint3" axis="0 0 1" range="-2.9007 2.9007" actuatorfrcrange="-87 87" />
+              <geom mesh="link3_0" material="white" class="visual" />
+              <geom mesh="link3_1" material="black" class="visual" />
+              <geom name="fr3_link3_collision" class="collision" mesh="link3_coll" />
+              <body name="fr3_link4" pos="0.0825 0 0" quat="1 1 0 0">
+                <inertial pos="-0.0459101 0.0630493 -0.00851879" quat="0.23761 0.892458 -0.00078702 0.383484" mass="2.6156" diaginertia="0.0206104 0.0206104 0.0206104" />
+                <joint name="franka_fr3_joint4" axis="0 0 1" range="-3.0421 -0.1518" actuatorfrcrange="-87 87" />
+                <geom mesh="link4_0" material="white" class="visual" />
+                <geom mesh="link4_1" material="black" class="visual" />
+                <geom name="fr3_link4_collision" class="collision" mesh="link4_coll" />
+                <body name="fr3_link5" pos="-0.0825 0.384 0" quat="1 -1 0 0">
+                  <inertial pos="-0.00160396 0.0292536 -0.0972966" quat="0.922285 0.098826 0.0982562 -0.360514" mass="2.32712" diaginertia="0.0182879 0.0182879 0.0182879" />
+                  <joint name="franka_fr3_joint5" axis="0 0 1" range="-2.8065 2.8065" actuatorfrcrange="-12 12" />
+                  <geom mesh="link5_0" material="white" class="visual" />
+                  <geom mesh="link5_1" material="white" class="visual" />
+                  <geom mesh="link5_2" material="black" class="visual" />
+                  <geom name="fr3_link5_collision" class="collision" mesh="link5_coll" />
+                  <body name="fr3_link6" quat="1 1 0 0">
+                    <inertial pos="0.0597131 -0.0410295 -0.0101693" quat="0.593933 0.525442 0.520644 0.316361" mass="1.81704" diaginertia="0.00483538 0.00483538 0.00483538" />
+                    <joint name="franka_fr3_joint6" axis="0 0 1" range="0.5445 4.5169" actuatorfrcrange="-12 12" />
+                    <geom mesh="link6_0" material="button_green" class="visual" />
+                    <geom mesh="link6_1" material="white" class="visual" />
+                    <geom mesh="link6_2" material="white" class="visual" />
+                    <geom mesh="link6_3" material="gray" class="visual" />
+                    <geom mesh="link6_4" material="button_red" class="visual" />
+                    <geom mesh="link6_5" material="white" class="visual" />
+                    <geom mesh="link6_6" material="black" class="visual" />
+                    <geom mesh="link6_7" material="button_blue" class="visual" />
+                    <geom name="fr3_link6_collision" class="collision" mesh="link6_coll" />
+                    <body name="fr3_link7" pos="0.088 0 0" quat="1 1 0 0">
+                      <inertial pos="0.00452258 0.00862619 -0.0161633" quat="0.120255 0.394761 -0.799132 0.437139" mass="0.627143" diaginertia="3.076e-07 3.076e-07 3.076e-07" />
+                      <joint name="franka_fr3_joint7" axis="0 0 1" range="-3.0159 3.0159" actuatorfrcrange="-12 12" />
+                      <geom mesh="link7_0" material="black" class="visual" />
+                      <geom mesh="link7_1" material="white" class="visual" />
+                      <geom mesh="link7_2" material="white" class="visual" />
+                      <geom mesh="link7_3" material="black" class="visual" />
+                      <geom name="fr3_link7_collision" class="collision" mesh="link7_coll" />
+                      <body name="hand" pos="0 0 0.107" quat="0.9238795 0 0 -0.3826834">
+                        <inertial mass="0.73" pos="-0.01 0 0.03" diaginertia="0.001 0.0025 0.0017" />
+                        <geom mesh="hand_0" material="off_white" class="visual" />
+                        <geom mesh="hand_1" material="black" class="visual" />
+                        <geom mesh="hand_2" material="black" class="visual" />
+                        <geom mesh="hand_3" material="white" class="visual" />
+                        <geom mesh="hand_4" material="off_white" class="visual" />
+                        <geom mesh="hand_c" class="collision" />
+                        <body name="left_finger" pos="0 0 0.0584">
+                          <inertial mass="0.015" pos="0 0 0" diaginertia="2.375e-6 2.375e-6 7.5e-7" />
+                          <joint name="franka_fr3_finger_joint1" class="fr3_finger" />
+                          <geom mesh="finger_0" material="off_white" class="visual" />
+                          <geom mesh="finger_1" material="black" class="visual" />
+                          <geom mesh="finger_0" class="collision" />
+                          <geom class="fingertip_pad_collision_1" />
+                          <geom class="fingertip_pad_collision_2" />
+                          <geom class="fingertip_pad_collision_3" />
+                          <geom class="fingertip_pad_collision_4" />
+                          <geom class="fingertip_pad_collision_5" />
+                          <site name="EE" pos="0.0 0 0.1025" rgba="1 0 0 1" />
+                          <site name="ee_teleop_fr3_1" pos="0.0 0 0.05" euler="0 0 -1.57" rgba="1 0 0 1" />
+                        </body>
+                        <body name="right_finger" pos="0 0 0.0584" quat="0 0 0 1">
+                          <inertial mass="0.015" pos="0 0 0" diaginertia="2.375e-6 2.375e-6 7.5e-7" />
+                          <joint name="franka_fr3_finger_joint2" class="fr3_finger" />
+                          <geom mesh="finger_0" material="off_white" class="visual" />
+                          <geom mesh="finger_1" material="black" class="visual" />
+                          <geom mesh="finger_0" class="collision" />
+                          <geom class="fingertip_pad_collision_1" />
+                          <geom class="fingertip_pad_collision_2" />
+                          <geom class="fingertip_pad_collision_3" />
+                          <geom class="fingertip_pad_collision_4" />
+                          <geom class="fingertip_pad_collision_5" />
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- Second FR3 robot on table 2 -->
+    <body name="fr3_base_2" pos="0 0 0.75" euler="0 0 -1.57079">
+      <body name="fr3_link0_2" childclass="fr3">
+        <geom mesh="link0_0" material="black" class="visual" />
+        <geom mesh="link0_1" material="white" class="visual" />
+        <geom mesh="link0_2" material="white" class="visual" />
+        <geom mesh="link0_3" material="white" class="visual" />
+        <geom mesh="link0_4" material="white" class="visual" />
+        <geom mesh="link0_5" material="red" class="visual" />
+        <geom mesh="link0_6" material="black" class="visual" />
+        <geom name="fr3_link0_collision_2" mesh="link0_coll" class="collision" />
+        <body name="fr3_link1_2" pos="0 0 0.333">
+          <inertial pos="4.128e-07 -0.0181251 -0.0386036" quat="0.999901 0.0021545 0.00429041 0.0132325" mass="2.92747" diaginertia="0.0186043 0.0181194 0.00538716" />
+          <joint name="franka_fr3_joint1_2" axis="0 0 1" range="-2.7437 2.7437" actuatorfrcrange="-87 87" />
+          <geom name="fr3_link1_collision_2" class="collision" mesh="link1_coll" />
+          <geom material="white" mesh="link1" class="visual" />
+          <body name="fr3_link2_2" quat="1 -1 0 0">
+            <inertial pos="0.00318289 -0.0743222 0.00881461" quat="0.356855 0.680818 -0.434812 0.469126" mass="2.93554" diaginertia="0.0299291 0.0299291 0.0299291" />
+            <joint name="franka_fr3_joint2_2" axis="0 0 1" range="-1.7837 1.7837" actuatorfrcrange="-87 87" />
+            <geom material="white" mesh="link2.obj" class="visual" />
+            <geom name="fr3_link2_collision_2" class="collision" mesh="link2_coll" />
+            <body name="fr3_link3_2" pos="0 -0.316 0" quat="1 1 0 0">
+              <inertial pos="0.0407016 -0.00482006 -0.0289731" quat="0.950032 -0.148357 0.229935 0.150201" mass="2.2449" diaginertia="0.0140109 0.0140109 0.0140109" />
+              <joint name="franka_fr3_joint3_2" axis="0 0 1" range="-2.9007 2.9007" actuatorfrcrange="-87 87" />
+              <geom mesh="link3_0" material="white" class="visual" />
+              <geom mesh="link3_1" material="black" class="visual" />
+              <geom name="fr3_link3_collision_2" class="collision" mesh="link3_coll" />
+              <body name="fr3_link4_2" pos="0.0825 0 0" quat="1 1 0 0">
+                <inertial pos="-0.0459101 0.0630493 -0.00851879" quat="0.23761 0.892458 -0.00078702 0.383484" mass="2.6156" diaginertia="0.0206104 0.0206104 0.0206104" />
+                <joint name="franka_fr3_joint4_2" axis="0 0 1" range="-3.0421 -0.1518" actuatorfrcrange="-87 87" />
+                <geom mesh="link4_0" material="white" class="visual" />
+                <geom mesh="link4_1" material="black" class="visual" />
+                <geom name="fr3_link4_collision_2" class="collision" mesh="link4_coll" />
+                <body name="fr3_link5_2" pos="-0.0825 0.384 0" quat="1 -1 0 0">
+                  <inertial pos="-0.00160396 0.0292536 -0.0972966" quat="0.922285 0.098826 0.0982562 -0.360514" mass="2.32712" diaginertia="0.0182879 0.0182879 0.0182879" />
+                  <joint name="franka_fr3_joint5_2" axis="0 0 1" range="-2.8065 2.8065" actuatorfrcrange="-12 12" />
+                  <geom mesh="link5_0" material="white" class="visual" />
+                  <geom mesh="link5_1" material="white" class="visual" />
+                  <geom mesh="link5_2" material="black" class="visual" />
+                  <geom name="fr3_link5_collision_2" class="collision" mesh="link5_coll" />
+                  <body name="fr3_link6_2" quat="1 1 0 0">
+                    <inertial pos="0.0597131 -0.0410295 -0.0101693" quat="0.593933 0.525442 0.520644 0.316361" mass="1.81704" diaginertia="0.00483538 0.00483538 0.00483538" />
+                    <joint name="franka_fr3_joint6_2" axis="0 0 1" range="0.5445 4.5169" actuatorfrcrange="-12 12" />
+                    <geom mesh="link6_0" material="button_green" class="visual" />
+                    <geom mesh="link6_1" material="white" class="visual" />
+                    <geom mesh="link6_2" material="white" class="visual" />
+                    <geom mesh="link6_3" material="gray" class="visual" />
+                    <geom mesh="link6_4" material="button_red" class="visual" />
+                    <geom mesh="link6_5" material="white" class="visual" />
+                    <geom mesh="link6_6" material="black" class="visual" />
+                    <geom mesh="link6_7" material="button_blue" class="visual" />
+                    <geom name="fr3_link6_collision_2" class="collision" mesh="link6_coll" />
+                    <body name="fr3_link7_2" pos="0.088 0 0" quat="1 1 0 0">
+                      <inertial pos="0.00452258 0.00862619 -0.0161633" quat="0.120255 0.394761 -0.799132 0.437139" mass="0.627143" diaginertia="3.076e-07 3.076e-07 3.076e-07" />
+                      <joint name="franka_fr3_joint7_2" axis="0 0 1" range="-3.0159 3.0159" actuatorfrcrange="-12 12" />
+                      <geom mesh="link7_0" material="black" class="visual" />
+                      <geom mesh="link7_1" material="white" class="visual" />
+                      <geom mesh="link7_2" material="white" class="visual" />
+                      <geom mesh="link7_3" material="black" class="visual" />
+                      <geom name="fr3_link7_collision_2" class="collision" mesh="link7_coll" />
+                      <body name="hand_2" pos="0 0 0.107" quat="0.9238795 0 0 -0.3826834">
+                        <inertial mass="0.73" pos="-0.01 0 0.03" diaginertia="0.001 0.0025 0.0017" />
+                        <geom mesh="hand_0" material="off_white" class="visual" />
+                        <geom mesh="hand_1" material="black" class="visual" />
+                        <geom mesh="hand_2" material="black" class="visual" />
+                        <geom mesh="hand_3" material="white" class="visual" />
+                        <geom mesh="hand_4" material="off_white" class="visual" />
+                        <geom mesh="hand_c" class="collision" />
+                        <body name="left_finger_2" pos="0 0 0.0584">
+                          <inertial mass="0.015" pos="0 0 0" diaginertia="2.375e-6 2.375e-6 7.5e-7" />
+                          <joint name="franka_fr3_finger_joint1_2" class="fr3_finger" />
+                          <geom mesh="finger_0" material="off_white" class="visual" />
+                          <geom mesh="finger_1" material="black" class="visual" />
+                          <geom mesh="finger_0" class="collision" />
+                          <geom class="fingertip_pad_collision_1" />
+                          <geom class="fingertip_pad_collision_2" />
+                          <geom class="fingertip_pad_collision_3" />
+                          <geom class="fingertip_pad_collision_4" />
+                          <geom class="fingertip_pad_collision_5" />
+                          <site name="EE_2" pos="0.0 0 0.1025" rgba="1 0 0 1" />
+                          <site name="ee_teleop_fr3_2" pos="0.0 0 0.05" euler="0 0 -1.57" rgba="1 0 0 1" />
+                        </body>
+                        <body name="right_finger_2" pos="0 0 0.0584" quat="0 0 0 1">
+                          <inertial mass="0.015" pos="0 0 0" diaginertia="2.375e-6 2.375e-6 7.5e-7" />
+                          <joint name="franka_fr3_finger_joint2_2" class="fr3_finger" />
+                          <geom mesh="finger_0" material="off_white" class="visual" />
+                          <geom mesh="finger_1" material="black" class="visual" />
+                          <geom mesh="finger_0" class="collision" />
+                          <geom class="fingertip_pad_collision_1" />
+                          <geom class="fingertip_pad_collision_2" />
+                          <geom class="fingertip_pad_collision_3" />
+                          <geom class="fingertip_pad_collision_4" />
+                          <geom class="fingertip_pad_collision_5" />
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- UR5e robots with 2F85 grippers on table 3 -->
+    <body name="ur5e_base" pos="4.7 0 0.75" euler="0 0 -1.5708" childclass="ur5e">
+      <inertial mass="4.0" pos="0 0 0" diaginertia="0.00443333156 0.00443333156 0.0072" />
+      <geom mesh="base_0" material="black" class="visual" />
+      <geom mesh="base_1" material="jointgray" class="visual" />
+      <body name="ur5e_shoulder_link" pos="0 0 0.163">
+        <inertial mass="3.7" pos="0 0 0" diaginertia="0.0102675 0.0102675 0.00666" />
+        <joint name="ur5e_shoulder_pan_joint" class="size3" axis="0 0 1" />
+        <geom mesh="shoulder_0" material="urblue" class="visual" />
+        <geom mesh="shoulder_1" material="black" class="visual" />
+        <geom mesh="shoulder_2" material="jointgray" class="visual" />
+        <geom class="collision" size="0.06 0.06" pos="0 0 -0.04" />
+        <body name="ur5e_upper_arm_link" pos="0 0.138 0" quat="1 0 1 0">
+          <inertial mass="8.393" pos="0 0 0.2125" diaginertia="0.133886 0.133886 0.0151074" />
+          <joint name="ur5e_shoulder_lift_joint" class="size3" />
+          <geom mesh="upperarm_0" material="linkgray" class="visual" />
+          <geom mesh="upperarm_1" material="black" class="visual" />
+          <geom mesh="upperarm_2" material="jointgray" class="visual" />
+          <geom mesh="upperarm_3" material="urblue" class="visual" />
+          <geom class="collision" pos="0 -0.04 0" quat="1 1 0 0" size="0.06 0.06" />
+          <geom class="collision" size="0.05 0.2" pos="0 0 0.2" />
+          <body name="ur5e_forearm_link" pos="0 -0.131 0.425">
+            <inertial mass="2.275" pos="0 0 0.196" diaginertia="0.0311796 0.0311796 0.004095" />
+            <joint name="ur5e_elbow_joint" class="size3_limited" />
+            <geom mesh="forearm_0" material="urblue" class="visual" />
+            <geom mesh="forearm_1" material="linkgray" class="visual" />
+            <geom mesh="forearm_2" material="black" class="visual" />
+            <geom mesh="forearm_3" material="jointgray" class="visual" />
+            <geom class="collision" pos="0 0.08 0" quat="1 1 0 0" size="0.055 0.06" />
+            <geom class="collision" size="0.038 0.19" pos="0 0 0.2" />
+            <body name="ur5e_wrist_1_link" pos="0 0 0.392" quat="1 0 1 0">
+              <inertial mass="1.219" pos="0 0.127 0" diaginertia="0.0025599 0.0025599 0.0021942" />
+              <joint name="ur5e_wrist_1_joint" class="size1" />
+              <geom mesh="wrist1_0" material="black" class="visual" />
+              <geom mesh="wrist1_1" material="urblue" class="visual" />
+              <geom mesh="wrist1_2" material="jointgray" class="visual" />
+              <geom class="collision" pos="0 0.05 0" quat="1 1 0 0" size="0.04 0.07" />
+              <body name="ur5e_wrist_2_link" pos="0 0.127 0">
+                <inertial mass="1.219" pos="0 0 0.1" diaginertia="0.0025599 0.0025599 0.0021942" />
+                <joint name="ur5e_wrist_2_joint" axis="0 0 1" class="size1" />
+                <geom mesh="wrist2_0" material="black" class="visual" />
+                <geom mesh="wrist2_1" material="urblue" class="visual" />
+                <geom mesh="wrist2_2" material="jointgray" class="visual" />
+                <geom class="collision" size="0.04 0.06" pos="0 0 0.04" />
+                <geom class="collision" pos="0 0.02 0.1" quat="1 1 0 0" size="0.04 0.04" />
+                <body name="ur5e_wrist_3_link" pos="0 0 0.1">
+                  <inertial mass="0.1889" pos="0 0.0771683 0" quat="1 0 0 1" diaginertia="0.000132134 9.90863e-05 9.90863e-05" />
+                  <joint name="ur5e_wrist_3_joint" class="size1" />
+                  <geom material="linkgray" mesh="wrist3" class="visual" />
+                  <geom class="eef_collision" pos="0 0.08 0" quat="1 1 0 0" size="0.04 0.02" />
+                  <site name="ur5e_ee_teleop" pos="0 0.25 0" euler="-1.57 0 -1.57" size="0.01" />
+
+                  <body name="ur5e_base_mount" pos="0 0.1 0.007" quat="-1 1 0 0" childclass="2f85">
+                    <geom class="gripper_visual" mesh="base_mount" material="black" />
+                    <geom class="gripper_collision" mesh="base_mount" />
+                    <body name="ur5e_gripper_base" pos="0 0 0.0038" quat="1 0 0 -1">
+                      <inertial mass="0.777441" pos="0 -2.70394e-05 0.0354675" quat="1 -0.00152849 0 0" diaginertia="0.000260285 0.000225381 0.000152708" />
+                      <geom class="gripper_visual" mesh="2f85base" material="black" />
+                      <geom class="gripper_collision" mesh="2f85base" />
+
+                      <!-- Right-hand side 4-bar linkage -->
+                      <body name="ur5e_right_driver" pos="0 0.0306011 0.054904">
+                        <inertial mass="0.00899563" pos="2.96931e-12 0.0177547 0.00107314" quat="0.681301 0.732003 0 0" diaginertia="1.72352e-06 1.60906e-06 3.22006e-07" />
+                        <joint name="ur5e_right_driver_joint" class="driver" />
+                        <geom class="gripper_visual" mesh="driver" material="gray" />
+                        <geom class="gripper_collision" mesh="driver" />
+                        <body name="ur5e_right_coupler" pos="0 0.0315 -0.0041">
+                          <inertial mass="0.0140974" pos="0 0.00301209 0.0232175" quat="0.705636 -0.0455904 0.0455904 0.705636" diaginertia="4.16206e-06 3.52216e-06 8.88131e-07" />
+                          <joint name="ur5e_right_coupler_joint" class="coupler" />
+                          <geom class="gripper_visual" mesh="coupler" material="black" />
+                          <geom class="gripper_collision" mesh="coupler" />
+                        </body>
+                      </body>
+                      <body name="ur5e_right_spring_link" pos="0 0.0132 0.0609">
+                        <inertial mass="0.0221642" pos="-8.65005e-09 0.0181624 0.0212658" quat="0.663403 -0.244737 0.244737 0.663403" diaginertia="8.96853e-06 6.71733e-06 2.63931e-06" />
+                        <joint name="ur5e_right_spring_link_joint" class="spring_link" />
+                        <geom class="gripper_visual" mesh="spring_link" material="black" />
+                        <geom class="gripper_collision" mesh="spring_link" />
+                        <body name="ur5e_right_follower" pos="0 0.055 0.0375">
+                          <inertial mass="0.0125222" pos="0 -0.011046 0.0124786" quat="1 0.1664 0 0" diaginertia="2.67415e-06 2.4559e-06 6.02031e-07" />
+                          <joint name="ur5e_right_follower_joint" class="follower" />
+                          <geom class="gripper_visual" mesh="follower" material="black" />
+                          <geom class="gripper_collision" mesh="follower" />
+                          <body name="ur5e_right_pad" pos="0 -0.0189 0.01352">
+                            <geom class="pad_box1" name="ur5e_right_pad1" />
+                            <geom class="pad_box2" name="ur5e_right_pad2" />
+                            <inertial mass="0.0035" pos="0 -0.0025 0.0185" quat="0.707107 0 0 0.707107" diaginertia="4.73958e-07 3.64583e-07 1.23958e-07" />
+                            <geom class="gripper_visual" mesh="pad" />
+                            <body name="ur5e_right_silicone_pad">
+                              <geom class="gripper_visual" mesh="silicone_pad" material="black" />
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+
+                      <!-- Left-hand side 4-bar linkage -->
+                      <body name="ur5e_left_driver" pos="0 -0.0306011 0.054904" quat="0 0 0 1">
+                        <inertial mass="0.00899563" pos="0 0.0177547 0.00107314" quat="0.681301 0.732003 0 0" diaginertia="1.72352e-06 1.60906e-06 3.22006e-07" />
+                        <joint name="ur5e_left_driver_joint" class="driver" />
+                        <geom class="gripper_visual" mesh="driver" material="gray" />
+                        <geom class="gripper_collision" mesh="driver" />
+                        <body name="ur5e_left_coupler" pos="0 0.0315 -0.0041">
+                          <inertial mass="0.0140974" pos="0 0.00301209 0.0232175" quat="0.705636 -0.0455904 0.0455904 0.705636" diaginertia="4.16206e-06 3.52216e-06 8.88131e-07" />
+                          <joint name="ur5e_left_coupler_joint" class="coupler" />
+                          <geom class="gripper_visual" mesh="coupler" material="black" />
+                          <geom class="gripper_collision" mesh="coupler" />
+                        </body>
+                      </body>
+                      <body name="ur5e_left_spring_link" pos="0 -0.0132 0.0609" quat="0 0 0 1">
+                        <inertial mass="0.0221642" pos="-8.65005e-09 0.0181624 0.0212658" quat="0.663403 -0.244737 0.244737 0.663403" diaginertia="8.96853e-06 6.71733e-06 2.63931e-06" />
+                        <joint name="ur5e_left_spring_link_joint" class="spring_link" />
+                        <geom class="gripper_visual" mesh="spring_link" material="black" />
+                        <geom class="gripper_collision" mesh="spring_link" />
+                        <body name="ur5e_left_follower" pos="0 0.055 0.0375">
+                          <inertial mass="0.0125222" pos="0 -0.011046 0.0124786" quat="1 0.1664 0 0" diaginertia="2.67415e-06 2.4559e-06 6.02031e-07" />
+                          <joint name="ur5e_left_follower_joint" class="follower" />
+                          <geom class="gripper_visual" mesh="follower" material="black" />
+                          <geom class="gripper_collision" mesh="follower" />
+                          <body name="ur5e_left_pad" pos="0 -0.0189 0.01352">
+                            <geom class="pad_box1" name="ur5e_left_pad1" />
+                            <geom class="pad_box2" name="ur5e_left_pad2" />
+                            <inertial mass="0.0035" pos="0 -0.0025 0.0185" quat="1 0 0 1" diaginertia="4.73958e-07 3.64583e-07 1.23958e-07" />
+                            <geom class="gripper_visual" mesh="pad" />
+                            <body name="ur5e_left_silicone_pad">
+                              <geom class="gripper_visual" mesh="silicone_pad" material="black" />
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- Second UR5e robot with 2F85 gripper on table 4 -->
+    <body name="ur5e_base_2" pos="4.0 0 0.75" euler="0 0 -1.5708" childclass="ur5e">
+      <inertial mass="4.0" pos="0 0 0" diaginertia="0.00443333156 0.00443333156 0.0072" />
+      <geom mesh="base_0" material="black" class="visual" />
+      <geom mesh="base_1" material="jointgray" class="visual" />
+      <body name="ur5e_shoulder_link_2" pos="0 0 0.163">
+        <inertial mass="3.7" pos="0 0 0" diaginertia="0.0102675 0.0102675 0.00666" />
+        <joint name="ur5e_shoulder_pan_joint_2" class="size3" axis="0 0 1" />
+        <geom mesh="shoulder_0" material="urblue" class="visual" />
+        <geom mesh="shoulder_1" material="black" class="visual" />
+        <geom mesh="shoulder_2" material="jointgray" class="visual" />
+        <geom class="collision" size="0.06 0.06" pos="0 0 -0.04" />
+        <body name="ur5e_upper_arm_link_2" pos="0 0.138 0" quat="1 0 1 0">
+          <inertial mass="8.393" pos="0 0 0.2125" diaginertia="0.133886 0.133886 0.0151074" />
+          <joint name="ur5e_shoulder_lift_joint_2" class="size3" />
+          <geom mesh="upperarm_0" material="linkgray" class="visual" />
+          <geom mesh="upperarm_1" material="black" class="visual" />
+          <geom mesh="upperarm_2" material="jointgray" class="visual" />
+          <geom mesh="upperarm_3" material="urblue" class="visual" />
+          <geom class="collision" pos="0 -0.04 0" quat="1 1 0 0" size="0.06 0.06" />
+          <geom class="collision" size="0.05 0.2" pos="0 0 0.2" />
+          <body name="ur5e_forearm_link_2" pos="0 -0.131 0.425">
+            <inertial mass="2.275" pos="0 0 0.196" diaginertia="0.0311796 0.0311796 0.004095" />
+            <joint name="ur5e_elbow_joint_2" class="size3_limited" />
+            <geom mesh="forearm_0" material="urblue" class="visual" />
+            <geom mesh="forearm_1" material="linkgray" class="visual" />
+            <geom mesh="forearm_2" material="black" class="visual" />
+            <geom mesh="forearm_3" material="jointgray" class="visual" />
+            <geom class="collision" pos="0 0.08 0" quat="1 1 0 0" size="0.055 0.06" />
+            <geom class="collision" size="0.038 0.19" pos="0 0 0.2" />
+            <body name="ur5e_wrist_1_link_2" pos="0 0 0.392" quat="1 0 1 0">
+              <inertial mass="1.219" pos="0 0.127 0" diaginertia="0.0025599 0.0025599 0.0021942" />
+              <joint name="ur5e_wrist_1_joint_2" class="size1" />
+              <geom mesh="wrist1_0" material="black" class="visual" />
+              <geom mesh="wrist1_1" material="urblue" class="visual" />
+              <geom mesh="wrist1_2" material="jointgray" class="visual" />
+              <geom class="collision" pos="0 0.05 0" quat="1 1 0 0" size="0.04 0.07" />
+              <body name="ur5e_wrist_2_link_2" pos="0 0.127 0">
+                <inertial mass="1.219" pos="0 0 0.1" diaginertia="0.0025599 0.0025599 0.0021942" />
+                <joint name="ur5e_wrist_2_joint_2" axis="0 0 1" class="size1" />
+                <geom mesh="wrist2_0" material="black" class="visual" />
+                <geom mesh="wrist2_1" material="urblue" class="visual" />
+                <geom mesh="wrist2_2" material="jointgray" class="visual" />
+                <geom class="collision" size="0.04 0.06" pos="0 0 0.04" />
+                <geom class="collision" pos="0 0.02 0.1" quat="1 1 0 0" size="0.04 0.04" />
+                <body name="ur5e_wrist_3_link_2" pos="0 0 0.1">
+                  <inertial mass="0.1889" pos="0 0.0771683 0" quat="1 0 0 1" diaginertia="0.000132134 9.90863e-05 9.90863e-05" />
+                  <joint name="ur5e_wrist_3_joint_2" class="size1" />
+                  <geom material="linkgray" mesh="wrist3" class="visual" />
+                  <geom class="eef_collision" pos="0 0.08 0" quat="1 1 0 0" size="0.04 0.02" />
+                  <site name="ur5e_ee_teleop_2" pos="0 0.25 0" euler="-1.57 0 -1.57" size="0.01" />
+
+                  <body name="ur5e_base_mount_2" pos="0 0.1 0.007" quat="-1 1 0 0" childclass="2f85">
+                    <geom class="gripper_visual" mesh="base_mount" material="black" />
+                    <geom class="gripper_collision" mesh="base_mount" />
+                    <body name="ur5e_gripper_base_2" pos="0 0 0.0038" quat="1 0 0 -1">
+                      <inertial mass="0.777441" pos="0 -2.70394e-05 0.0354675" quat="1 -0.00152849 0 0" diaginertia="0.000260285 0.000225381 0.000152708" />
+                      <geom class="gripper_visual" mesh="2f85base" material="black" />
+                      <geom class="gripper_collision" mesh="2f85base" />
+
+                      <!-- Right-hand side 4-bar linkage -->
+                      <body name="ur5e_right_driver_2" pos="0 0.0306011 0.054904">
+                        <inertial mass="0.00899563" pos="2.96931e-12 0.0177547 0.00107314" quat="0.681301 0.732003 0 0" diaginertia="1.72352e-06 1.60906e-06 3.22006e-07" />
+                        <joint name="ur5e_right_driver_joint_2" class="driver" />
+                        <geom class="gripper_visual" mesh="driver" material="gray" />
+                        <geom class="gripper_collision" mesh="driver" />
+                        <body name="ur5e_right_coupler_2" pos="0 0.0315 -0.0041">
+                          <inertial mass="0.0140974" pos="0 0.00301209 0.0232175" quat="0.705636 -0.0455904 0.0455904 0.705636" diaginertia="4.16206e-06 3.52216e-06 8.88131e-07" />
+                          <joint name="ur5e_right_coupler_joint_2" class="coupler" />
+                          <geom class="gripper_visual" mesh="coupler" material="black" />
+                          <geom class="gripper_collision" mesh="coupler" />
+                        </body>
+                      </body>
+                      <body name="ur5e_right_spring_link_2" pos="0 0.0132 0.0609">
+                        <inertial mass="0.0221642" pos="-8.65005e-09 0.0181624 0.0212658" quat="0.663403 -0.244737 0.244737 0.663403" diaginertia="8.96853e-06 6.71733e-06 2.63931e-06" />
+                        <joint name="ur5e_right_spring_link_joint_2" class="spring_link" />
+                        <geom class="gripper_visual" mesh="spring_link" material="black" />
+                        <geom class="gripper_collision" mesh="spring_link" />
+                        <body name="ur5e_right_follower_2" pos="0 0.055 0.0375">
+                          <inertial mass="0.0125222" pos="0 -0.011046 0.0124786" quat="1 0.1664 0 0" diaginertia="2.67415e-06 2.4559e-06 6.02031e-07" />
+                          <joint name="ur5e_right_follower_joint_2" class="follower" />
+                          <geom class="gripper_visual" mesh="follower" material="black" />
+                          <geom class="gripper_collision" mesh="follower" />
+                          <body name="ur5e_right_pad_2" pos="0 -0.0189 0.01352">
+                            <geom class="pad_box1" name="ur5e_right_pad1_2" />
+                            <geom class="pad_box2" name="ur5e_right_pad2_2" />
+                            <inertial mass="0.0035" pos="0 -0.0025 0.0185" quat="0.707107 0 0 0.707107" diaginertia="4.73958e-07 3.64583e-07 1.23958e-07" />
+                            <geom class="gripper_visual" mesh="pad" />
+                            <body name="ur5e_right_silicone_pad_2">
+                              <geom class="gripper_visual" mesh="silicone_pad" material="black" />
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+
+                      <!-- Left-hand side 4-bar linkage -->
+                      <body name="ur5e_left_driver_2" pos="0 -0.0306011 0.054904" quat="0 0 0 1">
+                        <inertial mass="0.00899563" pos="0 0.0177547 0.00107314" quat="0.681301 0.732003 0 0" diaginertia="1.72352e-06 1.60906e-06 3.22006e-07" />
+                        <joint name="ur5e_left_driver_joint_2" class="driver" />
+                        <geom class="gripper_visual" mesh="driver" material="gray" />
+                        <geom class="gripper_collision" mesh="driver" />
+                        <body name="ur5e_left_coupler_2" pos="0 0.0315 -0.0041">
+                          <inertial mass="0.0140974" pos="0 0.00301209 0.0232175" quat="0.705636 -0.0455904 0.0455904 0.705636" diaginertia="4.16206e-06 3.52216e-06 8.88131e-07" />
+                          <joint name="ur5e_left_coupler_joint_2" class="coupler" />
+                          <geom class="gripper_visual" mesh="coupler" material="black" />
+                          <geom class="gripper_collision" mesh="coupler" />
+                        </body>
+                      </body>
+                      <body name="ur5e_left_spring_link_2" pos="0 -0.0132 0.0609" quat="0 0 0 1">
+                        <inertial mass="0.0221642" pos="-8.65005e-09 0.0181624 0.0212658" quat="0.663403 -0.244737 0.244737 0.663403" diaginertia="8.96853e-06 6.71733e-06 2.63931e-06" />
+                        <joint name="ur5e_left_spring_link_joint_2" class="spring_link" />
+                        <geom class="gripper_visual" mesh="spring_link" material="black" />
+                        <geom class="gripper_collision" mesh="spring_link" />
+                        <body name="ur5e_left_follower_2" pos="0 0.055 0.0375">
+                          <inertial mass="0.0125222" pos="0 -0.011046 0.0124786" quat="1 0.1664 0 0" diaginertia="2.67415e-06 2.4559e-06 6.02031e-07" />
+                          <joint name="ur5e_left_follower_joint_2" class="follower" />
+                          <geom class="gripper_visual" mesh="follower" material="black" />
+                          <geom class="gripper_collision" mesh="follower" />
+                          <body name="ur5e_left_pad_2" pos="0 -0.0189 0.01352">
+                            <geom class="pad_box1" name="ur5e_left_pad1_2" />
+                            <geom class="pad_box2" name="ur5e_left_pad2_2" />
+                            <inertial mass="0.0035" pos="0 -0.0025 0.0185" quat="1 0 0 1" diaginertia="4.73958e-07 3.64583e-07 1.23958e-07" />
+                            <geom class="gripper_visual" mesh="pad" />
+                            <body name="ur5e_left_silicone_pad_2">
+                              <geom class="gripper_visual" mesh="silicone_pad" material="black" />
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- Piper robots on table 3 -->
+    <body name="piper_base" pos="8.7 0 0.75" euler="0 0 -1.57079" childclass="piper">
+      <geom class="visual" density="0" mesh="base_link" material="gray_mat" />
+      <geom class="collision" mesh="base_link" />
+      <body name="piper_link1" pos="0 0 0.123" quat="0.707105 0 0 -0.707108">
+        <inertial pos="0.00131676 0.000310289 -0.00922875" quat="0.557105 0.432155 0.377373 0.600388" mass="0.097868" diaginertia="9.25942e-05 8.3083e-05 7.69469e-05" />
+        <joint name="piper_joint1" axis="0 0 1" range="-2.618 2.618" />
+        <geom class="visual" density="0" mesh="piper_link1" material="gray_mat" />
+        <geom class="collision" mesh="piper_link1" />
+        <body name="piper_link2" quat="0.499998 0.5 -0.500002 -0.5">
+          <inertial pos="0.148794 -0.00242027 0.00175155" quat="-0.0249063 0.70684 0.00803509 0.706889" mass="0.290889" diaginertia="0.00177549 0.00173142 0.00014552" />
+          <joint name="piper_joint2" axis="0 0 1" range="0 3.14" />
+          <geom mesh="link2_0" material="gray_mat" class="visual" />
+          <geom mesh="link2_1" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_2" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_3" material="dark_gray_mat" class="visual" />
+          <geom mesh="link2_4" material="dark_gray_mat" class="visual" />
+          <geom mesh="link2_5" material="red_mat" class="visual" />
+          <geom mesh="link2_6" material="dark_gray_mat" class="visual" />
+          <geom mesh="link2_7" material="gray_mat" class="visual" />
+          <geom mesh="link2_8" material="red_mat" class="visual" />
+          <geom mesh="link2_9" material="red_mat" class="visual" />
+          <geom mesh="link2_10" material="gray_mat" class="visual" />
+          <geom mesh="link2_11" material="red_mat" class="visual" />
+          <geom mesh="link2_12" material="red_mat" class="visual" />
+          <geom mesh="link2_13" material="red_mat" class="visual" />
+          <geom mesh="link2_14" material="red_mat" class="visual" />
+          <geom mesh="link2_15" material="red_mat" class="visual" />
+          <geom mesh="link2_16" material="red_mat" class="visual" />
+          <geom mesh="link2_17" material="red_mat" class="visual" />
+          <geom mesh="link2_18" material="red_mat" class="visual" />
+          <geom mesh="link2_19" material="red_mat" class="visual" />
+          <geom mesh="link2_20" material="red_mat" class="visual" />
+          <geom mesh="link2_21" material="gray_mat" class="visual" />
+          <geom mesh="link2_22" material="red_mat" class="visual" />
+          <geom mesh="link2_23" material="red_mat" class="visual" />
+          <geom mesh="link2_24" material="red_mat" class="visual" />
+          <geom mesh="link2_25" material="dark_gray_mat" class="visual" />
+          <geom mesh="link2_26" material="red_mat" class="visual" />
+          <geom mesh="link2_27" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_28" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_29" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_30" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_31" material="light_medium_gray_mat" class="visual" />
+          <geom mesh="piper_link2" class="collision" />
+          <body name="piper_link3" pos="0.28358 0.028726 0" quat="0.998726 0 0 0.0504536">
+            <inertial pos="-0.0996835 0.0349477 0.000508026" quat="0.0777021 0.702287 -0.0990541 0.700674" mass="0.290848" diaginertia="0.000241946 0.000222224 0.000100384" />
+            <joint name="piper_joint3" pos="0 0 0" axis="0 0 1" range="-2.697 0" />
+            <geom mesh="piper_link3_0" material="darker_gray_mat" class="visual" />
+            <geom mesh="piper_link3_1" material="red_mat" class="visual" />
+            <geom mesh="link3_2" material="gray_mat" class="visual" />
+            <geom mesh="link3_3" material="gray_mat" class="visual" />
+            <geom mesh="link3_4" material="gray_mat" class="visual" />
+            <geom mesh="link3_5" material="gray_mat" class="visual" />
+            <geom mesh="link3_7" material="darker_gray_mat" class="visual" />
+            <geom mesh="link3_8" material="white_mat" class="visual" />
+            <geom mesh="link3_9" material="red_mat" class="visual" />
+            <geom mesh="link3_10" material="white_mat" class="visual" />
+            <geom mesh="link3_11" material="white_mat" class="visual" />
+            <geom mesh="link3_12" material="white_mat" class="visual" />
+            <geom mesh="link3_13" material="white_mat" class="visual" />
+            <geom mesh="link3_14" material="gray_mat" class="visual" />
+            <geom mesh="link3_15" material="gray_mat" class="visual" />
+            <geom mesh="link3_16" material="gray_mat" class="visual" />
+            <geom mesh="link3_17" material="gray_mat" class="visual" />
+            <geom mesh="link3_18" material="gray_mat" class="visual" />
+            <geom mesh="link3_19" material="gray_mat" class="visual" />
+            <geom mesh="link3_20" material="gray_mat" class="visual" />
+            <geom mesh="link3_21" material="gray_mat" class="visual" />
+            <geom mesh="link3_22" material="gray_mat" class="visual" />
+            <geom mesh="link3_23" material="gray_mat" class="visual" />
+            <geom mesh="link3_24" material="gray_mat" class="visual" />
+            <geom mesh="link3_25" material="gray_mat" class="visual" />
+            <geom mesh="link3_26" material="gray_mat" class="visual" />
+            <geom mesh="link3_27" material="gray_mat" class="visual" />
+            <geom mesh="link3_28" material="gray_mat" class="visual" />
+            <geom mesh="piper_link3" class="collision" />
+            <body name="piper_link4" pos="-0.24221 0.068514 0" quat="0.544767 -0.544769 -0.450809 0.450808">
+              <inertial pos="0.000276465 -0.00102804 -0.00472831" quat="0.492305 0.505285 0.503294 0.499017" mass="0.127087" diaginertia="4.87057e-05 4.10595e-05 3.82001e-05" />
+              <joint name="piper_joint4" axis="0 0 1" range="-1.832 1.832" />
+              <geom mesh="link4_2" material="gray_mat" class="visual" />
+              <geom mesh="link4_3" material="darker_gray_mat" class="visual" />
+              <geom mesh="link4_4" material="gray_mat" class="visual" />
+              <geom mesh="link4_5" material="gray_mat" class="visual" />
+              <geom mesh="link4_6" material="gray_mat" class="visual" />
+              <geom mesh="piper_link4" class="collision" />
+              <body name="piper_link5" quat="0.707105 0.707108 0 0">
+                <inertial pos="8.82262e-05 0.0566829 -0.0019612" quat="0.507447 0.490986 0.506887 0.494466" mass="0.144711" diaginertia="0.001 0.001 0.001" />
+                <joint name="piper_joint5" axis="0 0 1" range="-1.22 1.22" />
+                <geom mesh="piper_link5_2" material="black_mat" class="visual" />
+                <geom mesh="link5_3" material="black_mat" class="visual" />
+                <geom mesh="link5_4" material="darker_gray_mat" class="visual" />
+                <geom mesh="link5_5" material="gray_mat" class="visual" />
+                <geom mesh="link5_6" material="light_gray_mat" class="visual" />
+                <geom mesh="link5_7" material="gray_mat" class="visual" />
+                <geom mesh="link5_8" material="gray_mat" class="visual" />
+                <geom mesh="piper_link5" class="collision" />
+                <body name="piper_link6" pos="0 0.091 0.0014165" quat="0 0 -0.707105 -0.707108">
+                  <inertial pos="0.0010312 0.0121761 0.0315481" quat="0.0230402 0.707091 0.0373344 0.70576" mass="1.2" diaginertia="0.001 0.001 0.001" />
+                  <joint name="piper_joint6" axis="0 0 1" range="-3.14 3.14" />
+                  <geom quat="0.707105 0 0 0.707108" mesh="link6" material="gray_mat" class="visual" />
+                  <geom quat="0.707105 0 0 0.707108" mesh="link6" class="collision" />
+                  <body name="piper_link7" pos="0 0 0.13503" quat="1.89468e-08 1.89469e-08 0.707108 0.707105">
+                    <inertial pos="-0.000277778 -0.0467673 -0.00921029" quat="0.46134 0.536174 -0.553273 0.439968" mass="0.0264823" diaginertia="0.001 0.001 0.001" />
+                    <joint name="piper_joint7" axis="0 0 -1" class="piper_finger" range="0 0.035" />
+                    <geom mesh="link7" rgba="0.8 0.4 0.2 1" class="visual" />
+                    <geom type="box" size=".012 .015 .0025" pos="0 -0.015 -0.0025" rgba="1 0 0 .2" class="collision" />
+                    <geom type="box" size=".015 .015 .0025" pos="0 -0.045 -0.0025" rgba="0 0 1 .2" class="collision" />
+                  </body>
+                  <body name="piper_link8" pos="0 0 0.13503" quat="1.89468e-08 -1.89469e-08 -0.707108 0.707105">
+                    <inertial pos="0.000277817 0.0467674 -0.0092103" quat="0.553273 0.439968 -0.46134 0.536174" mass="0.0264822" diaginertia="0.001 0.001 0.001" />
+                    <joint name="piper_joint8" axis="0 0 1" class="piper_finger" range="-0.035 0" />
+                    <geom mesh="link8" rgba="0.8 0.4 0.2 1" class="visual" />
+                    <geom type="box" size=".012 .015 .0025" pos="0 0.015 -0.0025" rgba="1 0 0 .2" class="collision" />
+                    <geom type="box" size=".015 .015 .0025" pos="0 0.045 -0.0025" rgba="0 0 1 .2" class="collision" />
+                  </body>
+                  <site name="piper_ee" pos="0 0 0.13503" euler="0 0 0" rgba="0.8 0.8 0 0" size="0.001" />
+                  <site name="piper_ee_teleop" pos="0 0 0.13503" euler="0 0 1.57" rgba="0.8 0.8 0 0" size="0.001" />
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- Second Piper robot on table 4 -->
+    <body name="piper_base_2" pos="8.0 0 0.75" euler="0 0 -1.57079" childclass="piper">
+      <geom class="visual" density="0" mesh="base_link" material="gray_mat" />
+      <geom class="collision" mesh="base_link" />
+      <body name="piper_link1_2" pos="0 0 0.123" quat="0.707105 0 0 -0.707108">
+        <inertial pos="0.00131676 0.000310289 -0.00922875" quat="0.557105 0.432155 0.377373 0.600388" mass="0.097868" diaginertia="9.25942e-05 8.3083e-05 7.69469e-05" />
+        <joint name="piper_joint1_2" axis="0 0 1" range="-2.618 2.618" />
+        <geom class="visual" density="0" mesh="piper_link1" material="gray_mat" />
+        <geom class="collision" mesh="piper_link1" />
+        <body name="piper_link2_2" quat="0.499998 0.5 -0.500002 -0.5">
+          <inertial pos="0.148794 -0.00242027 0.00175155" quat="-0.0249063 0.70684 0.00803509 0.706889" mass="0.290889" diaginertia="0.00177549 0.00173142 0.00014552" />
+          <joint name="piper_joint2_2" axis="0 0 1" range="0 3.14" />
+          <geom mesh="link2_0" material="gray_mat" class="visual" />
+          <geom mesh="link2_1" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_2" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_3" material="dark_gray_mat" class="visual" />
+          <geom mesh="link2_4" material="dark_gray_mat" class="visual" />
+          <geom mesh="link2_5" material="red_mat" class="visual" />
+          <geom mesh="link2_6" material="dark_gray_mat" class="visual" />
+          <geom mesh="link2_7" material="gray_mat" class="visual" />
+          <geom mesh="link2_8" material="red_mat" class="visual" />
+          <geom mesh="link2_9" material="red_mat" class="visual" />
+          <geom mesh="link2_10" material="gray_mat" class="visual" />
+          <geom mesh="link2_11" material="red_mat" class="visual" />
+          <geom mesh="link2_12" material="red_mat" class="visual" />
+          <geom mesh="link2_13" material="red_mat" class="visual" />
+          <geom mesh="link2_14" material="red_mat" class="visual" />
+          <geom mesh="link2_15" material="red_mat" class="visual" />
+          <geom mesh="link2_16" material="red_mat" class="visual" />
+          <geom mesh="link2_17" material="red_mat" class="visual" />
+          <geom mesh="link2_18" material="red_mat" class="visual" />
+          <geom mesh="link2_19" material="red_mat" class="visual" />
+          <geom mesh="link2_20" material="red_mat" class="visual" />
+          <geom mesh="link2_21" material="gray_mat" class="visual" />
+          <geom mesh="link2_22" material="red_mat" class="visual" />
+          <geom mesh="link2_23" material="red_mat" class="visual" />
+          <geom mesh="link2_24" material="red_mat" class="visual" />
+          <geom mesh="link2_25" material="dark_gray_mat" class="visual" />
+          <geom mesh="link2_26" material="red_mat" class="visual" />
+          <geom mesh="link2_27" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_28" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_29" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_30" material="darker_gray_mat" class="visual" />
+          <geom mesh="link2_31" material="light_medium_gray_mat" class="visual" />
+          <geom mesh="piper_link2" class="collision" />
+          <body name="piper_link3_2" pos="0.28358 0.028726 0" quat="0.998726 0 0 0.0504536">
+            <inertial pos="-0.0996835 0.0349477 0.000508026" quat="0.0777021 0.702287 -0.0990541 0.700674" mass="0.290848" diaginertia="0.000241946 0.000222224 0.000100384" />
+            <joint name="piper_joint3_2" pos="0 0 0" axis="0 0 1" range="-2.697 0" />
+            <geom mesh="piper_link3_0" material="darker_gray_mat" class="visual" />
+            <geom mesh="piper_link3_1" material="red_mat" class="visual" />
+            <geom mesh="link3_2" material="gray_mat" class="visual" />
+            <geom mesh="link3_3" material="gray_mat" class="visual" />
+            <geom mesh="link3_4" material="gray_mat" class="visual" />
+            <geom mesh="link3_5" material="gray_mat" class="visual" />
+            <geom mesh="link3_7" material="darker_gray_mat" class="visual" />
+            <geom mesh="link3_8" material="white_mat" class="visual" />
+            <geom mesh="link3_9" material="red_mat" class="visual" />
+            <geom mesh="link3_10" material="white_mat" class="visual" />
+            <geom mesh="link3_11" material="white_mat" class="visual" />
+            <geom mesh="link3_12" material="white_mat" class="visual" />
+            <geom mesh="link3_13" material="white_mat" class="visual" />
+            <geom mesh="link3_14" material="gray_mat" class="visual" />
+            <geom mesh="link3_15" material="gray_mat" class="visual" />
+            <geom mesh="link3_16" material="gray_mat" class="visual" />
+            <geom mesh="link3_17" material="gray_mat" class="visual" />
+            <geom mesh="link3_18" material="gray_mat" class="visual" />
+            <geom mesh="link3_19" material="gray_mat" class="visual" />
+            <geom mesh="link3_20" material="gray_mat" class="visual" />
+            <geom mesh="link3_21" material="gray_mat" class="visual" />
+            <geom mesh="link3_22" material="gray_mat" class="visual" />
+            <geom mesh="link3_23" material="gray_mat" class="visual" />
+            <geom mesh="link3_24" material="gray_mat" class="visual" />
+            <geom mesh="link3_25" material="gray_mat" class="visual" />
+            <geom mesh="link3_26" material="gray_mat" class="visual" />
+            <geom mesh="link3_27" material="gray_mat" class="visual" />
+            <geom mesh="link3_28" material="gray_mat" class="visual" />
+            <geom mesh="piper_link3" class="collision" />
+            <body name="piper_link4_2" pos="-0.24221 0.068514 0" quat="0.544767 -0.544769 -0.450809 0.450808">
+              <inertial pos="0.000276465 -0.00102804 -0.00472831" quat="0.492305 0.505285 0.503294 0.499017" mass="0.127087" diaginertia="4.87057e-05 4.10595e-05 3.82001e-05" />
+              <joint name="piper_joint4_2" axis="0 0 1" range="-1.832 1.832" />
+              <geom mesh="link4_2" material="gray_mat" class="visual" />
+              <geom mesh="link4_3" material="darker_gray_mat" class="visual" />
+              <geom mesh="link4_4" material="gray_mat" class="visual" />
+              <geom mesh="link4_5" material="gray_mat" class="visual" />
+              <geom mesh="link4_6" material="gray_mat" class="visual" />
+              <geom mesh="piper_link4" class="collision" />
+              <body name="piper_link5_2" quat="0.707105 0.707108 0 0">
+                <inertial pos="8.82262e-05 0.0566829 -0.0019612" quat="0.507447 0.490986 0.506887 0.494466" mass="0.144711" diaginertia="0.001 0.001 0.001" />
+                <joint name="piper_joint5_2" axis="0 0 1" range="-1.22 1.22" />
+                <geom mesh="piper_link5_2" material="black_mat" class="visual" />
+                <geom mesh="link5_3" material="black_mat" class="visual" />
+                <geom mesh="link5_4" material="darker_gray_mat" class="visual" />
+                <geom mesh="link5_5" material="gray_mat" class="visual" />
+                <geom mesh="link5_6" material="light_gray_mat" class="visual" />
+                <geom mesh="link5_7" material="gray_mat" class="visual" />
+                <geom mesh="link5_8" material="gray_mat" class="visual" />
+                <geom mesh="piper_link5" class="collision" />
+                <body name="piper_link6_2" pos="0 0.091 0.0014165" quat="0 0 -0.707105 -0.707108">
+                  <inertial pos="0.0010312 0.0121761 0.0315481" quat="0.0230402 0.707091 0.0373344 0.70576" mass="1.2" diaginertia="0.001 0.001 0.001" />
+                  <joint name="piper_joint6_2" axis="0 0 1" range="-3.14 3.14" />
+                  <geom quat="0.707105 0 0 0.707108" mesh="link6" material="gray_mat" class="visual" />
+                  <geom quat="0.707105 0 0 0.707108" mesh="link6" class="collision" />
+                  <body name="piper_link7_2" pos="0 0 0.13503" quat="1.89468e-08 1.89469e-08 0.707108 0.707105">
+                    <inertial pos="-0.000277778 -0.0467673 -0.00921029" quat="0.46134 0.536174 -0.553273 0.439968" mass="0.0264823" diaginertia="0.001 0.001 0.001" />
+                    <joint name="piper_joint7_2" axis="0 0 -1" class="piper_finger" range="0 0.035" />
+                    <geom mesh="link7" rgba="0.8 0.4 0.2 1" class="visual" />
+                    <geom type="box" size=".012 .015 .0025" pos="0 -0.015 -0.0025" rgba="1 0 0 .2" class="collision" />
+                    <geom type="box" size=".015 .015 .0025" pos="0 -0.045 -0.0025" rgba="0 0 1 .2" class="collision" />
+                  </body>
+                  <body name="piper_link8_2" pos="0 0 0.13503" quat="1.89468e-08 -1.89469e-08 -0.707108 0.707105">
+                    <inertial pos="0.000277817 0.0467674 -0.0092103" quat="0.553273 0.439968 -0.46134 0.536174" mass="0.0264822" diaginertia="0.001 0.001 0.001" />
+                    <joint name="piper_joint8_2" axis="0 0 1" class="piper_finger" range="-0.035 0" />
+                    <geom mesh="link8" rgba="0.8 0.4 0.2 1" class="visual" />
+                    <geom type="box" size=".012 .015 .0025" pos="0 0.015 -0.0025" rgba="1 0 0 .2" class="collision" />
+                    <geom type="box" size=".015 .015 .0025" pos="0 0.045 -0.0025" rgba="0 0 1 .2" class="collision" />
+                  </body>
+                  <site name="piper_ee_2" pos="0 0 0.13503" euler="0 0 0" rgba="0.8 0.8 0 0" size="0.001" />
+                  <site name="piper_ee_teleop_2" pos="0 0 0.13503" euler="0 0 1.57" rgba="0.8 0.8 0 0" size="0.001" />
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- RM75 robots with 2F85 grippers on table 1 -->
+    <body name="rm75_base" pos="12.7 0 0.75" euler="0 0 -1.5708" childclass="rm75">
+      <geom type="mesh" rgba="0.7529 0.7529 0.7529 1" mesh="base_link_rm75" />
+      <body name="rm75_Link1" pos="0 0 0.2405" quat="0.707105 -0.707108 0 0">
+        <inertial pos="0.0251854 1.19161e-08 -0.021108" quat="0.568743 0.42008 0.419865 0.569015" mass="0.593563" diaginertia="0.00126614 0.00124677 0.000496264" />
+        <joint name="rm75_joint1" pos="0 0 0" axis="0 -1 0" range="-10 10" actuatorfrcrange="-60 60" />
+        <geom type="mesh" rgba="0.1843 0.3098 0.3098 1" mesh="link1_rm75" />
+        <body name="rm75_Link2" quat="0.707105 0.707108 0 0">
+          <inertial pos="2.72859e-07 0.0110778 0.0761295" quat="0.700418 0.0973711 -0.0973581 0.700325" mass="0.43285" diaginertia="0.00130156 0.00125838 0.000238372" />
+          <joint name="rm75_joint2" pos="0 0 0" axis="0 1 0" range="-2.268 2.268" actuatorfrcrange="-60 60" />
+          <geom type="mesh" rgba="1 1 1 1" mesh="link2_rm75" />
+          <body name="rm75_Link3" pos="0 0 0.256" quat="0.707105 -0.707108 0 0">
+            <inertial pos="6.84676e-07 0.0273475 -0.023544" quat="0.59313 0.805106 0.000113224 -7.25221e-05" mass="0.431325" diaginertia="0.000794333 0.000774632 0.000270805" />
+            <joint name="rm75_joint3" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-30 30" />
+            <geom type="mesh" rgba="0.1843 0.3098 0.3098 1" mesh="link3_rm75" />
+            <body name="rm75_Link4" quat="0.707105 0.707108 0 0">
+              <inertial pos="5.05313e-06 0.0105691 0.0595926" quat="0.699779 0.0991943 -0.0993927 0.700422" mass="0.289634" diaginertia="0.00065604 0.000637371 0.000114622" />
+              <joint name="rm75_joint4" pos="0 0 0" axis="0 1 0" range="-2.355 2.355" actuatorfrcrange="-30 30" />
+              <geom type="mesh" rgba="1 1 1 1" mesh="link4_rm75" />
+              <body name="rm75_Link5" pos="0 0 0.21" quat="0.707105 -0.707108 0 0">
+                <inertial pos="1.15517e-06 0.0215395 -0.0180424" quat="0.602604 0.798041 -8.31168e-05 7.31986e-05" mass="0.23942" diaginertia="0.000285939 0.000275318 0.000107298" />
+                <joint name="rm75_joint5" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-10 10" />
+                <geom type="mesh" rgba="0.1843 0.3098 0.3098 1" mesh="link5_rm75" />
+                <body name="rm75_Link6" quat="0.707105 0.707108 0 0">
+                  <inertial pos="3.19795e-06 0.00736804 0.0593808" quat="0.698922 0.105284 -0.105471 0.6995" mass="0.2188" diaginertia="0.000358615 0.00035054 8.07958e-05" />
+                  <joint name="rm75_joint6" pos="0 0 0" axis="0 1 0" range="-2.233 2.233" actuatorfrcrange="-10 10" />
+                  <geom type="mesh" rgba="1 1 1 1" mesh="link6_rm75" />
+                  <body name="rm75_Link7" pos="0 0 0.144">
+                    <inertial pos="0.000714238 -0.000396712 -0.0126724" quat="0.613063 0.350717 -0.614301 0.351831" mass="0.0649018" diaginertia="3.17886e-05 2.10548e-05 1.80205e-05" />
+                    <joint name="rm75_joint7" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorfrcrange="-10 10" />
+                    <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="link7_rm75" />
+                    <site name="rm75_ee_teleop" pos="0.0 0 0.0" euler="0 0 0" rgba="1 0 0 1" size="0.0001" />
+
+                    <!-- Robotiq 2F85 gripper attachment -->
+                    <body name="rm75_base_mount" pos="0 0 0.007" childclass="2f85">
+                      <geom class="gripper_visual" mesh="base_mount" material="black" />
+                      <geom class="gripper_collision" mesh="base_mount" />
+                      <body name="rm75_gripper_base" pos="0 0 0.0038" quat="1 0 0 -1">
+                        <inertial mass="0.777441" pos="0 -2.70394e-05 0.0354675" quat="1 -0.00152849 0 0" diaginertia="0.000260285 0.000225381 0.000152708" />
+                        <geom class="gripper_visual" mesh="2f85base" material="black" />
+                        <geom class="gripper_collision" mesh="2f85base" />
+
+                        <!-- Right-hand side 4-bar linkage -->
+                        <body name="rm75_right_driver" pos="0 0.0306011 0.054904">
+                          <inertial mass="0.00899563" pos="2.96931e-12 0.0177547 0.00107314" quat="0.681301 0.732003 0 0" diaginertia="1.72352e-06 1.60906e-06 3.22006e-07" />
+                          <joint name="rm75_right_driver_joint" class="driver" />
+                          <geom class="gripper_visual" mesh="driver" material="gray" />
+                          <geom class="gripper_collision" mesh="driver" />
+                          <body name="rm75_right_coupler" pos="0 0.0315 -0.0041">
+                            <inertial mass="0.0140974" pos="0 0.00301209 0.0232175" quat="0.705636 -0.0455904 0.0455904 0.705636" diaginertia="4.16206e-06 3.52216e-06 8.88131e-07" />
+                            <joint name="rm75_right_coupler_joint" class="coupler" />
+                            <geom class="gripper_visual" mesh="coupler" material="black" />
+                            <geom class="gripper_collision" mesh="coupler" />
+                          </body>
+                        </body>
+                        <body name="rm75_right_spring_link" pos="0 0.0132 0.0609">
+                          <inertial mass="0.0221642" pos="-8.65005e-09 0.0181624 0.0212658" quat="0.663403 -0.244737 0.244737 0.663403" diaginertia="8.96853e-06 6.71733e-06 2.63931e-06" />
+                          <joint name="rm75_right_spring_link_joint" class="spring_link" />
+                          <geom class="gripper_visual" mesh="spring_link" material="black" />
+                          <geom class="gripper_collision" mesh="spring_link" />
+                          <body name="rm75_right_follower" pos="0 0.055 0.0375">
+                            <inertial mass="0.0125222" pos="0 -0.011046 0.0124786" quat="1 0.1664 0 0" diaginertia="2.67415e-06 2.4559e-06 6.02031e-07" />
+                            <joint name="rm75_right_follower_joint" class="follower" />
+                            <geom class="gripper_visual" mesh="follower" material="black" />
+                            <geom class="gripper_collision" mesh="follower" />
+                            <body name="rm75_right_pad" pos="0 -0.0189 0.01352">
+                              <geom class="pad_box1" name="rm75_right_pad1" />
+                              <geom class="pad_box2" name="rm75_right_pad2" />
+                              <inertial mass="0.0035" pos="0 -0.0025 0.0185" quat="0.707107 0 0 0.707107" diaginertia="4.73958e-07 3.64583e-07 1.23958e-07" />
+                              <geom class="gripper_visual" mesh="pad" />
+                              <body name="rm75_right_silicone_pad">
+                                <geom class="gripper_visual" mesh="silicone_pad" material="black" />
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+
+                        <!-- Left-hand side 4-bar linkage -->
+                        <body name="rm75_left_driver" pos="0 -0.0306011 0.054904" quat="0 0 0 1">
+                          <inertial mass="0.00899563" pos="0 0.0177547 0.00107314" quat="0.681301 0.732003 0 0" diaginertia="1.72352e-06 1.60906e-06 3.22006e-07" />
+                          <joint name="rm75_left_driver_joint" class="driver" />
+                          <geom class="gripper_visual" mesh="driver" material="gray" />
+                          <geom class="gripper_collision" mesh="driver" />
+                          <body name="rm75_left_coupler" pos="0 0.0315 -0.0041">
+                            <inertial mass="0.0140974" pos="0 0.00301209 0.0232175" quat="0.705636 -0.0455904 0.0455904 0.705636" diaginertia="4.16206e-06 3.52216e-06 8.88131e-07" />
+                            <joint name="rm75_left_coupler_joint" class="coupler" />
+                            <geom class="gripper_visual" mesh="coupler" material="black" />
+                            <geom class="gripper_collision" mesh="coupler" />
+                          </body>
+                        </body>
+                        <body name="rm75_left_spring_link" pos="0 -0.0132 0.0609" quat="0 0 0 1">
+                          <inertial mass="0.0221642" pos="-8.65005e-09 0.0181624 0.0212658" quat="0.663403 -0.244737 0.244737 0.663403" diaginertia="8.96853e-06 6.71733e-06 2.63931e-06" />
+                          <joint name="rm75_left_spring_link_joint" class="spring_link" />
+                          <geom class="gripper_visual" mesh="spring_link" material="black" />
+                          <geom class="gripper_collision" mesh="spring_link" />
+                          <body name="rm75_left_follower" pos="0 0.055 0.0375">
+                            <inertial mass="0.0125222" pos="0 -0.011046 0.0124786" quat="1 0.1664 0 0" diaginertia="2.67415e-06 2.4559e-06 6.02031e-07" />
+                            <joint name="rm75_left_follower_joint" class="follower" />
+                            <geom class="gripper_visual" mesh="follower" material="black" />
+                            <geom class="gripper_collision" mesh="follower" />
+                            <body name="rm75_left_pad" pos="0 -0.0189 0.01352">
+                              <geom class="pad_box1" name="rm75_left_pad1" />
+                              <geom class="pad_box2" name="rm75_left_pad2" />
+                              <inertial mass="0.0035" pos="0 -0.0025 0.0185" quat="1 0 0 1" diaginertia="4.73958e-07 3.64583e-07 1.23958e-07" />
+                              <geom class="gripper_visual" mesh="pad" />
+                              <body name="rm75_left_silicone_pad">
+                                <geom class="gripper_visual" mesh="silicone_pad" material="black" />
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- Second RM75 robot with 2F85 gripper on table 2 -->
+    <body name="rm75_base_2" pos="12.0 0 0.75" euler="0 0 -1.5708" childclass="rm75">
+      <geom type="mesh" rgba="0.7529 0.7529 0.7529 1" mesh="base_link_rm75" />
+      <body name="rm75_Link1_2" pos="0 0 0.2405" quat="0.707105 -0.707108 0 0">
+        <inertial pos="0.0251854 1.19161e-08 -0.021108" quat="0.568743 0.42008 0.419865 0.569015" mass="0.593563" diaginertia="0.00126614 0.00124677 0.000496264" />
+        <joint name="rm75_joint1_2" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-60 60" />
+        <geom type="mesh" rgba="0.1843 0.3098 0.3098 1" mesh="link1_rm75" />
+        <body name="rm75_Link2_2" quat="0.707105 0.707108 0 0">
+          <inertial pos="2.72859e-07 0.0110778 0.0761295" quat="0.700418 0.0973711 -0.0973581 0.700325" mass="0.43285" diaginertia="0.00130156 0.00125838 0.000238372" />
+          <joint name="rm75_joint2_2" pos="0 0 0" axis="0 1 0" range="-2.268 2.268" actuatorfrcrange="-60 60" />
+          <geom type="mesh" rgba="1 1 1 1" mesh="link2_rm75" />
+          <body name="rm75_Link3_2" pos="0 0 0.256" quat="0.707105 -0.707108 0 0">
+            <inertial pos="6.84676e-07 0.0273475 -0.023544" quat="0.59313 0.805106 0.000113224 -7.25221e-05" mass="0.431325" diaginertia="0.000794333 0.000774632 0.000270805" />
+            <joint name="rm75_joint3_2" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-30 30" />
+            <geom type="mesh" rgba="0.1843 0.3098 0.3098 1" mesh="link3_rm75" />
+            <body name="rm75_Link4_2" quat="0.707105 0.707108 0 0">
+              <inertial pos="5.05313e-06 0.0105691 0.0595926" quat="0.699779 0.0991943 -0.0993927 0.700422" mass="0.289634" diaginertia="0.00065604 0.000637371 0.000114622" />
+              <joint name="rm75_joint4_2" pos="0 0 0" axis="0 1 0" range="-2.355 2.355" actuatorfrcrange="-30 30" />
+              <geom type="mesh" rgba="1 1 1 1" mesh="link4_rm75" />
+              <body name="rm75_Link5_2" pos="0 0 0.21" quat="0.707105 -0.707108 0 0">
+                <inertial pos="1.15517e-06 0.0215395 -0.0180424" quat="0.602604 0.798041 -8.31168e-05 7.31986e-05" mass="0.23942" diaginertia="0.000285939 0.000275318 0.000107298" />
+                <joint name="rm75_joint5_2" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-10 10" />
+                <geom type="mesh" rgba="0.1843 0.3098 0.3098 1" mesh="link5_rm75" />
+                <body name="rm75_Link6_2" quat="0.707105 0.707108 0 0">
+                  <inertial pos="3.19795e-06 0.00736804 0.0593808" quat="0.698922 0.105284 -0.105471 0.6995" mass="0.2188" diaginertia="0.000358615 0.00035054 8.07958e-05" />
+                  <joint name="rm75_joint6_2" pos="0 0 0" axis="0 1 0" range="-2.233 2.233" actuatorfrcrange="-10 10" />
+                  <geom type="mesh" rgba="1 1 1 1" mesh="link6_rm75" />
+                  <body name="rm75_Link7_2" pos="0 0 0.144">
+                    <inertial pos="0.000714238 -0.000396712 -0.0126724" quat="0.613063 0.350717 -0.614301 0.351831" mass="0.0649018" diaginertia="3.17886e-05 2.10548e-05 1.80205e-05" />
+                    <joint name="rm75_joint7_2" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorfrcrange="-10 10" />
+                    <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="link7_rm75" />
+                    <site name="rm75_ee_teleop_2" pos="0.0 0 0.0" euler="0 0 0" rgba="1 0 0 1" size="0.0001" />
+
+                    <!-- Robotiq 2F85 gripper attachment -->
+                    <body name="rm75_base_mount_2" pos="0 0 0.007" childclass="2f85">
+                      <geom class="gripper_visual" mesh="base_mount" material="black" />
+                      <geom class="gripper_collision" mesh="base_mount" />
+                      <body name="rm75_gripper_base_2" pos="0 0 0.0038" quat="1 0 0 -1">
+                        <inertial mass="0.777441" pos="0 -2.70394e-05 0.0354675" quat="1 -0.00152849 0 0" diaginertia="0.000260285 0.000225381 0.000152708" />
+                        <geom class="gripper_visual" mesh="2f85base" material="black" />
+                        <geom class="gripper_collision" mesh="2f85base" />
+
+                        <!-- Right-hand side 4-bar linkage -->
+                        <body name="rm75_right_driver_2" pos="0 0.0306011 0.054904">
+                          <inertial mass="0.00899563" pos="2.96931e-12 0.0177547 0.00107314" quat="0.681301 0.732003 0 0" diaginertia="1.72352e-06 1.60906e-06 3.22006e-07" />
+                          <joint name="rm75_right_driver_joint_2" class="driver" />
+                          <geom class="gripper_visual" mesh="driver" material="gray" />
+                          <geom class="gripper_collision" mesh="driver" />
+                          <body name="rm75_right_coupler_2" pos="0 0.0315 -0.0041">
+                            <inertial mass="0.0140974" pos="0 0.00301209 0.0232175" quat="0.705636 -0.0455904 0.0455904 0.705636" diaginertia="4.16206e-06 3.52216e-06 8.88131e-07" />
+                            <joint name="rm75_right_coupler_joint_2" class="coupler" />
+                            <geom class="gripper_visual" mesh="coupler" material="black" />
+                            <geom class="gripper_collision" mesh="coupler" />
+                          </body>
+                        </body>
+                        <body name="rm75_right_spring_link_2" pos="0 0.0132 0.0609">
+                          <inertial mass="0.0221642" pos="-8.65005e-09 0.0181624 0.0212658" quat="0.663403 -0.244737 0.244737 0.663403" diaginertia="8.96853e-06 6.71733e-06 2.63931e-06" />
+                          <joint name="rm75_right_spring_link_joint_2" class="spring_link" />
+                          <geom class="gripper_visual" mesh="spring_link" material="black" />
+                          <geom class="gripper_collision" mesh="spring_link" />
+                          <body name="rm75_right_follower_2" pos="0 0.055 0.0375">
+                            <inertial mass="0.0125222" pos="0 -0.011046 0.0124786" quat="1 0.1664 0 0" diaginertia="2.67415e-06 2.4559e-06 6.02031e-07" />
+                            <joint name="rm75_right_follower_joint_2" class="follower" />
+                            <geom class="gripper_visual" mesh="follower" material="black" />
+                            <geom class="gripper_collision" mesh="follower" />
+                            <body name="rm75_right_pad_2" pos="0 -0.0189 0.01352">
+                              <geom class="pad_box1" name="rm75_right_pad1_2" />
+                              <geom class="pad_box2" name="rm75_right_pad2_2" />
+                              <inertial mass="0.0035" pos="0 -0.0025 0.0185" quat="0.707107 0 0 0.707107" diaginertia="4.73958e-07 3.64583e-07 1.23958e-07" />
+                              <geom class="gripper_visual" mesh="pad" />
+                              <body name="rm75_right_silicone_pad_2">
+                                <geom class="gripper_visual" mesh="silicone_pad" material="black" />
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+
+                        <!-- Left-hand side 4-bar linkage -->
+                        <body name="rm75_left_driver_2" pos="0 -0.0306011 0.054904" quat="0 0 0 1">
+                          <inertial mass="0.00899563" pos="0 0.0177547 0.00107314" quat="0.681301 0.732003 0 0" diaginertia="1.72352e-06 1.60906e-06 3.22006e-07" />
+                          <joint name="rm75_left_driver_joint_2" class="driver" />
+                          <geom class="gripper_visual" mesh="driver" material="gray" />
+                          <geom class="gripper_collision" mesh="driver" />
+                          <body name="rm75_left_coupler_2" pos="0 0.0315 -0.0041">
+                            <inertial mass="0.0140974" pos="0 0.00301209 0.0232175" quat="0.705636 -0.0455904 0.0455904 0.705636" diaginertia="4.16206e-06 3.52216e-06 8.88131e-07" />
+                            <joint name="rm75_left_coupler_joint_2" class="coupler" />
+                            <geom class="gripper_visual" mesh="coupler" material="black" />
+                            <geom class="gripper_collision" mesh="coupler" />
+                          </body>
+                        </body>
+                        <body name="rm75_left_spring_link_2" pos="0 -0.0132 0.0609" quat="0 0 0 1">
+                          <inertial mass="0.0221642" pos="-8.65005e-09 0.0181624 0.0212658" quat="0.663403 -0.244737 0.244737 0.663403" diaginertia="8.96853e-06 6.71733e-06 2.63931e-06" />
+                          <joint name="rm75_left_spring_link_joint_2" class="spring_link" />
+                          <geom class="gripper_visual" mesh="spring_link" material="black" />
+                          <geom class="gripper_collision" mesh="spring_link" />
+                          <body name="rm75_left_follower_2" pos="0 0.055 0.0375">
+                            <inertial mass="0.0125222" pos="0 -0.011046 0.0124786" quat="1 0.1664 0 0" diaginertia="2.67415e-06 2.4559e-06 6.02031e-07" />
+                            <joint name="rm75_left_follower_joint_2" class="follower" />
+                            <geom class="gripper_visual" mesh="follower" material="black" />
+                            <geom class="gripper_collision" mesh="follower" />
+                            <body name="rm75_left_pad_2" pos="0 -0.0189 0.01352">
+                              <geom class="pad_box1" name="rm75_left_pad1_2" />
+                              <geom class="pad_box2" name="rm75_left_pad2_2" />
+                              <inertial mass="0.0035" pos="0 -0.0025 0.0185" quat="1 0 0 1" diaginertia="4.73958e-07 3.64583e-07 1.23958e-07" />
+                              <geom class="gripper_visual" mesh="pad" />
+                              <body name="rm75_left_silicone_pad_2">
+                                <geom class="gripper_visual" mesh="silicone_pad" material="black" />
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <tendon>
+    <!-- FR3 1 gripper tendon -->
+    <fixed name="split_0">
+      <joint joint="franka_fr3_finger_joint1" coef="0.5" />
+      <joint joint="franka_fr3_finger_joint2" coef="0.5" />
+    </fixed>
+    <!-- FR3 2 gripper tendon -->
+    <fixed name="split_1">
+      <joint joint="franka_fr3_finger_joint1_2" coef="0.5" />
+      <joint joint="franka_fr3_finger_joint2_2" coef="0.5" />
+    </fixed>
+    <!-- RM75 1 gripper tendon -->
+    <fixed name="split_rm75_0">
+      <joint joint="rm75_right_driver_joint" coef="0.5" />
+      <joint joint="rm75_left_driver_joint" coef="0.5" />
+    </fixed>
+    <!-- RM75 2 gripper tendon -->
+    <fixed name="split_rm75_1">
+      <joint joint="rm75_right_driver_joint_2" coef="0.5" />
+      <joint joint="rm75_left_driver_joint_2" coef="0.5" />
+    </fixed>
+    <!-- UR5e 1 gripper tendon -->
+    <fixed name="split_ur5e_0">
+      <joint joint="ur5e_right_driver_joint" coef="0.5" />
+      <joint joint="ur5e_left_driver_joint" coef="0.5" />
+    </fixed>
+    <!-- UR5e 2 gripper tendon -->
+    <fixed name="split_ur5e_1">
+      <joint joint="ur5e_right_driver_joint_2" coef="0.5" />
+      <joint joint="ur5e_left_driver_joint_2" coef="0.5" />
+    </fixed>
+  </tendon>
+
+  <equality>
+    <!-- FR3 1 gripper constraint -->
+    <joint joint1="franka_fr3_finger_joint1" joint2="franka_fr3_finger_joint2" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <!-- FR3 2 gripper constraint -->
+    <joint joint1="franka_fr3_finger_joint1_2" joint2="franka_fr3_finger_joint2_2" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <!-- RM75 1 gripper constraint -->
+    <connect anchor="0 0 0" body1="rm75_right_follower" body2="rm75_right_coupler" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <connect anchor="0 0 0" body1="rm75_left_follower" body2="rm75_left_coupler" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <joint joint1="rm75_right_driver_joint" joint2="rm75_left_driver_joint" polycoef="0 1 0 0 0" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <!-- RM75 2 gripper constraint -->
+    <connect anchor="0 0 0" body1="rm75_right_follower_2" body2="rm75_right_coupler_2" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <connect anchor="0 0 0" body1="rm75_left_follower_2" body2="rm75_left_coupler_2" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <joint joint1="rm75_right_driver_joint_2" joint2="rm75_left_driver_joint_2" polycoef="0 1 0 0 0" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <!-- UR5e 1 gripper constraint -->
+    <connect anchor="0 0 0" body1="ur5e_right_follower" body2="ur5e_right_coupler" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <connect anchor="0 0 0" body1="ur5e_left_follower" body2="ur5e_left_coupler" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <joint joint1="ur5e_right_driver_joint" joint2="ur5e_left_driver_joint" polycoef="0 1 0 0 0" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <!-- UR5e 2 gripper constraint -->
+    <connect anchor="0 0 0" body1="ur5e_right_follower_2" body2="ur5e_right_coupler_2" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <connect anchor="0 0 0" body1="ur5e_left_follower_2" body2="ur5e_left_coupler_2" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <joint joint1="ur5e_right_driver_joint_2" joint2="ur5e_left_driver_joint_2" polycoef="0 1 0 0 0" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <!-- Piper 1 gripper constraint -->
+    <joint joint1="piper_joint8" joint2="piper_joint7" polycoef="0 -1 0 0 0" />
+    <!-- Piper 2 gripper constraint -->
+    <joint joint1="piper_joint8_2" joint2="piper_joint7_2" polycoef="0 -1 0 0 0" />
+  </equality>
+
+  <actuator>
+    <!-- FR3 robot 2 actuators (left arm) -->
+    <position name="franka_fr3_joint1_2" joint="franka_fr3_joint1_2" class="fr3" kp="1600" dampratio="2" />
+    <position name="franka_fr3_joint2_2" joint="franka_fr3_joint2_2" class="fr3" kp="1600" dampratio="1" />
+    <position name="franka_fr3_joint3_2" joint="franka_fr3_joint3_2" class="fr3" kp="800" dampratio="1" />
+    <position name="franka_fr3_joint4_2" joint="franka_fr3_joint4_2" class="fr3" kp="800" dampratio="1" />
+    <position name="franka_fr3_joint5_2" joint="franka_fr3_joint5_2" class="fr3" kp="400" dampratio="1" />
+    <position name="franka_fr3_joint6_2" joint="franka_fr3_joint6_2" class="fr3" kp="400" dampratio="1" />
+    <position name="franka_fr3_joint7_2" joint="franka_fr3_joint7_2" class="fr3" kp="400" dampratio="1" />
+    <general name="franka_fr3_gripper_1" class="fr3" tendon="split_1" forcerange="-100 100" ctrlrange="0 255" gainprm="0.01568627451 0 0" biasprm="0 -100 -10" />
+
+    <!-- FR3 robot 1 actuators (right arm) -->
+    <position name="franka_fr3_joint1" joint="franka_fr3_joint1" class="fr3" kp="1600" dampratio="2" />
+    <position name="franka_fr3_joint2" joint="franka_fr3_joint2" class="fr3" kp="1600" dampratio="1" />
+    <position name="franka_fr3_joint3" joint="franka_fr3_joint3" class="fr3" kp="800" dampratio="1" />
+    <position name="franka_fr3_joint4" joint="franka_fr3_joint4" class="fr3" kp="800" dampratio="1" />
+    <position name="franka_fr3_joint5" joint="franka_fr3_joint5" class="fr3" kp="400" dampratio="1" />
+    <position name="franka_fr3_joint6" joint="franka_fr3_joint6" class="fr3" kp="400" dampratio="1" />
+    <position name="franka_fr3_joint7" joint="franka_fr3_joint7" class="fr3" kp="400" dampratio="1" />
+    <general name="franka_fr3_gripper_0" class="fr3" tendon="split_0" forcerange="-100 100" ctrlrange="0 255" gainprm="0.01568627451 0 0" biasprm="0 -100 -10" />
+
+    <!-- UR5e robot 2 actuators (left arm) -->
+    <position name="ur5e_shoulder_pan_2" joint="ur5e_shoulder_pan_joint_2" ctrlrange="-6.28319 6.28319" forcerange="-150 150" kp="2500" dampratio="1" />
+    <position name="ur5e_shoulder_lift_2" joint="ur5e_shoulder_lift_joint_2" ctrlrange="-6.28319 6.28319" forcerange="-150 150" kp="2500" dampratio="1" />
+    <position name="ur5e_elbow_2" joint="ur5e_elbow_joint_2" ctrlrange="-3.1415 3.1415" forcerange="-150 150" kp="2500" dampratio="1" />
+    <position name="ur5e_wrist_1_2" joint="ur5e_wrist_1_joint_2" ctrlrange="-6.28319 6.28319" forcerange="-28 28" kp="1000" dampratio="1" />
+    <position name="ur5e_wrist_2_2" joint="ur5e_wrist_2_joint_2" ctrlrange="-6.28319 6.28319" forcerange="-28 28" kp="1000" dampratio="1" />
+    <position name="ur5e_wrist_3_2" joint="ur5e_wrist_3_joint_2" ctrlrange="-6.28319 6.28319" forcerange="-28 28" kp="1000" dampratio="1" />
+
+    <!-- UR5e robot 2 gripper actuators -->
+    <general name="ur5e_gripper_1" tendon="split_ur5e_1" forcerange="-5 5" ctrlrange="0 255" gainprm="0.3137255 0 0" biasprm="0 -100 -10" biastype="affine" />
+
+    <!-- UR5e robot 1 actuators (right arm) -->
+    <position name="ur5e_shoulder_pan" joint="ur5e_shoulder_pan_joint" ctrlrange="-6.28319 6.28319" forcerange="-150 150" kp="2500" dampratio="1" />
+    <position name="ur5e_shoulder_lift" joint="ur5e_shoulder_lift_joint" ctrlrange="-6.28319 6.28319" forcerange="-150 150" kp="2500" dampratio="1" />
+    <position name="ur5e_elbow" joint="ur5e_elbow_joint" ctrlrange="-3.1415 3.1415" forcerange="-150 150" kp="2500" dampratio="1" />
+    <position name="ur5e_wrist_1" joint="ur5e_wrist_1_joint" ctrlrange="-6.28319 6.28319" forcerange="-28 28" kp="1000" dampratio="1" />
+    <position name="ur5e_wrist_2" joint="ur5e_wrist_2_joint" ctrlrange="-6.28319 6.28319" forcerange="-28 28" kp="1000" dampratio="1" />
+    <position name="ur5e_wrist_3" joint="ur5e_wrist_3_joint" ctrlrange="-6.28319 6.28319" forcerange="-28 28" kp="1000" dampratio="1" />
+
+    <!-- UR5e robot 1 gripper actuators -->
+    <general name="ur5e_gripper_0" tendon="split_ur5e_0" forcerange="-5 5" ctrlrange="0 255" gainprm="0.3137255 0 0" biasprm="0 -100 -10" biastype="affine" />
+
+    <!-- Piper robot 2 actuators (left arm) -->
+    <position name="piper_joint1_2" joint="piper_joint1_2" class="piper" kp="1600" dampratio="1.5" />
+    <position name="piper_joint2_2" joint="piper_joint2_2" class="piper" kp="1600" dampratio="1.5" />
+    <position name="piper_joint3_2" joint="piper_joint3_2" class="piper" kp="1600" dampratio="1.5" />
+    <position name="piper_joint4_2" joint="piper_joint4_2" class="piper" kp="800" dampratio="1.5" />
+    <position name="piper_joint5_2" joint="piper_joint5_2" class="piper" kp="200" dampratio="1.5" />
+    <position name="piper_joint6_2" joint="piper_joint6_2" class="piper" kp="200" dampratio="1.5" />
+    <position name="piper_gripper_1" joint="piper_joint7_2" class="piper_finger" kp="500" kv="50" />
+
+    <!-- Piper robot 1 actuators (right arm) -->
+    <position name="piper_joint1" joint="piper_joint1" class="piper" kp="1600" dampratio="1.5" />
+    <position name="piper_joint2" joint="piper_joint2" class="piper" kp="1600" dampratio="1.5" />
+    <position name="piper_joint3" joint="piper_joint3" class="piper" kp="1600" dampratio="1.5" />
+    <position name="piper_joint4" joint="piper_joint4" class="piper" kp="800" dampratio="1.5" />
+    <position name="piper_joint5" joint="piper_joint5" class="piper" kp="200" dampratio="1.5" />
+    <position name="piper_joint6" joint="piper_joint6" class="piper" kp="200" dampratio="1.5" />
+    <position name="piper_gripper_0" joint="piper_joint7" class="piper_finger" kp="500" kv="50" />
+
+    <!-- RM75 robot 2 actuators (left arm) -->
+    <position name="rm75_joint1_2" joint="rm75_joint1_2" class="rm75" kp="600" kv="20" />
+    <position name="rm75_joint2_2" joint="rm75_joint2_2" class="rm75" kp="1200" kv="30" />
+    <position name="rm75_joint3_2" joint="rm75_joint3_2" class="rm75" kp="600" kv="20" />
+    <position name="rm75_joint4_2" joint="rm75_joint4_2" class="rm75" kp="600" kv="20" />
+    <position name="rm75_joint5_2" joint="rm75_joint5_2" class="rm75" kp="400" kv="5" />
+    <position name="rm75_joint6_2" joint="rm75_joint6_2" class="rm75" kp="400" kv="5" />
+    <position name="rm75_joint7_2" joint="rm75_joint7_2" class="rm75" kp="100" kv="2" />
+
+    <!-- RM75 robot 2 gripper actuators -->
+    <general name="rm75_gripper_1" tendon="split_rm75_1" forcerange="-5 5" ctrlrange="0 255" gainprm="0.3137255 0 0" biasprm="0 -100 -10" biastype="affine" />
+
+    <!-- RM75 robot 1 actuators (right arm) -->
+    <position name="rm75_joint1" joint="rm75_joint1" class="rm75" kp="600" kv="20" />
+    <position name="rm75_joint2" joint="rm75_joint2" class="rm75" kp="1200" kv="30" />
+    <position name="rm75_joint3" joint="rm75_joint3" class="rm75" kp="600" kv="20" />
+    <position name="rm75_joint4" joint="rm75_joint4" class="rm75" kp="600" kv="20" />
+    <position name="rm75_joint5" joint="rm75_joint5" class="rm75" kp="400" kv="5" />
+    <position name="rm75_joint6" joint="rm75_joint6" class="rm75" kp="400" kv="5" />
+    <position name="rm75_joint7" joint="rm75_joint7" class="rm75" kp="100" kv="2" />
+
+    <!-- RM75 robot 1 gripper actuators -->
+    <general name="rm75_gripper_0" tendon="split_rm75_0" forcerange="-5 5" ctrlrange="0 255" gainprm="0.3137255 0 0" biasprm="0 -100 -10" biastype="affine" />
+  </actuator>
+
+  <sensor>
+    <!-- FR3 robot 1 sensors -->
+    <jointpos name="fr3_joint1_pos" joint="franka_fr3_joint1" />
+    <jointpos name="fr3_joint2_pos" joint="franka_fr3_joint2" />
+    <jointpos name="fr3_joint3_pos" joint="franka_fr3_joint3" />
+    <jointpos name="fr3_joint4_pos" joint="franka_fr3_joint4" />
+    <jointpos name="fr3_joint5_pos" joint="franka_fr3_joint5" />
+    <jointpos name="fr3_joint6_pos" joint="franka_fr3_joint6" />
+    <jointpos name="fr3_joint7_pos" joint="franka_fr3_joint7" />
+    <tendonpos name="franka_gripper_0_pos" tendon="split_0" />
+
+    <!-- FR3 robot 2 sensors -->
+    <jointpos name="fr3_joint1_pos_2" joint="franka_fr3_joint1_2" />
+    <jointpos name="fr3_joint2_pos_2" joint="franka_fr3_joint2_2" />
+    <jointpos name="fr3_joint3_pos_2" joint="franka_fr3_joint3_2" />
+    <jointpos name="fr3_joint4_pos_2" joint="franka_fr3_joint4_2" />
+    <jointpos name="fr3_joint5_pos_2" joint="franka_fr3_joint5_2" />
+    <jointpos name="fr3_joint6_pos_2" joint="franka_fr3_joint6_2" />
+    <jointpos name="fr3_joint7_pos_2" joint="franka_fr3_joint7_2" />
+    <tendonpos name="franka_gripper_1_pos" tendon="split_1" />
+
+    <!-- Piper robot 1 sensors -->
+    <jointpos name="piper_joint1_pos" joint="piper_joint1" />
+    <jointpos name="piper_joint2_pos" joint="piper_joint2" />
+    <jointpos name="piper_joint3_pos" joint="piper_joint3" />
+    <jointpos name="piper_joint4_pos" joint="piper_joint4" />
+    <jointpos name="piper_joint5_pos" joint="piper_joint5" />
+    <jointpos name="piper_joint6_pos" joint="piper_joint6" />
+    <jointpos name="piper_gripper_0_pos" joint="piper_joint7" />
+
+    <!-- Piper robot 2 sensors -->
+    <jointpos name="piper_joint1_pos_2" joint="piper_joint1_2" />
+    <jointpos name="piper_joint2_pos_2" joint="piper_joint2_2" />
+    <jointpos name="piper_joint3_pos_2" joint="piper_joint3_2" />
+    <jointpos name="piper_joint4_pos_2" joint="piper_joint4_2" />
+    <jointpos name="piper_joint5_pos_2" joint="piper_joint5_2" />
+    <jointpos name="piper_joint6_pos_2" joint="piper_joint6_2" />
+    <jointpos name="piper_gripper_1_pos" joint="piper_joint7_2" />
+
+    <!-- RM75 robot 1 sensors -->
+    <jointpos name="rm75_joint1_pos" joint="rm75_joint1" />
+    <jointpos name="rm75_joint2_pos" joint="rm75_joint2" />
+    <jointpos name="rm75_joint3_pos" joint="rm75_joint3" />
+    <jointpos name="rm75_joint4_pos" joint="rm75_joint4" />
+    <jointpos name="rm75_joint5_pos" joint="rm75_joint5" />
+    <jointpos name="rm75_joint6_pos" joint="rm75_joint6" />
+    <jointpos name="rm75_joint7_pos" joint="rm75_joint7" />
+
+    <!-- RM75 robot 1 gripper sensors -->
+    <tendonpos name="rm75_gripper_0_pos" tendon="split_rm75_0" />
+
+    <!-- RM75 robot 2 sensors -->
+    <jointpos name="rm75_joint1_pos_2" joint="rm75_joint1_2" />
+    <jointpos name="rm75_joint2_pos_2" joint="rm75_joint2_2" />
+    <jointpos name="rm75_joint3_pos_2" joint="rm75_joint3_2" />
+    <jointpos name="rm75_joint4_pos_2" joint="rm75_joint4_2" />
+    <jointpos name="rm75_joint5_pos_2" joint="rm75_joint5_2" />
+    <jointpos name="rm75_joint6_pos_2" joint="rm75_joint6_2" />
+    <jointpos name="rm75_joint7_pos_2" joint="rm75_joint7_2" />
+
+    <!-- RM75 robot 2 gripper sensors -->
+    <tendonpos name="rm75_gripper_1_pos" tendon="split_rm75_1" />
+
+    <!-- UR5e robot 1 sensors -->
+    <jointpos name="ur5e_shoulder_pan_pos" joint="ur5e_shoulder_pan_joint" />
+    <jointpos name="ur5e_shoulder_lift_pos" joint="ur5e_shoulder_lift_joint" />
+    <jointpos name="ur5e_elbow_pos" joint="ur5e_elbow_joint" />
+    <jointpos name="ur5e_wrist_1_pos" joint="ur5e_wrist_1_joint" />
+    <jointpos name="ur5e_wrist_2_pos" joint="ur5e_wrist_2_joint" />
+    <jointpos name="ur5e_wrist_3_pos" joint="ur5e_wrist_3_joint" />
+
+    <!-- UR5e robot 1 gripper sensors -->
+    <tendonpos name="ur5e_gripper_0_pos" tendon="split_ur5e_0" />
+
+    <!-- UR5e robot 2 sensors -->
+    <jointpos name="ur5e_shoulder_pan_pos_2" joint="ur5e_shoulder_pan_joint_2" />
+    <jointpos name="ur5e_shoulder_lift_pos_2" joint="ur5e_shoulder_lift_joint_2" />
+    <jointpos name="ur5e_elbow_pos_2" joint="ur5e_elbow_joint_2" />
+    <jointpos name="ur5e_wrist_1_pos_2" joint="ur5e_wrist_1_joint_2" />
+    <jointpos name="ur5e_wrist_2_pos_2" joint="ur5e_wrist_2_joint_2" />
+    <jointpos name="ur5e_wrist_3_pos_2" joint="ur5e_wrist_3_joint_2" />
+
+    <!-- UR5e robot 2 gripper sensors -->
+    <tendonpos name="ur5e_gripper_1_pos" tendon="split_ur5e_1" />
+  </sensor>
+
+  <contact>
+    <!-- FR3 robot 1 contacts -->
+    <exclude body1="fr3_link0" body2="fr3_link1" />
+    <exclude body1="fr3_link1" body2="fr3_link2" />
+    <exclude body1="fr3_link2" body2="fr3_link3" />
+    <exclude body1="fr3_link3" body2="fr3_link4" />
+    <exclude body1="fr3_link4" body2="fr3_link5" />
+    <exclude body1="fr3_link5" body2="fr3_link6" />
+    <exclude body1="fr3_link6" body2="fr3_link7" />
+    <exclude body1="fr3_link7" body2="hand" />
+    <exclude body1="hand" body2="left_finger" />
+    <exclude body1="hand" body2="right_finger" />
+
+    <!-- FR3 robot 2 contacts -->
+    <exclude body1="fr3_link0_2" body2="fr3_link1_2" />
+    <exclude body1="fr3_link1_2" body2="fr3_link2_2" />
+    <exclude body1="fr3_link2_2" body2="fr3_link3_2" />
+    <exclude body1="fr3_link3_2" body2="fr3_link4_2" />
+    <exclude body1="fr3_link4_2" body2="fr3_link5_2" />
+    <exclude body1="fr3_link5_2" body2="fr3_link6_2" />
+    <exclude body1="fr3_link6_2" body2="fr3_link7_2" />
+    <exclude body1="fr3_link7_2" body2="hand_2" />
+    <exclude body1="hand_2" body2="left_finger_2" />
+    <exclude body1="hand_2" body2="right_finger_2" />
+
+    <!-- Piper robot 1 contacts -->
+    <exclude body1="piper_link1" body2="piper_link2" />
+    <exclude body1="piper_link2" body2="piper_link3" />
+    <exclude body1="piper_link3" body2="piper_link4" />
+    <exclude body1="piper_link4" body2="piper_link5" />
+    <exclude body1="piper_link5" body2="piper_link6" />
+    <exclude body1="piper_link6" body2="piper_link7" />
+    <exclude body1="piper_link6" body2="piper_link8" />
+
+    <!-- Piper robot 2 contacts -->
+    <exclude body1="piper_link1_2" body2="piper_link2_2" />
+    <exclude body1="piper_link2_2" body2="piper_link3_2" />
+    <exclude body1="piper_link3_2" body2="piper_link4_2" />
+    <exclude body1="piper_link4_2" body2="piper_link5_2" />
+    <exclude body1="piper_link5_2" body2="piper_link6_2" />
+    <exclude body1="piper_link6_2" body2="piper_link7_2" />
+    <exclude body1="piper_link6_2" body2="piper_link8_2" />
+
+    <!-- RM75 robot 1 contacts -->
+    <exclude body1="rm75_Link1" body2="rm75_Link2" />
+    <exclude body1="rm75_Link2" body2="rm75_Link3" />
+    <exclude body1="rm75_Link3" body2="rm75_Link4" />
+    <exclude body1="rm75_Link4" body2="rm75_Link5" />
+    <exclude body1="rm75_Link5" body2="rm75_Link6" />
+    <exclude body1="rm75_Link6" body2="rm75_Link7" />
+
+    <!-- RM75 robot 1 gripper contacts -->
+    <exclude body1="rm75_Link7" body2="rm75_base_mount" />
+    <exclude body1="rm75_base_mount" body2="rm75_gripper_base" />
+    <exclude body1="rm75_gripper_base" body2="rm75_right_driver" />
+    <exclude body1="rm75_gripper_base" body2="rm75_left_driver" />
+    <exclude body1="rm75_gripper_base" body2="rm75_right_spring_link" />
+    <exclude body1="rm75_gripper_base" body2="rm75_left_spring_link" />
+    <exclude body1="rm75_right_driver" body2="rm75_right_coupler" />
+    <exclude body1="rm75_right_spring_link" body2="rm75_right_follower" />
+    <exclude body1="rm75_right_follower" body2="rm75_right_pad" />
+    <exclude body1="rm75_left_driver" body2="rm75_left_coupler" />
+    <exclude body1="rm75_left_spring_link" body2="rm75_left_follower" />
+    <exclude body1="rm75_left_follower" body2="rm75_left_pad" />
+
+    <!-- RM75 robot 2 contacts -->
+    <exclude body1="rm75_Link1_2" body2="rm75_Link2_2" />
+    <exclude body1="rm75_Link2_2" body2="rm75_Link3_2" />
+    <exclude body1="rm75_Link3_2" body2="rm75_Link4_2" />
+    <exclude body1="rm75_Link4_2" body2="rm75_Link5_2" />
+    <exclude body1="rm75_Link5_2" body2="rm75_Link6_2" />
+    <exclude body1="rm75_Link6_2" body2="rm75_Link7_2" />
+
+    <!-- RM75 robot 2 gripper contacts -->
+    <exclude body1="rm75_Link7_2" body2="rm75_base_mount_2" />
+    <exclude body1="rm75_base_mount_2" body2="rm75_gripper_base_2" />
+    <exclude body1="rm75_gripper_base_2" body2="rm75_right_driver_2" />
+    <exclude body1="rm75_gripper_base_2" body2="rm75_left_driver_2" />
+    <exclude body1="rm75_gripper_base_2" body2="rm75_right_spring_link_2" />
+    <exclude body1="rm75_gripper_base_2" body2="rm75_left_spring_link_2" />
+    <exclude body1="rm75_right_driver_2" body2="rm75_right_coupler_2" />
+    <exclude body1="rm75_right_spring_link_2" body2="rm75_right_follower_2" />
+    <exclude body1="rm75_right_follower_2" body2="rm75_right_pad_2" />
+    <exclude body1="rm75_left_driver_2" body2="rm75_left_coupler_2" />
+    <exclude body1="rm75_left_spring_link_2" body2="rm75_left_follower_2" />
+    <exclude body1="rm75_left_follower_2" body2="rm75_left_pad_2" />
+
+    <!-- UR5e robot 1 contacts -->
+    <exclude body1="ur5e_shoulder_link" body2="ur5e_upper_arm_link" />
+    <exclude body1="ur5e_upper_arm_link" body2="ur5e_forearm_link" />
+    <exclude body1="ur5e_forearm_link" body2="ur5e_wrist_1_link" />
+    <exclude body1="ur5e_wrist_1_link" body2="ur5e_wrist_2_link" />
+    <exclude body1="ur5e_wrist_2_link" body2="ur5e_wrist_3_link" />
+
+    <!-- UR5e robot 1 gripper contacts -->
+    <exclude body1="ur5e_wrist_3_link" body2="ur5e_base_mount" />
+    <exclude body1="ur5e_base_mount" body2="ur5e_gripper_base" />
+    <exclude body1="ur5e_gripper_base" body2="ur5e_right_driver" />
+    <exclude body1="ur5e_gripper_base" body2="ur5e_left_driver" />
+    <exclude body1="ur5e_gripper_base" body2="ur5e_right_spring_link" />
+    <exclude body1="ur5e_gripper_base" body2="ur5e_left_spring_link" />
+    <exclude body1="ur5e_right_driver" body2="ur5e_right_coupler" />
+    <exclude body1="ur5e_right_spring_link" body2="ur5e_right_follower" />
+    <exclude body1="ur5e_right_follower" body2="ur5e_right_pad" />
+    <exclude body1="ur5e_left_driver" body2="ur5e_left_coupler" />
+    <exclude body1="ur5e_left_spring_link" body2="ur5e_left_follower" />
+    <exclude body1="ur5e_left_follower" body2="ur5e_left_pad" />
+
+    <!-- UR5e robot 2 contacts -->
+    <exclude body1="ur5e_shoulder_link_2" body2="ur5e_upper_arm_link_2" />
+    <exclude body1="ur5e_upper_arm_link_2" body2="ur5e_forearm_link_2" />
+    <exclude body1="ur5e_forearm_link_2" body2="ur5e_wrist_1_link_2" />
+    <exclude body1="ur5e_wrist_1_link_2" body2="ur5e_wrist_2_link_2" />
+    <exclude body1="ur5e_wrist_2_link_2" body2="ur5e_wrist_3_link_2" />
+
+    <!-- UR5e robot 2 gripper contacts -->
+    <exclude body1="ur5e_wrist_3_link_2" body2="ur5e_base_mount_2" />
+    <exclude body1="ur5e_base_mount_2" body2="ur5e_gripper_base_2" />
+    <exclude body1="ur5e_gripper_base_2" body2="ur5e_right_driver_2" />
+    <exclude body1="ur5e_gripper_base_2" body2="ur5e_left_driver_2" />
+    <exclude body1="ur5e_gripper_base_2" body2="ur5e_right_spring_link_2" />
+    <exclude body1="ur5e_gripper_base_2" body2="ur5e_left_spring_link_2" />
+    <exclude body1="ur5e_right_driver_2" body2="ur5e_right_coupler_2" />
+    <exclude body1="ur5e_right_spring_link_2" body2="ur5e_right_follower_2" />
+    <exclude body1="ur5e_right_follower_2" body2="ur5e_right_pad_2" />
+    <exclude body1="ur5e_left_driver_2" body2="ur5e_left_coupler_2" />
+    <exclude body1="ur5e_left_spring_link_2" body2="ur5e_left_follower_2" />
+    <exclude body1="ur5e_left_follower_2" body2="ur5e_left_pad" />
+  </contact>
+
+</mujoco>

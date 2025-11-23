@@ -1,0 +1,23 @@
+<mujoco model="ur5e">
+  <option timestep="0.001" gravity="0 0 -9.80665" integrator="implicitfast" />
+  <compiler angle="radian" meshdir="../assets" autolimits="true" />
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.2 0.2 0.2" width="512" height="3072" />
+  </asset>
+
+  <include file="../mjcf/ur5e_defaults.xml" />
+  <include file="../mjcf/ur5e_contacts.xml" />
+  <include file="../mjcf/ur5e_assets.xml" />
+  <include file="../mjcf/ur5e_actuators.xml" />
+  <include file="../mjcf/ur5e_sensors.xml" />
+
+  <worldbody>
+    <include file="../mjcf/ur5e_2f85_links.xml" />
+  </worldbody>
+
+  <keyframe>
+    <key name="home" qpos="0 -1.5708 0 -1.5708 0 0 0 0 0 0 0 0 0 0" ctrl="0 -1.5708 0 -1.5708 0 0 0" />
+    <key name="standby1" qpos="3.1415926 -1.5708 -1.5708 -1.5708 1.5708 0 0 0 0 0 0 0 0 0" ctrl="3.1415926 -1.5708 -1.5708 -1.5708 1.5708 0 0" />
+    <key name="standby2" qpos="0 -1.5708 1.5708 -1.5708 -1.5708 0 0 0 0 0 0 0 0 0" ctrl="0 -1.5708 1.5708 -1.5708 -1.5708 0 0" />
+  </keyframe>
+</mujoco>

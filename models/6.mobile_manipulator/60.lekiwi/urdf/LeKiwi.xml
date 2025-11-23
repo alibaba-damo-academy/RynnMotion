@@ -1,0 +1,344 @@
+<mujoco model="LeKiwi">
+    <compiler angle="radian" meshdir="../assets/" autolimits="true"/>
+    <option gravity="0 0 -9.80665"/>
+    <asset>
+        <mesh name="drive_motor_mount-v4-3" file="drive_motor_mount-v4-3.stl" scale="0.001 0.001 0.001" />
+        <mesh name="base_plate_layer1-v5-1" file="base_plate_layer1-v5-1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="ST3215_Servo_Motor-v1-2" file="ST3215_Servo_Motor-v1-2.stl" scale="0.001 0.001 0.001" />
+        <mesh name="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2-2" file="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2-2.stl" scale="0.001 0.001 0.001" />
+        <mesh name="4-Omni-Directional-Wheel_Single_Body-v1-2" file="simplify_4-Omni-Directional-Wheel_Single_Body-v1-2.stl" scale="0.001 0.001 0.001" />
+        <mesh name="drive_motor_mount-v4-2" file="drive_motor_mount-v4-2.stl" scale="0.001 0.001 0.001" />
+        <mesh name="ST3215_Servo_Motor-v1-1" file="ST3215_Servo_Motor-v1-1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2-1" file="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2-1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="4-Omni-Directional-Wheel_Single_Body-v1-1" file="simplify_4-Omni-Directional-Wheel_Single_Body-v1-1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="drive_motor_mount-v4-1" file="drive_motor_mount-v4-1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="ST3215_Servo_Motor-v1" file="ST3215_Servo_Motor-v1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2" file="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2.stl" scale="0.001 0.001 0.001" />
+        <mesh name="4-Omni-Directional-Wheel_Single_Body-v1" file="simplify_4-Omni-Directional-Wheel_Single_Body-v1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="servo_controller_mount-v1" file="servo_controller_mount-v1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="lipo_battery_mount-v1" file="lipo_battery_mount-v1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="Battery---Battery-5.2-Ah-DC5521-Plug-v2" file="Battery---Battery-5.2-Ah-DC5521-Plug-v2.stl" scale="0.001 0.001 0.001" />
+        <mesh name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff" file="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff.stl" scale="0.001 0.001 0.001" />
+        <mesh name="base_plate_layer2-v1" file="base_plate_layer2-v1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="Bottom-V2-v3" file="Bottom-V2-v3.stl" scale="0.001 0.001 0.001" />
+        <mesh name="Top-V2-v2" file="Top-V2-v2.stl" scale="0.001 0.001 0.001" />
+        <mesh name="Camera-Mount-v6" file="Camera-Mount-v6.stl" scale="0.001 0.001 0.001" />
+        <mesh name="Camera-Model-v3" file="Camera-Model-v3.stl" scale="0.001 0.001 0.001" />
+        <mesh name="Base_08q-v1" file="Base_08q-v1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="WaveShare_Mounting_Plate_01d-v1" file="WaveShare_Mounting_Plate_01d-v1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-1" file="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-2" file="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-2.stl" scale="0.001 0.001 0.001" />
+        <mesh name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-3" file="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-3.stl" scale="0.001 0.001 0.001" />
+        <mesh name="drive_motor_mount-v4" file="drive_motor_mount-v4.stl" scale="0.001 0.001 0.001" />
+        <mesh file="waveshare_mounting_plate_so101_v2.stl"/>
+        <mesh file="sts3215_03a_v1.stl"/>
+        <mesh file="motor_holder_so101_base_v1.stl"/>
+        <mesh file="wrist_roll_follower_so101_v1.stl"/>
+        <mesh file="moving_jaw_so101_v1.stl"/>
+        <mesh file="base_motor_holder_so101_v1.stl"/>
+        <mesh file="upper_arm_so101_v1.stl"/>
+        <mesh file="wrist_roll_pitch_so101_v2.stl"/>
+        <mesh file="under_arm_so101_v1.stl"/>
+        <mesh file="rotation_pitch_so101_v1.stl"/>
+        <mesh file="motor_holder_so101_wrist_v1.stl"/>
+        <mesh file="sts3215_03a_no_horn_v1.stl"/>
+        <mesh file="base_so101_v2.stl"/>
+        <mesh name="Wrist_Camera" file="../assets/Wrist_Camera.stl"/>
+        <material name="base_motor_holder_so101_v1_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="base_so101_v2_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="sts3215_03a_v1_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="waveshare_mounting_plate_so101_v2_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="motor_holder_so101_base_v1_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="rotation_pitch_so101_v1_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="upper_arm_so101_v1_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="under_arm_so101_v1_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="motor_holder_so101_wrist_v1_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="sts3215_03a_no_horn_v1_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="wrist_roll_pitch_so101_v2_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="wrist_roll_follower_so101_v1_material" rgba="0.1 0.1 0.1 1"/>
+        <material name="moving_jaw_so101_v1_material" rgba="1 1 1 1"/>
+    </asset>
+
+    <tendon>
+        <fixed name="slider_actuator_x">
+            <joint joint="ST3215_Servo_Motor-v1-2_Hub---Servo" coef="0"/>
+            <joint joint="ST3215_Servo_Motor-v1-1_Hub-2---Servo" coef="-0.5"/>
+            <joint joint="ST3215_Servo_Motor-v1_Revolute-40" coef="0.5"/>
+        </fixed>
+
+        <fixed name="slide">
+            <joint joint="ST3215_Servo_Motor-v1-2_Hub---Servo" coef="0.0"/>
+            <joint joint="ST3215_Servo_Motor-v1-1_Hub-2---Servo" coef="0.286"/>
+            <joint joint="ST3215_Servo_Motor-v1_Revolute-40" coef="-0.286"/>
+        </fixed>
+
+        <fixed name="rotate">
+            <joint joint="ST3215_Servo_Motor-v1-2_Hub---Servo" coef="0.33"/>
+            <joint joint="ST3215_Servo_Motor-v1-1_Hub-2---Servo" coef="0.33"/>
+            <joint joint="ST3215_Servo_Motor-v1_Revolute-40" coef="0.33"/>
+        </fixed>
+    </tendon>
+
+    <default>
+        <default class="so101_new_calib">
+            <default class="visual">
+                <geom type="mesh" contype="0" conaffinity="0" group="2"/>
+            </default>
+            <default class="collision">
+                <geom group="3"/>
+                <default class="finger_collision">
+                    <geom type="box" solimp="0 1 0.001 0.02 3" solref="0.001 1" friction="2 0.05 0.05"/>
+                </default>
+            </default>
+        </default>
+        <default class="sts3215">
+            <geom contype="0" conaffinity="0"/>
+            <joint damping="0.60" frictionloss="0.052" armature="0.028"/>
+            <!-- For lerobot this are not exactly the motor params as the Kp and Kd not map 1-to-1 thus motor idendification with lerobot Kp=16 and Kd=32 should actually be done -->
+            <position kp="17.8"/>
+        </default>
+        <default class="backlash">
+            <!-- +/- 0.5° of backlash -->
+            <joint damping="0.01" frictionloss="0" armature="0.01" limited="true" range="-0.008726646259971648 0.008726646259971648"/>
+        </default>
+    </default>
+
+
+    <sensor>
+        <framepos name="eePos" objtype="site" objname="ee"/>
+        <framequat name="eeQuat" objtype="site" objname="ee"/>
+        <framelinvel name="eeLinVel" objtype="site" objname="ee"/>
+        <frameangvel name="eeAngVel" objtype="site" objname="ee"/>
+        <gyro name="eeGyro" site="ee"/>
+        <accelerometer name="eeAcc" site="ee"/>
+        <force name="eeForce" site="ee"/>
+    </sensor>
+
+    <actuator>
+
+        <velocity name="hinge_actuator_z" joint="hinge_joint_z" kv="100"/>
+        <velocity name="slider_actuator_x" joint="slide_joint_x" kv="100"/>
+        <velocity name="slider_actuator_y" joint="slide_joint_y" kv="100"/>
+
+        <velocity name="wheel1" joint="ST3215_Servo_Motor-v1-2_Hub---Servo" kv="10"/>
+        <velocity name="wheel2" joint="ST3215_Servo_Motor-v1-1_Hub-2---Servo" kv="10"/>
+        <velocity name="wheel3" joint="ST3215_Servo_Motor-v1_Revolute-40" kv="10"/>
+
+        <position class="sts3215" name="shoulder_pan" joint="shoulder_pan" forcerange="-3.35 3.35" ctrlrange="-1.91986 1.91986"/>
+        <position class="sts3215" name="shoulder_lift" joint="shoulder_lift" forcerange="-3.35 3.35" ctrlrange="-1.74533 1.74533"/>
+        <position class="sts3215" name="elbow_flex" joint="elbow_flex" forcerange="-3.35 3.35" ctrlrange="-1.69 1.69"/>
+        <position class="sts3215" name="wrist_flex" joint="wrist_flex" forcerange="-3.35 3.35" ctrlrange="-1.65806 1.65806"/>
+        <position class="sts3215" name="wrist_roll" joint="wrist_roll" forcerange="-3.35 3.35" ctrlrange="-2.74385 2.84121"/>
+        <position class="sts3215" name="gripper" joint="gripper" forcerange="-3.35 3.35" ctrlrange="-0.17453 1.74533"/>
+
+    </actuator>
+
+    <worldbody>
+        <light directional="true" pos="-0.5 0.5 3" dir="0 0 -1" />
+        <body name="chassis" pos="0 0 0.035">
+
+            <joint name="hinge_joint_z" type="hinge" axis="0 0 1"/>
+            <joint name="slide_joint_x" type="slide" axis="1 0 0"/>
+            <joint name="slide_joint_y" type="slide" axis="0 1 0"/>
+
+            <geom type="box" size="0.05 0.05 0.01" friction="0.1 0.001 0.001" mass="0.5"/>
+            <camera name="ext_camera" pos="0.5 0 0.8" euler="0 0.78 1.57" mode="track" resolution="1920 1080" sensorsize="5.37 4.04" focal="2.9 2.9"/>
+
+            <body name="base_plate_layer1-v5-1" pos="0.0 0.0 0.0" euler="0.0 0.0 -1.5708">
+                <site name="red_sphere" pos="0 0 0" size="0.01" rgba="1 0 0 1" type="sphere"/>
+                <geom name="base_plate_layer1-v5-1_geom" type="mesh" mesh="base_plate_layer1-v5-1" pos="0 0 0" euler="0 0 0" />
+                <inertial mass="1.9468624348344596" pos="-4.730687660675253e-15 -2.7155537377808555e-05 -0.0035000000000000005" fullinertia="0.005637109888809055 0.005628440956780792 0.0112496514690387 1.3447333053523504e-16 1.7848833522297417e-20 2.6469779601696886e-23" />
+                <body name="drive_motor_mount-v4-3" pos="-0.020610000007450578 -0.09 0.0020000000000000018" euler="-0.0 0.0 -1.5707963267948966">
+                    <geom name="drive_motor_mount-v4-3_geom" type="mesh" mesh="drive_motor_mount-v4-3" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="0.035884017191401885" pos="0.00017900181977195112 -0.0006914486154622601 0.0004348187449640745" fullinertia="3.2235542654871883e-06 3.901284246443171e-06 6.890721819180175e-06 -1.4488185386067676e-08 -3.4701845947883736e-08 1.0877684749210782e-07" />
+                    <body name="ST3215_Servo_Motor-v1-2" pos="0.00959999999999999 -0.004889999992549421 0.01436" euler="-6.123233995736766e-17 0.0 -1.5707963267948968">
+                        <geom name="ST3215_Servo_Motor-v1-2_geom" type="mesh" mesh="ST3215_Servo_Motor-v1-2" pos="0 0 0" euler="0 0 0" friction="0.001 0.0001 0.0001"/>
+                        <inertial mass="0.0658962961901927" pos="-0.014664257020729004 -0.008722816656342332 1.2191853053420506e-06" fullinertia="1.0300908387946657e-05 1.3913691655689984e-05 1.8215748982019662e-05 1.1951581712694353e-07 -1.7998869276644268e-09 8.88550145137008e-10" />
+                        <body name="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2-2" pos="-0.025500000000000002 0.011187500000000003 2.220446049250313e-18" euler="-1.5707963267948966 1.5192908393215678e-64 3.141592653589793">
+                            <joint name="ST3215_Servo_Motor-v1-2_Hub---Servo" type="hinge" axis="6.887535064975403e-49 -3.749399456654644e-33 1.0" pos="-4.4408920985006255e-18 -3.469446951953615e-18 -0.0015874999999999917"/>
+                            <geom name="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2-2_geom" type="mesh" mesh="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2-2" pos="0 0 0" euler="0 0 0" friction="0.001 0.0001 0.0001"/>
+                            <inertial mass="0.08665496109754897" pos="8.50877658112488e-09 7.358945011137765e-09 0.0023811166424899887" fullinertia="1.2296291761641504e-05 1.2296276073121143e-05 2.2911778015411222e-05 -3.19167294920219e-12 1.755992026942528e-12 1.5186622033709633e-12" />
+                            <body name="4-Omni-Directional-Wheel_Single_Body-v1-2" pos="-2.453269466693399e-18 0.0 0.0174625" euler="-3.141592653589793 -1.5192908393215678e-64 -0.2617993877991494">
+                                <geom name="4-Omni-Directional-Wheel_Single_Body-v1-2_geom" type="mesh" mesh="4-Omni-Directional-Wheel_Single_Body-v1-2" pos="0 0 0" euler="0 0 0" friction="0.001 0.0001 0.0001"/>
+                                <inertial mass="1.3542854082324305" pos="-7.105207895657716e-08 -1.1369917947312704e-07 -1.2090586078983279e-08" fullinertia="0.0010936200374455458 0.0010936108480286116 0.0018798127501507855 -5.245142023675448e-09 4.046730352778215e-10 1.0004485488405523e-10" />
+                            </body>
+                        </body>
+                    </body>
+                </body>
+                <body name="drive_motor_mount-v4-2" pos="0.08824728634432479 0.027151216421550314 0.001999999999999993" euler="-0.0 0.0 0.5235987755982997">
+                    <geom name="drive_motor_mount-v4-2_geom" type="mesh" mesh="drive_motor_mount-v4-2" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="0.035884017191401885" pos="0.00017900181977194513 -0.0006914486154622601 0.00043481874496407525" fullinertia="3.2235542654872044e-06 3.901284246443212e-06 6.890721819180191e-06 -1.4488185386052894e-08 -3.470184594788067e-08 1.0877684749210813e-07" />
+                    <body name="ST3215_Servo_Motor-v1-1" pos="0.010400000000000081 -0.004889999992549394 0.014359999999999984" euler="-6.406864442435952e-17 -7.857775794700331e-16 -1.570796326794897">
+                        <geom name="ST3215_Servo_Motor-v1-1_geom" type="mesh" mesh="ST3215_Servo_Motor-v1-1" pos="0 0 0" euler="0 0 0" friction="0.001 0.0001 0.0001"/>
+                        <inertial mass="0.0658962961901927" pos="-0.014664257020728995 -0.008722816656342374 1.2191853053600496e-06" fullinertia="1.0300908387946253e-05 1.391369165569022e-05 1.8215748982019256e-05 1.1951581712706042e-07 -1.7998869276893484e-09 8.885501451146896e-10" />
+                        <body name="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2-1" pos="-0.02550000000000004 0.011187499999999986 0.0" euler="-1.5707963267948966 2.220446049250324e-16 1.6021677874353734e-16">
+                            <joint name="ST3215_Servo_Motor-v1-1_Hub-2---Servo" type="hinge" axis="-2.018922194424455e-07 5.551115123125783e-17 0.9999996503124177" pos="1.0279185592260934e-07 6.850769951327593e-18 -0.0015873219592831226" />
+                            <geom name="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2-1_geom" type="mesh" mesh="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2-1" pos="0 0 0" euler="0 0 0" friction="0.001 0.0001 0.0001"/>
+                            <inertial mass="0.08665496109754897" pos="8.508776579152501e-09 7.358945011269938e-09 0.0023811166424899787" fullinertia="1.2296291761641589e-05 1.2296276073121566e-05 2.2911778015411107e-05 -3.1916729680995547e-12 1.755991986238418e-12 1.5186621750295066e-12" />
+                            <body name="4-Omni-Directional-Wheel_Single_Body-v1-1" pos="-8.88178419700111e-18 3.3306690738754695e-17 0.01746250000000007" euler="3.141592653589793 5.5511151231257747e-17 1.8325957145940461">
+                                <geom name="4-Omni-Directional-Wheel_Single_Body-v1-1_geom" type="mesh" mesh="4-Omni-Directional-Wheel_Single_Body-v1-1" pos="0 0 0" euler="0 0 0" friction="0.001 0.0001 0.0001"/>
+                                <inertial mass="1.3542854082324305" pos="-7.105207896524954e-08 -1.1369917948959942e-07 -1.2090586104095832e-08" fullinertia="0.0010936200374455313 0.0010936108480285981 0.0018798127501507892 -5.2451420243259696e-09 4.0467303541420525e-10 1.0004485627777097e-10" />
+                            </body>
+                        </body>
+                    </body>
+                </body>
+                <body name="drive_motor_mount-v4-1" pos="-0.06763728633687423 0.06284878357844971 0.0020000000000000018" euler="5.415442118703716e-17 -1.3598996028091536e-16 2.617993877991494">
+                    <geom name="drive_motor_mount-v4-1_geom" type="mesh" mesh="drive_motor_mount-v4-1" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="0.035884017191401885" pos="0.0001790018197719455 -0.0006914486154622614 0.0004348187449640748" fullinertia="3.2235542654871925e-06 3.901284246443185e-06 6.890721819180079e-06 -1.4488185386019653e-08 -3.470184594788136e-08 1.087768474921115e-07" />
+                    <body name="ST3215_Servo_Motor-v1" pos="0.00959999999999999 -0.004889999992549434 0.014360000000000013" euler="2.2863854877850107e-16 -1.2117128698533114e-16 -1.5707963267948966">
+                        <geom name="ST3215_Servo_Motor-v1_geom" type="mesh" mesh="ST3215_Servo_Motor-v1" pos="0 0 0" euler="0 0 0" friction="0.001 0.0001 0.0001"/>
+                        <inertial mass="0.0658962961901927" pos="-0.014664257020729005 -0.00872281665634233 1.2191853053530741e-06" fullinertia="1.0300908387946575e-05 1.3913691655689957e-05 1.821574898201946e-05 1.1951581712691303e-07 -1.7998869276903668e-09 8.885501451354187e-10" />
+                        <body name="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2" pos="-0.02549999999999999 0.011187500000000003 -8.881784197001253e-18" euler="-1.5707963267948966 2.4155320165495564e-32 1.570796326794897">
+                            <joint name="ST3215_Servo_Motor-v1_Revolute-40" type="hinge" axis="-1.2961506867803505e-16 -2.018922189983563e-07 0.9999996503124184" pos="2.796134304347991e-17 1.2953369686987196e-08 -0.0015874775641056748" />
+                            <geom name="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2_geom" type="mesh" mesh="3_8-Hex-Bore-Plastic-VersaHub-217-5828-v2" pos="0 0 0" euler="0 0 0" friction="0.001 0.0001 0.0001"/>
+                            <inertial mass="0.08665496109754897" pos="8.508776583007207e-09 7.358945014555165e-09 0.0023811166424899874" fullinertia="1.2296291761641274e-05 1.2296276073121517e-05 2.291177801541124e-05 -3.1916729470190563e-12 1.7559920314671269e-12 1.5186621186676676e-12" />
+                            <body name="4-Omni-Directional-Wheel_Single_Body-v1" pos="-2.220446049250313e-18 -7.105427357601001e-17 0.017462499999999947" euler="-3.141592653589793 6.689058043222894e-18 -0.2617993877991494">
+                                <geom name="4-Omni-Directional-Wheel_Single_Body-v1_geom" type="mesh" mesh="4-Omni-Directional-Wheel_Single_Body-v1" pos="0 0 0" euler="0 0 0" friction="0.001 0.0001 0.0001"/>
+                                <inertial mass="1.3542854082324305" pos="-7.105207895771595e-08 -1.1369917947234093e-07 -1.2090586101420118e-08" fullinertia="0.0010936200374455356 0.0010936108480285988 0.0018798127501507824 -5.245142023187557e-09 4.046730340142343e-10 1.0004485862393181e-10" />
+                            </body>
+                        </body>
+                    </body>
+                </body>
+                <body name="servo_controller_mount-v1" pos="0.0 0.06 0.0029999999999999983" euler="-0.0 0.0 -0.0">
+                    <geom name="servo_controller_mount-v1_geom" type="mesh" mesh="servo_controller_mount-v1" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="0.06175589411431898" pos="-3.6769132064861433e-14 0.0 -0.0012090515491760903" fullinertia="1.0761471541836937e-05 1.8890192778258753e-05 2.9413765100515303e-05 2.602085214051591e-22 -6.608103581422321e-19 1.6940658945086007e-21" />
+                </body>
+                <body name="lipo_battery_mount-v1" pos="-0.05 -0.02 0.0" euler="-0.0 0.0 1.5707963267948968">
+                    <geom name="lipo_battery_mount-v1_geom" type="mesh" mesh="lipo_battery_mount-v1" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="0.1653518573066047" pos="-4.0023770071114873e-16 -0.003034408758946965 0.003481111705280585" fullinertia="9.882008372625315e-05 7.479150401991051e-05 0.0001696386060861471 4.0216183619824973e-19 -1.283332239482784e-19 2.263422861539775e-06" />
+                    <body name="Battery---Battery-5.2-Ah-DC5521-Plug-v2" pos="2.220446049250313e-18 0.036499999999999984 0.003000000000000007" euler="-1.5707963267948966 6.123233995736767e-17 -1.5707963267948966">
+                        <geom name="Battery---Battery-5.2-Ah-DC5521-Plug-v2_geom" type="mesh" mesh="Battery---Battery-5.2-Ah-DC5521-Plug-v2" pos="0 0 0" euler="0 0 0" />
+                        <inertial mass="1.2215469988184764" pos="0.020000000000000018 -8.300646300726007e-05 -0.03492202423172039" fullinertia="0.0008162228074590446 0.00065975897252246 0.00047597821218279645 1.3010426069826053e-18 4.3368086899420163e-19 3.135378714781114e-06" />
+                    </body>
+                </body>
+                <body name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff" pos="0.0 1.3010426069826053e-18 0.025" euler="-0.0 0.0 -0.0">
+                    <geom name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff_geom" type="mesh" mesh="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="0.006150070863406618" pos="2.1864399078485972e-14 -1.2010287423717232e-09 -6.6970201384464195e-09" fullinertia="1.0965196650850464e-06 1.096519654894581e-06 1.837396493115053e-08 3.0209076389532564e-20 2.6974127807751317e-18 -9.149560120561933e-14" />
+                </body>
+                <body name="Camera-Mount-v6" pos="-4.551914400963142e-17 0.1 0.0" euler="-0.0 0.0 1.5707963267948966">
+                    <geom name="Camera-Mount-v6_geom" type="mesh" mesh="Camera-Mount-v6" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="0.09147094298688183" pos="0.0030289224720198397 0.00011242904514014542 0.02064739422580405" fullinertia="3.4924657273467044e-05 1.7958936503269972e-05 1.8461671554877027e-05 -2.8535574628355763e-08 1.483173255618039e-06 1.1115307183257866e-07" />
+                    <body name="Camera-Model-v3" pos="0.005843306737767851 -6.514592966970533e-17 0.02401122309705938" euler="-9.937525710640365e-31 1.3962634015954634 1.5707963267948966">
+                        <geom name="Camera-Model-v3_geom" type="mesh" mesh="Camera-Model-v3" pos="0 0 0" euler="0 0 0" />
+                        <inertial mass="0.039920058315088616" pos="0.00011860470791938802 0.00023881874959842783 0.004326318838629241" fullinertia="5.219349028990072e-06 5.305573488496055e-06 7.674281395938296e-06 6.564111916115197e-08 1.3381791184156136e-08 2.6971366213773554e-08" />
+                    </body>
+                </body>
+                <body name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-1" pos="-0.09660254037844385 0.03267949192431126 0.025" euler="8.164311994315686e-17 0.0 -0.0">
+                    <geom name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-1_geom" type="mesh" mesh="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-1" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="0.006150070863406618" pos="2.1866952693017084e-14 -1.2010287431252216e-09 -6.6970201384464195e-09" fullinertia="1.0965196650850481e-06 1.0965196548945726e-06 1.8373964931137077e-08 3.3881317890172236e-20 2.698646969952201e-18 -9.149560204254155e-14" />
+                </body>
+                <body name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-2" pos="0.02 -0.1 0.025" euler="8.164311994315686e-17 0.0 -0.0">
+                    <geom name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-2_geom" type="mesh" mesh="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-2" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="0.006150070863406618" pos="2.1862511800918584e-14 -1.2010287342434374e-09 -6.6970201384464195e-09" fullinertia="1.096519665085043e-06 1.0965196548945802e-06 1.837396493115063e-08 3.2187251995663636e-20 2.6969529040576923e-18 -9.14956011955086e-14" />
+                </body>
+                <body name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-3" pos="0.0766025403784439 0.06732050807568875 0.025" euler="8.164311994315686e-17 0.0 -0.0">
+                    <geom name="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-3_geom" type="mesh" mesh="94868A713_NO-THREADS_Female-Threaded-Hex-Standoff-3" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="0.006150070863406618" pos="2.1866952693017084e-14 -1.2010287342434374e-09 -6.6970201384464195e-09" fullinertia="1.096519665085043e-06 1.0965196548945862e-06 1.8373964931164182e-08 2.7105054312137834e-20 2.6969529040576923e-18 -9.149559950144271e-14" />
+                </body>
+
+                <body name="base_plate_layer2-v1" pos="0.0 -6.430841866638185e-19 0.056999999999999995" euler="-0.0 0.0 -0.0">
+                    <geom name="base_plate_layer2-v1_geom" type="mesh" mesh="base_plate_layer2-v1" pos="0 0 0" euler="0 0 0" />
+                    <inertial mass="1.9468624348344596" pos="-4.730687660675253e-15 -2.7155537377808555e-05 -0.0034999999999999966" fullinertia="0.0056371098888090545 0.005628440956780792 0.0112496514690387 1.3447333053523506e-16 1.7848833522266602e-20 0.0" />
+                    <body name="Bottom-V2-v3" pos="-2.980230284777008e-11 -0.06400000000000002 1.4210854715202004e-16" euler="-2.2293090993986824e-33 9.57182296485495e-19 -3.141592653589793">
+                        <geom name="Bottom-V2-v3_geom" type="mesh" mesh="Bottom-V2-v3" pos="0 0 0" euler="0 0 0" />
+                        <inertial mass="0.14588862570926195" pos="-0.00162379917481353 0.0017514442972537737 0.0028600223736592917" fullinertia="5.861212367196976e-05 0.000126485904877694 0.00018209683987627657 1.504419769130799e-06 2.5907710844293906e-06 -7.708271472892189e-07" />
+                        <body name="Top-V2-v2" pos="-2.2605506554644607e-07 0.0 0.02899957050948762" euler="-3.141592653589793 -9.571822964854947e-19 -5.551115123126053e-17">
+                            <geom name="Top-V2-v2_geom" type="mesh" mesh="Top-V2-v2" pos="0 0 0" euler="0 0 0" />
+                            <inertial mass="0.1256590419653392" pos="-0.0036436981408919968 -0.0003259633563240798 0.004946871759115404" fullinertia="5.8982381320791524e-05 0.00013338786905954623 0.00018586375094365218 1.6170683703385845e-07 2.7949770042390678e-06 -5.073018525688329e-07" />
+                        </body>
+                    </body>
+
+                    <body name="base" pos="0 0.028 0" quat="0.707 0 0 0.707" childclass="so101_new_calib">
+                        <include file="../../../environments/frame.xml"/>
+                        <inertial pos="0.0137179 -5.19711e-05 0.0334843" mass="0.147" fullinertia="0.000114686 0.000136117 0.000130364 -4.59787e-07 4.97151e-06 9.75275e-08"/>
+                        <geom type="mesh" class="visual" pos="-0.00636471 -9.94414e-05 -0.0024" quat="0.5 0.5 0.5 0.5" mesh="base_motor_holder_so101_v1" material="base_motor_holder_so101_v1_material"/>
+                        <geom type="mesh" class="visual" pos="-0.00636471 -8.97657e-09 -0.0024" quat="0.5 0.5 0.5 0.5" mesh="base_so101_v2" material="base_so101_v2_material"/>
+                        <geom type="mesh" class="visual" pos="0.0263353 -8.97657e-09 0.0437" quat="1 -2.85511e-16 -9.64433e-17 6.12908e-16" mesh="sts3215_03a_v1" material="sts3215_03a_v1_material"/>
+                        <geom type="mesh" class="visual" pos="-0.0309827 -0.000199441 0.0474" quat="0.5 0.5 0.5 0.5" mesh="waveshare_mounting_plate_so101_v2" material="waveshare_mounting_plate_so101_v2_material"/>
+
+                        <body name="shoulder" pos="0.0388353 -8.97657e-09 0.0624" quat="3.56167e-16 1.22818e-15 -1 -4.14635e-16">
+                            <joint axis="0 0 1" name="shoulder_pan" type="hinge" range="-1.9198621771937616 1.9198621771937634" class="sts3215"/>
+                            <inertial pos="-0.0307604 -1.66727e-05 -0.0252713" mass="0.100006" fullinertia="8.3759e-05 8.10403e-05 2.39783e-05 7.55525e-08 -1.16342e-06 1.54663e-07"/>
+                            <geom type="mesh" class="visual" pos="-0.0303992 0.000422241 -0.0417" quat="0.5 0.5 0.5 -0.5" mesh="sts3215_03a_v1" material="sts3215_03a_v1_material"/>
+                            <geom type="mesh" class="collision" pos="-0.0303992 0.000422241 -0.0417" quat="0.5 0.5 0.5 -0.5" mesh="sts3215_03a_v1" material="sts3215_03a_v1_material"/>
+                            <geom type="mesh" class="visual" pos="-0.0675992 -0.000177759 0.0158499" quat="0.5 0.5 -0.5 0.5" mesh="motor_holder_so101_base_v1" material="motor_holder_so101_base_v1_material"/>
+                            <geom type="mesh" class="collision" pos="-0.0675992 -0.000177759 0.0158499" quat="0.5 0.5 -0.5 0.5" mesh="motor_holder_so101_base_v1" material="motor_holder_so101_base_v1_material"/>
+                            <geom type="mesh" class="visual" pos="0.0122008 2.22413e-05 0.0464" quat="0.707107 -0.707107 -0 8.3163e-34" mesh="rotation_pitch_so101_v1" material="rotation_pitch_so101_v1_material"/>
+                            <geom type="mesh" class="collision" pos="0.0122008 2.22413e-05 0.0464" quat="0.707107 -0.707107 -0 8.3163e-34" mesh="rotation_pitch_so101_v1" material="rotation_pitch_so101_v1_material"/>
+
+                            <body name="upper_arm" pos="-0.0303992 -0.0182778 -0.0542" quat="0.5 -0.5 -0.5 -0.5">
+                                <joint axis="0 0 1" name="shoulder_lift" type="hinge" range="-1.7453292519943224 1.7453292519943366" class="sts3215"/>
+                                <inertial pos="-0.0898471 -0.00838224 0.0184089" mass="0.103" fullinertia="4.08002e-05 0.000147318 0.000142487 -1.97819e-05 -4.03016e-08 8.97326e-09"/>
+                                <geom type="mesh" class="visual" pos="-0.11257 -0.0155 0.0187" quat="4.56308e-16 -0.707107 0.707107 -1.37383e-16" mesh="sts3215_03a_v1" material="sts3215_03a_v1_material"/>
+                                <geom type="mesh" class="collision" pos="-0.11257 -0.0155 0.0187" quat="4.56308e-16 -0.707107 0.707107 -1.37383e-16" mesh="sts3215_03a_v1" material="sts3215_03a_v1_material"/>
+                                <geom type="mesh" class="visual" pos="-0.065085 0.012 0.0182" quat="0 1 0 0" mesh="upper_arm_so101_v1" material="upper_arm_so101_v1_material"/>
+                                <geom type="mesh" class="collision" pos="-0.065085 0.012 0.0182" quat="0 1 0 0" mesh="upper_arm_so101_v1" material="upper_arm_so101_v1_material"/>
+
+                                <body name="lower_arm" pos="-0.11257 -0.028 1.73763e-16" quat="0.707107 -5.98613e-17 -2.58051e-17 0.707107">
+                                    <joint axis="0 0 1" name="elbow_flex" type="hinge" range="-1.69 1.69" class="sts3215"/>
+                                    <inertial pos="-0.0980701 0.00324376 0.0182831" mass="0.104" fullinertia="2.87438e-05 0.000159844 0.00014529 7.41152e-06 1.26409e-06 -4.90188e-08"/>
+                                    <geom type="mesh" class="visual" pos="-0.0648499 -0.032 0.0182" quat="0 1 0 0" mesh="under_arm_so101_v1" material="under_arm_so101_v1_material"/>
+                                    <geom type="mesh" class="collision" pos="-0.0648499 -0.032 0.0182" quat="0 1 0 0" mesh="under_arm_so101_v1" material="under_arm_so101_v1_material"/>
+                                    <geom type="mesh" class="visual" pos="-0.0648499 -0.032 0.018" quat="3.92687e-16 -1 -1.9186e-15 -6.38378e-16" mesh="motor_holder_so101_wrist_v1" material="motor_holder_so101_wrist_v1_material"/>
+                                    <geom type="mesh" class="collision" pos="-0.0648499 -0.032 0.018" quat="3.92687e-16 -1 -1.9186e-15 -6.38378e-16" mesh="motor_holder_so101_wrist_v1" material="motor_holder_so101_wrist_v1_material"/>
+                                    <geom type="mesh" class="visual" pos="-0.1224 0.0052 0.0187" quat="7.21645e-16 1.56949e-15 1 -3.33067e-16" mesh="sts3215_03a_v1" material="sts3215_03a_v1_material"/>
+                                    <geom type="mesh" class="collision" pos="-0.1224 0.0052 0.0187" quat="7.21645e-16 1.56949e-15 1 -3.33067e-16" mesh="sts3215_03a_v1" material="sts3215_03a_v1_material"/>
+
+                                    <body name="wrist" pos="-0.1349 0.0052 3.62355e-17" quat="0.707107 9.58722e-16 -7.51313e-16 -0.707107">
+                                        <joint axis="0 0 1" name="wrist_flex" type="hinge" range="-1.6580628494556928 1.6580627293335335" class="sts3215"/>
+                                        <inertial pos="-0.000103312 -0.0386143 0.0281156" mass="0.079" fullinertia="3.68263e-05 2.5391e-05 2.1e-05 1.7893e-08 -5.28128e-08 3.6412e-06"/>
+                                        <geom type="mesh" class="visual" pos="8.32667e-17 -0.0424 0.0306" quat="0.5 0.5 0.5 -0.5" mesh="sts3215_03a_no_horn_v1" material="sts3215_03a_no_horn_v1_material"/>
+                                        <geom type="mesh" class="collision" pos="8.32667e-17 -0.0424 0.0306" quat="0.5 0.5 0.5 -0.5" mesh="sts3215_03a_no_horn_v1" material="sts3215_03a_no_horn_v1_material"/>
+                                        <geom type="mesh" class="visual" pos="0 -0.028 0.0181" quat="0.5 -0.5 -0.5 -0.5" mesh="wrist_roll_pitch_so101_v2" material="wrist_roll_pitch_so101_v2_material"/>
+                                        <geom type="mesh" class="collision" pos="0 -0.028 0.0181" quat="0.5 -0.5 -0.5 -0.5" mesh="wrist_roll_pitch_so101_v2" material="wrist_roll_pitch_so101_v2_material"/>
+
+                                        <body name="gripper" pos="5.55112e-17 -0.0611 0.0181" quat="0.0172091 -0.0172091 0.706897 0.706897">
+                                            <joint axis="0 0 1" name="wrist_roll" type="hinge" range="-2.7438472969992493 2.841206309382605" class="sts3215"/>
+                                            <inertial pos="0.000213627 0.000245138 -0.025187" mass="0.087" fullinertia="2.75087e-05 4.33657e-05 3.45059e-05 -3.35241e-07 -5.7352e-06 -5.17847e-08"/>
+                                            <geom type="mesh" class="visual" pos="0.0077 0.0001 -0.0234" quat="0.707107 -0.707107 1.66015e-15 6.45094e-15" mesh="sts3215_03a_v1" material="sts3215_03a_v1_material"/>
+                                            <geom type="mesh" class="collision" pos="0.0077 0.0001 -0.0234" quat="0.707107 -0.707107 1.66015e-15 6.45094e-15" mesh="sts3215_03a_v1" material="sts3215_03a_v1_material"/>
+                                            <geom type="mesh" class="visual" pos="8.32667e-17 -0.000218214 0.000949706" quat="0 1 0 0" mesh="wrist_roll_follower_so101_v1" material="wrist_roll_follower_so101_v1_material"/>
+                                            <geom type="mesh" class="collision" pos="8.32667e-17 -0.000218214 0.000949706" quat="0 1 0 0" mesh="wrist_roll_follower_so101_v1" material="wrist_roll_follower_so101_v1_material"/>
+                                            <geom class="finger_collision" name="fixed_jaw_pad_1" size="0.001 0.005 0.004" pos="-0.0089 0 -0.1014"/>
+                                            <geom class="finger_collision" name="fixed_jaw_pad_2" size="0.001 0.005 0.006" pos="-0.0109 0 -0.0914"/>
+                                            <geom class="finger_collision" name="fixed_jaw_pad_3" size="0.001 0.01 0.007" pos="-0.0126 0 -0.0768"/>
+                                            <geom class="finger_collision" name="fixed_jaw_pad_4" size="0.001 0.01 0.008" pos="-0.0143 0 -0.0572"/>
+
+                                            <body name="camera_orientation_bias" pos="0 0 0" euler="1.57 -3.14 0">
+                                                <body name="camera" pos="-0.002 -0.047 -0.1425" euler="0.36 0 0">
+                                                    <geom type="mesh" mesh="Wrist_Camera" rgba="1 1 1 1"/>
+                                                    <body pos="0.00125 0.044 0.065" euler="-2.5 0 1.570795">
+                                                        <camera name="Wrist_camera" mode="fixed" resolution="1920 1080" sensorsize="5.37 4.04" focal="2.9 2.9"/>
+                                                    </body>
+                                                </body>
+                                            </body>
+
+                                            <body name="ee" pos="0.0 0.0 -0.1" euler="1.57 3.14 0">
+                                                <site name="ee" rgba="0 0 0 0" size="0.002"/>
+                                                <include file="../../../environments/frame.xml"/>
+                                            </body>
+
+                                            <body name="moving_jaw_so101_v1" pos="0.0202 0.0188 -0.0234" quat="0.707107 0.707107 -1.85362e-08 1.85362e-08">
+                                                <joint axis="0 0 1" name="gripper" type="hinge" range="-0.17453297762778586 1.7453291995659765" class="sts3215"/>
+                                                <inertial pos="-0.00157495 -0.0300244 0.0192755" mass="0.012" fullinertia="6.61427e-06 1.89032e-06 5.28738e-06 -3.19807e-07 -5.90717e-09 -1.09945e-07"/>
+                                                <geom type="mesh" class="visual" pos="-5.55112e-17 -5.55112e-17 0.0189" quat="1 -0 3.00524e-16 -2.00834e-17" mesh="moving_jaw_so101_v1" material="moving_jaw_so101_v1_material"/>
+                                                <geom type="mesh" class="collision" pos="-5.55112e-17 -5.55112e-17 0.0189" quat="1 -0 3.00524e-16 -2.00834e-17" mesh="moving_jaw_so101_v1" material="moving_jaw_so101_v1_material"/>
+                                                <geom class="finger_collision" name="moving_jaw_pad_1" size="0.001 0.005 0.004" pos="-0.0113 -0.077 0.019"/>
+                                                <geom class="finger_collision" name="moving_jaw_pad_2" size="0.001 0.005 0.006" pos="-0.0093 -0.067 0.019"/>
+                                                <geom class="finger_collision" name="moving_jaw_pad_3" size="0.001 0.01 0.006" pos="-0.0073 -0.055 0.019"/>
+                                                <geom class="finger_collision" name="moving_jaw_pad_4" size="0.001 0.01 0.008" pos="-0.0073 -0.035 0.019"/>
+                                            </body>
+                                        </body>
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+
+                </body>
+            </body>
+
+        </body>
+
+    </worldbody>
+</mujoco>

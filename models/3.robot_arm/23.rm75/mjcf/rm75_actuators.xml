@@ -1,0 +1,37 @@
+<mujoco model="rm75_gripper_actuators">
+
+  <contact>
+    <exclude body1="base" body2="Link1" />
+    <exclude body1="gripper_base" body2="left_driver" />
+    <exclude body1="gripper_base" body2="right_driver" />
+    <exclude body1="gripper_base" body2="left_spring_link" />
+    <exclude body1="gripper_base" body2="right_spring_link" />
+    <exclude body1="right_coupler" body2="right_follower" />
+    <exclude body1="left_coupler" body2="left_follower" />
+  </contact>
+
+  <tendon>
+    <fixed name="split">
+      <joint joint="right_driver_joint" coef="0.5" />
+      <joint joint="left_driver_joint" coef="0.5" />
+    </fixed>
+  </tendon>
+
+  <equality>
+    <connect anchor="0 0 0" body1="right_follower" body2="right_coupler" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <connect anchor="0 0 0" body1="left_follower" body2="left_coupler" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <joint joint1="right_driver_joint" joint2="left_driver_joint" polycoef="0 1 0 0 0" solimp="0.95 0.99 0.001" solref="0.005 1" />
+  </equality>
+
+  <actuator>
+    <position class="rm75" name="lj1" joint="joint1" kp="500" dampratio="2" />
+    <position class="rm75" name="lj2" joint="joint2" kp="500" dampratio="2" />
+    <position class="rm75" name="lj3" joint="joint3" kp="500" dampratio="2" />
+    <position class="rm75" name="lj4" joint="joint4" kp="500" dampratio="2" />
+    <position class="rm75" name="lj5" joint="joint5" kp="300" dampratio="2" />
+    <position class="rm75" name="lj6" joint="joint6" kp="300" dampratio="2" />
+    <position class="rm75" name="lj7" joint="joint7" kp="120" dampratio="2" />
+    <general name="grip" tendon="split" forcerange="-5 5" ctrlrange="0 255" gainprm="0.3137255 0 0" biasprm="0 -100 -10" biastype="affine" />
+  </actuator>
+
+</mujoco>

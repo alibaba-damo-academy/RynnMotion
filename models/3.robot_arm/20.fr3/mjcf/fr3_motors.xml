@@ -1,0 +1,25 @@
+<mujoco model="fr3_motors">
+
+  <tendon>
+    <fixed name="split">
+      <joint joint="finger_joint1" coef="0.5"/>
+      <joint joint="finger_joint2" coef="0.5"/>
+    </fixed>
+  </tendon>
+
+  <equality>
+    <joint joint1="finger_joint1" joint2="finger_joint2" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+  </equality>
+
+  <actuator>
+    <motor class="fr3" name="lj1" joint="fr3_joint1"/>
+    <motor class="fr3" name="lj2" joint="fr3_joint2"/>
+    <motor class="fr3" name="lj3" joint="fr3_joint3"/>
+    <motor class="fr3" name="lj4" joint="fr3_joint4"/>
+    <motor class="fr3" name="lj5" joint="fr3_joint5"/>
+    <motor class="fr3" name="lj6" joint="fr3_joint6"/>
+    <motor class="fr3" name="lj7" joint="fr3_joint7"/>
+    <general class="fr3" name="grip" tendon="split" forcerange="-100 100" ctrlrange="0 255" gainprm="0.01568627451 0 0" biasprm="0 -100 -10"/>
+  </actuator>
+
+</mujoco>

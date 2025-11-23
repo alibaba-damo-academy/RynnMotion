@@ -1,0 +1,88 @@
+<mujoco model="rizon4s">
+  <compiler angle="radian" />
+
+  <default>
+    <default class="rizon4s">
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" />
+      </default>
+      <default class="collision">
+        <geom group="3" />
+        <default class="finger_collision">
+          <geom type="box" solimp="0 1 0.001 0.02 3" solref="0.001 1" friction="2 0.05 0.05" />
+        </default>
+      </default>
+    </default>
+    <default class="joint">
+      <geom contype="0" conaffinity="0" />
+      <joint damping="0.60" frictionloss="0.052" armature="0.028" />
+      <position kp="200" dampratio="1.0" />
+    </default>
+  </default>
+
+  <worldbody>
+    <body name="base" pos="0 0 09" childclass="rizon4s">
+      <geom type="cylinder" size="0.002 0.06" rgba="1 0 0 1" pos="0.06 0.0 0.0" euler="0 1.57079 0" class="visual" />
+      <geom type="cylinder" size="0.002 0.06" rgba="0 1 0 1" pos="0.0 0.06 0.0" euler="1.57079 0 0" class="visual" />
+      <geom type="cylinder" size="0.002 0.06" rgba="0 0 1 1" pos="0.0 0.0 0.06" euler="0 0 0" class="visual" />
+
+      <inertial pos="0.0030905 -0.00024462 0.029293" mass="3.8" diaginertia="0.02 0.02 0.02" />
+
+      <body name="link1" pos="0 0 0.155" quat="0 0 0 -1">
+        <site name="link1_Site" pos="0.0 0 0.0" rgba="1 0 0 1" />
+        <inertial pos="0 0 0.15" mass="3.6" diaginertia="0.015 0.015 0.008" />
+        <joint name="joint1" pos="0 0 0" axis="0 0 1" range="-2.8798 2.8798" actuatorfrcrange="-123 123" class="joint" />
+
+        <body name="link2" pos="0 0.03 0.21">
+          <inertial pos="0 0.04 0.1" mass="2.7" diaginertia="0.01 0.01 0.005" />
+          <joint name="joint2" pos="0 0 0" axis="0 1 0" range="-2.3562 2.3562" actuatorfrcrange="-123 123" class="joint" />
+
+          <body name="link3" pos="0 0.035 0.205">
+            <site name="link3_Site" pos="0.0 0. 0.0182778" rgba="1 0 0 1" />
+            <inertial pos="-0.01 0 0.14" mass="2.4" diaginertia="0.008 0.008 0.003" />
+            <joint name="joint3" pos="0 0 0" axis="0 0 1" range="-3.0543 3.0543" actuatorfrcrange="-64 64" class="joint" />
+
+            <body name="link4" pos="-0.02 -0.03 0.19" quat="0 0 0 -1">
+              <site name="link4_Site" pos="0.0 0 0.0182778" rgba="1 0 0 1" />
+              <inertial pos="-0.01 0.03 0.1" mass="2.4" diaginertia="0.008 0.008 0.003" />
+              <joint name="joint4" pos="0 0 0" axis="0 1 0" range="-1.9548 2.7751" actuatorfrcrange="-64 64" class="joint" />
+
+              <body name="link5" pos="-0.02 0.025 0.195" quat="0 0 0 -1">
+                <inertial pos="0 0 0.14" mass="2.3" diaginertia="0.008 0.008 0.003" />
+                <joint name="joint5" pos="0 0 0" axis="0 0 1" range="-3.0543 3.0543" actuatorfrcrange="-39 39" class="joint" />
+
+                <body name="link6" pos="0 0.03 0.19">
+                  <inertial pos="0.02 0.06 0.07" mass="2.2" diaginertia="0.008 0.008 0.005" />
+                  <joint name="joint6" pos="0 0 0" axis="0 1 0" range="-1.4835 4.6251" actuatorfrcrange="-39 39" class="joint" />
+
+                  <body name="link7" pos="-0.015 0.073 0.11" quat="0.707107 0 -0.707107 0">
+                    <inertial pos="0 0 0.1" mass="1.4" diaginertia="0.004 0.004 0.002" />
+                    <joint name="joint7" pos="0 0 0" axis="0 0 1" range="-3.0543 3.0543" actuatorfrcrange="-39 39" class="joint" />
+                    <site name="EE" size="0.005" pos="0.0 0.0 0.2" euler="3.1415926 0 0" rgba="1 0 0 1" />
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="joint1" joint="joint1" class="joint" kp="10000" dampratio="1.0" ctrlrange="-2.8798 2.8798" />
+    <position name="joint2" joint="joint2" class="joint" kp="10000" dampratio="1.0" ctrlrange="-2.3562 2.3562" />
+    <position name="joint3" joint="joint3" class="joint" kp="6000" dampratio="1.0" ctrlrange="-3.0543 3.0543" />
+    <position name="joint4" joint="joint4" class="joint" kp="2000" dampratio="1.0" ctrlrange="-1.9548 2.7751" />
+    <position name="joint5" joint="joint5" class="joint" kp="500" dampratio="1.0" ctrlrange="-3.0543 3.0543" />
+    <position name="joint6" joint="joint6" class="joint" kp="500" dampratio="1.0" ctrlrange="-1.4835 4.6251" />
+    <position name="joint7" joint="joint7" class="joint" kp="500" dampratio="1.0" ctrlrange="-3.0543 3.0543" />
+  </actuator>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0" />
+    <key name="standby1" qpos="0 0 0 1.57079 0 0 0" ctrl="0 0 0 1.57079 0 0 0" />
+    <key name="standby2" qpos="0 -0.7854 0 1.57079 0 0.7854 0" ctrl="0 -0.7854 0 1.57079 0 0.7854 0" />
+  </keyframe>
+
+</mujoco>

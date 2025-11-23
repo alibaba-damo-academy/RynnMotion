@@ -1,0 +1,8 @@
+package piperlcm;
+
+struct Time {
+    int32_t seq;
+    int64_t stamp;  // time in nanoseconds
+    string frame_id;
+}
+

@@ -1,0 +1,24 @@
+<mujoco model="dm6dof_assets">
+
+  <asset>
+    <!-- Mesh files -->
+    <mesh file="link0.STL"/>
+    <mesh file="link1.STL"/>
+    <mesh file="link2.STL"/>
+    <mesh file="link3.STL"/>
+    <mesh file="link4.STL"/>
+    <mesh file="link5.STL"/>
+    <mesh file="link6.STL"/>
+
+    <!-- Materials -->
+    <material name="link0_material" rgba="1 1 1 1"/>
+    <material name="link1_material" rgba="0.7 0.7 0.7 1"/>
+    <material name="link2_material" rgba="1 1 1 1"/>
+    <material name="link3_material" rgba="0.7 0.7 0.7 1"/>
+    <material name="link4_material" rgba="1 1 1 1"/>
+    <material name="link5_material" rgba="0.7 0.7 0.7 1"/>
+    <material name="link6_material" rgba="1 1 1 1"/>    
+
+  </asset>
+
+</mujoco>

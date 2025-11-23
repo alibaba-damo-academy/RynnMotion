@@ -1,0 +1,44 @@
+<mujoco model="asset">
+    <material name="light_gray" rgba="0.76 0.76 0.76 1"/>
+    <material name="medium_gray" rgba="0.4 0.4 0.4 1"/>
+    <material name="black" rgba="0.2 0.2 0.2 1"/>
+    <material name="metal" rgba="0.7 0.7 0.7 1"/>
+
+    <mesh name="pelvis" file="../meshes/pelvis.STL"/>
+    
+    <mesh name="leg_l1_link" file="../meshes/leg_l1_link.STL"/>
+    <mesh name="leg_l2_link" file="../meshes/leg_l2_link.STL"/>
+    <mesh name="leg_l3_link" file="../meshes/leg_l3_link.STL"/>
+    <mesh name="leg_l4_link" file="../meshes/leg_l4_link.STL"/>
+    <mesh name="leg_l5_link" file="../meshes/leg_l5_link.STL"/>
+    <mesh name="leg_l6_link" file="../meshes/leg_l6_link.STL"/>
+    
+    <mesh name="leg_r1_link" file="../meshes/leg_r1_link.STL"/>
+    <mesh name="leg_r2_link" file="../meshes/leg_r2_link.STL"/>
+    <mesh name="leg_r3_link" file="../meshes/leg_r3_link.STL"/>
+    <mesh name="leg_r4_link" file="../meshes/leg_r4_link.STL"/>
+    <mesh name="leg_r5_link" file="../meshes/leg_r5_link.STL"/>
+    <mesh name="leg_r6_link" file="../meshes/leg_r6_link.STL"/>
+    
+    <mesh name="torso_link" file="../meshes/torso_link.STL"/>
+    
+    <mesh name="left_shoulder_pitch_link" file="../meshes/left_shoulder_pitch_link.STL"/>
+    <mesh name="left_shoulder_roll_link" file="../meshes/left_shoulder_roll_link.STL"/>
+    <mesh name="left_shoulder_yaw_link" file="../meshes/left_shoulder_yaw_link.STL"/>
+    <mesh name="left_elbow_pitch_link" file="../meshes/left_elbow_pitch_link.STL"/>
+    <mesh name="left_elbow_roll_link" file="../meshes/left_elbow_roll_link.STL"/>
+    <mesh name="left_wrist_pitch_link" file="../meshes/left_wrist_pitch_link.STL"/>
+    <mesh name="left_wrist_yaw_link" file="../meshes/left_wrist_yaw_link.STL"/>
+    
+    <mesh name="right_shoulder_pitch_link" file="../meshes/right_shoulder_pitch_link.STL"/>
+    <mesh name="right_shoulder_roll_link" file="../meshes/right_shoulder_roll_link.STL"/>
+    <mesh name="right_shoulder_yaw_link" file="../meshes/right_shoulder_yaw_link.STL"/>
+    <mesh name="right_elbow_pitch_link" file="../meshes/right_elbow_pitch_link.STL"/>
+    <mesh name="right_elbow_roll_link" file="../meshes/right_elbow_roll_link.STL"/>
+    <mesh name="right_wrist_pitch_link" file="../meshes/right_wrist_pitch_link.STL"/>
+    <mesh name="right_wrist_yaw_link" file="../meshes/right_wrist_yaw_link.STL"/>
+    
+    <mesh name="head_yaw_link" file="../meshes/head_yaw_link.STL"/>
+    <mesh name="head_pitch_link" file="../meshes/head_pitch_link.STL"/>
+
+</mujoco>

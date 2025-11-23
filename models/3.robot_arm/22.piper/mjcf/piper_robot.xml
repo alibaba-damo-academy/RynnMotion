@@ -1,0 +1,27 @@
+<mujoco model="piper_description">
+  <option timestep="0.001" gravity="0 0 -9.80665" integrator="implicitfast"/>
+  <compiler angle="radian" meshdir="../assets" autolimits="true"/>
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.2 0.2 0.2" width="512" height="3072"/>
+  </asset>
+
+  <include file="../mjcf/piper_defaults.xml"/>
+  <include file="../mjcf/piper_assets.xml"/>
+  <include file="../mjcf/piper_actuators.xml"/>
+  <include file="../mjcf/piper_sensors.xml"/>
+
+  <worldbody>
+    <include file="../mjcf/piper_links.xml"/>
+  </worldbody>
+
+  <contact>
+    <exclude body1="base_link" body2="link1"/>
+  </contact>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0"/>
+    <key name="standby1" qpos="0 1.57079 -1.57079 0 1.57079 0 0 0" ctrl="0 1.57079 -1.57079 0 1.57079 0 0"/>
+    <key name="standby2" qpos="0 1.57079 -1.57079 0 1.57079 0 0 0" ctrl="0 1.57079 -1.57079 0 1.57079 0 0"/>
+  </keyframe>
+
+</mujoco>

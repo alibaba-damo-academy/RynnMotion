@@ -1,0 +1,67 @@
+<mujoco model="oneLink scene">
+  <compiler angle="radian" meshdir="../assets/" />
+
+  <asset>
+    <mesh name="base" file="base.STL" />
+    <mesh name="link1" file="link1.STL" />
+    <material name="wood_mat" rgba="0.2 0.2 0.2 1" specular="0.1" shininess="0.5" reflectance="0.1" />
+  </asset>
+
+  <option timestep="0.001" gravity="0 0 -9.80665" />
+
+  <statistic center="0.3 0 0.4" extent="1" />
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+    <rgba haze="0.15 0.25 0.35 1" />
+    <global azimuth="120" elevation="-20" />
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072" />
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+      markrgb="0.8 0.8 0.8" width="300" height="300" />
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2" />
+  </asset>
+
+  <worldbody>
+    <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" />
+
+    <!-- Use replicate to create two instances of the robot -->
+    <replicate count="1" offset="-0.6 0 0">
+      <body name="torso" pos="0 0 0.6" euler="0 0 0">
+        <geom type="mesh" rgba="0.7529 0.7529 0.7529 1" mesh="base" />
+        <body name="link1" pos="0.0426 0 0">
+          <inertial pos="0.0426 0 -0.211027" quat="1 0 0 0" mass="1.13355" diaginertia="0.0442953 0.0442502 0.000408361" />
+          <joint name="joint1" type="hinge" pos="0.0426 0 0" axis="1 0 0" damping="0.0" />
+          <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="link1" />
+          <site name="link1ee" pos="0.039 0 -0.539" rgba="1 0 0 1" size="0.001" />
+        </body>
+      </body>
+    </replicate>
+  </worldbody>
+
+  <actuator>
+    <position name="motor1" joint="joint10" kp="1000" dampratio="1.0" />
+    <motor name="motor2" joint="joint11" ctrlrange="-50 50" />
+  </actuator>
+
+  <sensor>
+    <!-- Sensors for first robot (index 0) -->
+    <framepos name="eePos-0" objtype="site" objname="link1ee" />
+    <framequat name="eeQuat-0" objtype="site" objname="link1ee" />
+    <framelinvel name="eeLinVel-0" objtype="site" objname="link1ee" />
+    <frameangvel name="eeAngVel-0" objtype="site" objname="link1ee" />
+    <gyro name="eeGyro-0" site="link1ee" />
+    <accelerometer name="eeAcc-0" site="link1ee" />
+
+    <!-- Sensors for second robot (index 1) -->
+    <framepos name="eePos-1" objtype="site" objname="link1ee0" />
+    <framequat name="eeQuat-1" objtype="site" objname="link1ee0" />
+    <framelinvel name="eeLinVel-1" objtype="site" objname="link1ee0" />
+    <frameangvel name="eeAngVel-1" objtype="site" objname="link1ee0" />
+    <gyro name="eeGyro-1" site="link1ee0" />
+    <accelerometer name="eeAcc-1" site="link1ee0" />
+  </sensor>
+</mujoco>

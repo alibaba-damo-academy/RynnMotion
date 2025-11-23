@@ -1,0 +1,28 @@
+package lcmMotion;
+
+struct lcm_record
+{
+    int64_t counter;          
+    float simTime;            
+    float wallTime;  
+    float duration;
+    
+    float qFb[20];            
+    float qdFb[20];           
+    float qtauFb[20];
+    
+    float qCmd[20];            
+    float qdCmd[20];  
+    float qtauCmd[20];
+
+    float eeXDes[20];
+    float eeXdotDes[20];
+
+    float eeXFb[20];
+    float eeXdotFb[20];
+
+    float ftForce[3];
+    float ftTorque[3];
+
+    float dataBuffer[50];
+}

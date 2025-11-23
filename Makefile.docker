@@ -1,0 +1,141 @@
+# RynnMotion Docker Development Makefile
+# Usage: make -f Makefile.docker <target>
+# Or create alias: alias dmake='make -f Makefile.docker'
+
+.PHONY: help build run exec stop clean rebuild logs shell test
+
+# Default target
+help:
+	@echo "RynnMotion Docker Development Commands"
+	@echo "======================================="
+	@echo ""
+	@echo "Quick Start:"
+	@echo "  make -f Makefile.docker build    - Build Docker image"
+	@echo "  make -f Makefile.docker run      - Run container and enter shell"
+	@echo "  make -f Makefile.docker shell    - Enter running container"
+	@echo ""
+	@echo "Development:"
+	@echo "  make -f Makefile.docker exec CMD='<command>' - Execute command in container"
+	@echo "  make -f Makefile.docker test     - Run tests in container"
+	@echo "  make -f Makefile.docker build-project - Build RynnMotion in container"
+	@echo ""
+	@echo "Management:"
+	@echo "  make -f Makefile.docker logs     - View container logs"
+	@echo "  make -f Makefile.docker stop     - Stop container"
+	@echo "  make -f Makefile.docker clean    - Remove container and volumes"
+	@echo "  make -f Makefile.docker rebuild  - Clean rebuild (no cache)"
+	@echo ""
+	@echo "Tip: Create an alias for easier usage:"
+	@echo "  alias dmake='make -f Makefile.docker'"
+	@echo ""
+
+# Build the Docker image
+build:
+	@echo "Building RynnMotion Docker image..."
+	docker-compose build rynnmotion-dev
+	@echo "✓ Build complete!"
+
+# Rebuild without cache
+rebuild:
+	@echo "Rebuilding RynnMotion Docker image (no cache)..."
+	docker-compose build --no-cache rynnmotion-dev
+	@echo "✓ Rebuild complete!"
+
+# Run container and enter interactive shell
+run:
+	@echo "Starting RynnMotion development container..."
+	@./scripts/docker-run.sh
+
+# Enter shell in running container
+shell:
+	@echo "Entering container shell..."
+	@docker exec -it rynnmotion-dev /bin/bash || echo "Error: Container not running. Use 'make run' first."
+
+# Execute command in container
+exec:
+	@docker exec -it rynnmotion-dev bash -c "$(CMD)" || echo "Error: Container not running. Use 'make run' first."
+
+# Stop container
+stop:
+	@echo "Stopping RynnMotion container..."
+	docker-compose down
+	@echo "✓ Container stopped"
+
+# Clean up containers and volumes
+clean:
+	@echo "Removing RynnMotion containers and volumes..."
+	@read -p "This will delete build artifacts and venv. Continue? [y/N] " -n 1 -r; \
+	echo; \
+	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
+		docker-compose down -v; \
+		echo "✓ Cleanup complete"; \
+	else \
+		echo "Cancelled"; \
+	fi
+
+# View logs
+logs:
+	docker-compose logs -f rynnmotion-dev
+
+# Build RynnMotion project inside container
+build-project:
+	@echo "Building RynnMotion C++ libraries..."
+	@docker exec -it rynnmotion-dev bash -c " \
+		mkdir -p /workspace/build && \
+		cd /workspace/build && \
+		cmake -DCMAKE_BUILD_TYPE=Release .. && \
+		make -j\$$(nproc) \
+	"
+	@echo "✓ Build complete!"
+
+# Install Python package
+install-python:
+	@echo "Installing RynnMotion Python package..."
+	@docker exec -it rynnmotion-dev bash -c " \
+		cd /workspace/python && \
+		python3 -m venv venv && \
+		. venv/bin/activate && \
+		pip install -e '.[dev]' \
+	"
+	@echo "✓ Python package installed!"
+
+# Run tests
+test:
+	@echo "Running RynnMotion tests..."
+	@docker exec -it rynnmotion-dev bash -c " \
+		cd /workspace/build && \
+		ctest --output-on-failure \
+	"
+
+# Start Jupyter
+jupyter:
+	@echo "Starting Jupyter Lab..."
+	docker-compose --profile jupyter up -d rynnmotion-jupyter
+	@echo "✓ Jupyter Lab running at http://localhost:8888"
+
+# Stop Jupyter
+jupyter-stop:
+	docker-compose --profile jupyter down
+
+# Format code
+format:
+	@echo "Formatting C++ code..."
+	@docker exec -it rynnmotion-dev bash -c " \
+		find /workspace/src -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i \
+	"
+	@echo "✓ Code formatted!"
+
+# Complete setup (build image + build project + install Python)
+setup: build
+	@echo "Running complete setup..."
+	@make -f Makefile.docker build-project
+	@make -f Makefile.docker install-python
+	@echo ""
+	@echo "=========================================="
+	@echo "✓ RynnMotion setup complete!"
+	@echo "=========================================="
+	@echo ""
+	@echo "Next steps:"
+	@echo "  make -f Makefile.docker shell  - Enter container"
+	@echo "  make -f Makefile.docker test   - Run tests"
+	@echo ""

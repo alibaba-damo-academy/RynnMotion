@@ -1,0 +1,11 @@
+package piperlcm;
+
+struct JointState {
+    Time header;
+    string name[7];        
+    double position[7];   
+    double velocity[7];   
+    double effort[7];     
+}
+
+

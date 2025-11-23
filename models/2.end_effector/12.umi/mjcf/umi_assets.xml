@@ -1,0 +1,72 @@
+<mujoco model="umi_assets">
+
+  <default>
+    <default class="umi_gripper">
+      <joint frictionloss="0.1" armature="0.1" />
+      <position kp="1000" />
+
+      <default class="screw">
+        <geom type="cylinder" size="0.0035 0.0035 0.01" material="black" contype="0" conaffinity="0" />
+      </default>
+
+      <default class="gripper_slide">
+        <joint type="slide" damping="0.1" range="-1.2 1.2" />
+        <position kp="100" dampratio="0.1" ctrlrange="-1.2 1.2" />
+      </default>
+      <default class="gripper_hinge">
+        <joint type="hinge" damping="0.1" range="-31.415 31.415" />
+        <position kp="10" dampratio="0.1" ctrlrange="-3.1415 3.1415" />
+      </default>
+      <default class="finger_slide">
+        <joint type="slide" stiffness="100" damping="10.1" range="0 0.05" />
+      </default>
+
+      <default class="finger_actuator">
+        <position ctrlrange="0 0.05" />
+      </default>
+      <default class="gripper_actuator">
+        <position kp="100" dampratio="1" ctrlrange="-1.2 1.2" />
+      </default>
+      <default class="gripper_rot_actuator">
+        <position kp="100" dampratio="1" ctrlrange="-3.1415 3.1415" />
+      </default>
+
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" density="0" group="2" />
+      </default>
+      <default class="collision">
+        <geom type="mesh" group="3" />
+      </default>
+
+      <default class="marker">
+        <geom type="box" size="0.009 0.009 0.00001" material="white" contype="0" conaffinity="0" mass="0.0" />
+      </default>
+      <default class="finger_holder_geom">
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" material="white" />
+      </default>
+
+    </default>
+  </default>
+
+  <asset>
+    <mesh file="base_link.stl" />
+    <mesh file="left_finger_holder.stl" />
+    <mesh file="left_finger.stl" />
+    <mesh file="right_finger_holder.stl" />
+    <mesh file="right_finger.stl" />
+    <mesh file="gopro.stl" />
+
+    <texture name="right_aruco_sticker" type="2d" file="right_aruco_sticker.png" />
+    <texture name="left_aruco_sticker" type="2d" file="left_aruco_sticker.png" />
+    <material name="Right_Aruco_Base_Sticker" texture="right_aruco_sticker" />
+    <material name="Left_Aruco_Base_Sticker" texture="left_aruco_sticker" />
+
+    <material name="mirror" rgba="0 0 0 1" texrepeat="5 5" reflectance="1.0" />
+    <material name="white" rgba="1 1 1 1" />
+    <material name="gray" rgba="0.15 0.15 0.15 1" />
+    <material name="light_gray" rgba="0.6 0.6 0.6 1" />
+    <material name="orange" rgba="0.92 0.68 0.24 1" />
+    <material name="black" rgba="0 0 0 1" />
+  </asset>
+
+</mujoco>

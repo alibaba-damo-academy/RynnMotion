@@ -1,0 +1,47 @@
+<mujoco model="oneLink">
+  <compiler angle="radian" meshdir="../assets/"/>
+
+  <asset>
+    <mesh name="base" file="base.STL"/>
+    <mesh name="link1" file="link1.STL"/>
+    <material name="wood_mat" rgba="0.2 0.2 0.2 1" specular="0.1" shininess="0.5" reflectance="0.1"/>
+  </asset>
+
+  <contact>
+    <exclude body1="torso" body2="link1"/>
+  </contact>
+
+  <worldbody>
+    <body name="torso" pos="0 0.0 0.6" euler="0 0 0">
+      <geom type="mesh" rgba="0.7529 0.7529 0.7529 1" mesh="base"/>
+      <body name="link1" pos="0.0426 0 0">
+        <inertial pos="0.0426 0 -0.211027" quat="1 0 0 0" mass="1.13355" diaginertia="0.0442953 0.0442502 0.000408361"/>
+        <joint name="joint1" type="hinge" pos="0.0426 0 0" axis="1 0 0" damping="0.0" range="-6.2832 6.2832" actuatorfrcrange="-100 100"/>
+        <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="link1"/>
+        <site name="EE" pos="0.039 0 -0.539" rgba="1 0 0 1" size="0.001" />
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="motor1" joint="joint1" kp="1000" dampratio="1.0"/>
+  </actuator>
+  <sensor>
+    <framepos name="eePos" objtype="site" objname="EE"/>
+    <framequat name="eeQuat" objtype="site" objname="EE"/>
+    <framelinvel name="eeLinVel" objtype="site" objname="EE"/>
+    <frameangvel name="eeAngVel" objtype="site" objname="EE"/>
+    <velocimeter name="eeVel" site="EE"/>
+    <gyro name="eeGyro" site="EE"/>
+    <accelerometer name="eeAcc" site="EE"/>
+    <force name="eeForce" site="EE"/>
+    <torque name="eeTorque" site="EE"/>
+  </sensor>
+
+  <keyframe>
+    <key name="home" qpos="0" ctrl="0"/>
+    <key name="standby1" qpos="1.57079" ctrl="1.57079"/>
+    <key name="standby2" qpos="-1.57079" ctrl="-1.57079"/>
+    <key name="standby3" qpos="-3.1415926" ctrl="-3.1415926"/>
+  </keyframe>
+</mujoco>

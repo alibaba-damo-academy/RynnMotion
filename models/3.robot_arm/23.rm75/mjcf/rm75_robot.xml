@@ -1,0 +1,24 @@
+<mujoco model="rm75">
+  <option timestep="0.001" gravity="0 0 -9.80665" integrator="implicitfast"/>
+  <compiler angle="radian" meshdir="../assets" autolimits="true"/>
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.2 0.2 0.2" width="512" height="3072"/>
+  </asset>
+
+  <include file="../mjcf/rm75_defaults.xml"/>
+  <include file="../mjcf/rm75_contacts.xml"/>
+  <include file="../mjcf/rm75_assets.xml"/>
+  <include file="../mjcf/rm75_actuators.xml"/>
+  <include file="../mjcf/rm75_sensors.xml"/>
+
+  <worldbody>
+    <include file="../mjcf/rm75_2f85_links.xml"/>
+  </worldbody>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0 0"/>
+    <key name="standby1" qpos="0 0 0 1.57079 0 1.57079 1.57079 0 0 0 0 0 0 0 0" ctrl="0 0 0 1.57079 0 1.57079 1.57079 0"/>
+    <key name="standby2" qpos="3.1415926 0 0 -1.57079 0 -1.57079 1.57079 0 0 0 0 0 0 0 0" ctrl="3.1415926 0 0 -1.57079 0 -1.57079 1.57079 0"/>
+  </keyframe>
+
+</mujoco>

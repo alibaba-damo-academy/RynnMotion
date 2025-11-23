@@ -1,0 +1,13 @@
+<mujoco model="rizon4s_actuators">
+
+  <actuator>
+    <position name="joint1" joint="joint1" class="joint" kp="5000" kv="500" ctrlrange="-2.8798 2.8798" />
+    <position name="joint2" joint="joint2" class="joint" kp="5000" kv="500" ctrlrange="-2.3562 2.3562" />
+    <position name="joint3" joint="joint3" class="joint" kp="5000" kv="500" ctrlrange="-3.0543 3.0543" />
+    <position name="joint4" joint="joint4" class="joint" kp="3000" kv="300" ctrlrange="-1.9548 2.7751" />
+    <position name="joint5" joint="joint5" class="joint" kp="3000" kv="300" ctrlrange="-3.0543 3.0543" />
+    <position name="joint6" joint="joint6" class="joint" kp="2000" kv="200" ctrlrange="-1.4835 4.6251" />
+    <position name="joint7" joint="joint7" class="joint" kp="2000" kv="200" ctrlrange="-3.0543 3.0543" />
+  </actuator>
+
+</mujoco>

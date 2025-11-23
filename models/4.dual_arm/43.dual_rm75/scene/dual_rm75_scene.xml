@@ -1,0 +1,59 @@
+<mujoco model="dual_rm75_gripper scene">
+  <compiler angle="radian" meshdir="../../../3.robot_arm/23.rm75/assets" autolimits="true" />
+  <option timestep="0.001" gravity="0 0 -9.80665" integrator="implicitfast" cone="elliptic" noslip_iterations="2" />
+
+  <include file="../../../3.robot_arm/23.rm75/mjcf/rm75_defaults.xml" />
+  <include file="../../../3.robot_arm/23.rm75/mjcf/rm75_assets.xml" />
+
+  <statistic center="0 0 0.85" extent="1.2" meansize="0.05" />
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+    <global azimuth="135" elevation="-20" />
+    <quality shadowsize="8192" />
+  </visual>
+
+  <asset>
+    <!-- Table meshes (relative to meshdir: ../../3.robot_arm/23.rm75/assets) -->
+    <mesh file="../../../environments/tablelegs.obj" />
+    <mesh file="../../../environments/tabletop.obj" />
+
+    <!-- Textures (relative to this XML file location) -->
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072" />
+    <texture type="2d" name="groundplane" builtin="flat" mark="edge" rgb1="0.1 0.1 0.1" rgb2="0.3 0.5 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+    <texture type="2d" file="../../../environments/small_meta_table_diffuse.png" />
+
+    <!-- Materials -->
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2" />
+    <material name="table" texture="small_meta_table_diffuse" />
+  </asset>
+
+  <worldbody>
+    <!-- Lighting -->
+    <light pos="0 0.1 2.5" />
+
+    <!-- Floor -->
+    <geom name="floor" size="10 10 0.05" type="plane" material="groundplane" />
+    <site name="worldref" />
+
+    <!-- Table -->
+    <geom mesh="tabletop" material="table" class="visual" />
+    <geom mesh="tablelegs" material="table" class="visual" />
+    <geom name="table" pos="0 0 -0.1009" size="0.61 0.37 0.1" type="box" class="collision" />
+
+    <!-- Cameras -->
+    <camera name="overhead_cam" focal="1.93e-3 1.93e-3" resolution="1280 720" sensorsize="3896e-6 2140e-6" pos="-1.5 0 2" euler="0 -1 -1.57079" />
+
+    <!-- Dual RM75 robots positioned for dual-arm teleoperation -->
+    <body name="tf1" pos="-0.25 0.4 0.75">
+      <replicate count="2" offset="0 -0.8 0" sep="_">
+        <include file="../../../3.robot_arm/23.rm75/mjcf/rm75_2f85_links.xml" />
+      </replicate>
+    </body>
+
+  </worldbody>
+
+  <include file="../../../3.robot_arm/23.rm75/mjcf/rm75_actuators.xml" />
+  <include file="../../../3.robot_arm/23.rm75/mjcf/rm75_sensors.xml" />
+
+</mujoco>

@@ -1,0 +1,140 @@
+<mujoco model="rm75_2f85_links">
+
+  <body name="base" pos="0 0 0" euler="0 0 0" childclass="rm75">
+    <geom type="cylinder" size="0.002 0.1" rgba="1 0 0 1" pos="0.1 0 0" euler="0 1.57079 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.1" rgba="0 1 0 1" pos="0 0.1 0" euler="1.57079 0 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.1" rgba="0 0 1 1" pos="0 0 0.1" euler="0 0 0" class="visual" />
+    <geom type="mesh" rgba="0.7529 0.7529 0.7529 1" mesh="base_link" />
+    <body name="Link1" pos="0 0 0.2405" quat="0.707105 -0.707108 0 0">
+      <site name="shoulderSite" pos="0.0 0 0.0" rgba="1 0 0 1" />
+
+      <inertial pos="0.0251854 1.19161e-08 -0.021108" quat="0.568743 0.42008 0.419865 0.569015" mass="0.593563" diaginertia="0.00126614 0.00124677 0.000496264" />
+      <joint name="joint1" pos="0 0 0" axis="0 -1 0" range="-6.3 6.3" actuatorfrcrange="-60 60" />
+      <geom type="mesh" rgba="0.1843 0.3098 0.3098 1" mesh="link1" />
+      <body name="Link2" quat="0.707105 0.707108 0 0">
+        <inertial pos="2.72859e-07 0.0110778 0.0761295" quat="0.700418 0.0973711 -0.0973581 0.700325" mass="0.43285" diaginertia="0.00130156 0.00125838 0.000238372" />
+        <joint name="joint2" pos="0 0 0" axis="0 1 0" range="-2.268 2.268" actuatorfrcrange="-60 60" />
+        <geom type="mesh" rgba="1 1 1 1" mesh="link2" />
+        <body name="Link3" pos="0 0 0.256" quat="0.707105 -0.707108 0 0">
+          <inertial pos="6.84676e-07 0.0273475 -0.023544" quat="0.59313 0.805106 0.000113224 -7.25221e-05" mass="0.431325" diaginertia="0.000794333 0.000774632 0.000270805" />
+          <joint name="joint3" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-30 30" />
+          <geom type="mesh" rgba="0.1843 0.3098 0.3098 1" mesh="link3" />
+          <body name="Link4" quat="0.707105 0.707108 0 0">
+            <site name="elbowSite" pos="0.0 0 0.0" rgba="1 0 0 1" />
+
+            <inertial pos="5.05313e-06 0.0105691 0.0595926" quat="0.699779 0.0991943 -0.0993927 0.700422" mass="0.289634" diaginertia="0.00065604 0.000637371 0.000114622" />
+            <joint name="joint4" pos="0 0 0" axis="0 1 0" range="-2.355 2.355" actuatorfrcrange="-30 30" />
+            <geom type="mesh" rgba="1 1 1 1" mesh="link4" />
+            <body name="Link5" pos="0 0 0.21" quat="0.707105 -0.707108 0 0">
+              <inertial pos="1.15517e-06 0.0215395 -0.0180424" quat="0.602604 0.798041 -8.31168e-05 7.31986e-05" mass="0.23942" diaginertia="0.000285939 0.000275318 0.000107298" />
+              <joint name="joint5" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-10 10" />
+              <geom type="mesh" rgba="0.1843 0.3098 0.3098 1" mesh="link5" />
+              <body name="Link6" quat="0.707105 0.707108 0 0">
+                <site name="wristSite" pos="0.0 0 0.0" rgba="1 0 0 1" />
+
+                <inertial pos="3.19795e-06 0.00736804 0.0593808" quat="0.698922 0.105284 -0.105471 0.6995" mass="0.2188" diaginertia="0.000358615 0.00035054 8.07958e-05" />
+                <joint name="joint6" pos="0 0 0" axis="0 1 0" range="-2.233 2.233" actuatorfrcrange="-10 10" />
+                <geom type="mesh" rgba="1 1 1 1" mesh="link6" />
+                <body name="Link7" pos="0 0 0.144">
+                  <inertial pos="0.000714238 -0.000396712 -0.0126724" quat="0.613063 0.350717 -0.614301 0.351831" mass="0.0649018" diaginertia="3.17886e-05 2.10548e-05 1.80205e-05" />
+                  <joint name="joint7" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorfrcrange="-10 10" />
+                  <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="link7" />
+
+                  <body name="tf1" pos="0 0 0.15" euler="0 3.1415926 1.57079">
+                    <site name="EE" rgba="1 0 0 1" size="0.0001" />
+                    <!-- <geom type="cylinder" size="0.002 0.05" rgba="1 0 0 1" pos="0.05 0 0." euler="0 1.57079 0" class="visual" />
+                    <geom type="cylinder" size="0.002 0.05" rgba="0 1 0 1" pos="0 0.05 0." euler="1.57079 0 0" class="visual" />
+                    <geom type="cylinder" size="0.002 0.05" rgba="0 0 1 1" pos="0 0.0 0.05" euler="0 0 0" class="visual" /> -->
+                  </body>
+
+                  <!-- Robotiq 2F85 gripper attachment -->
+                  <body name="base_mount" pos="0 0 0.007" childclass="2f85">
+                    <geom class="gripper_visual" mesh="base_mount" material="black" />
+                    <geom class="gripper_collision" mesh="base_mount" />
+                    <body name="gripper_base" pos="0 0 0.0038" quat="1 0 0 -1">
+                      <inertial mass="0.777441" pos="0 -2.70394e-05 0.0354675" quat="1 -0.00152849 0 0" diaginertia="0.000260285 0.000225381 0.000152708" />
+                      <geom class="gripper_visual" mesh="2f85base" material="black" />
+                      <geom class="gripper_collision" mesh="2f85base" />
+
+                      <!-- Right-hand side 4-bar linkage -->
+                      <body name="right_driver" pos="0 0.0306011 0.054904">
+                        <inertial mass="0.00899563" pos="2.96931e-12 0.0177547 0.00107314" quat="0.681301 0.732003 0 0" diaginertia="1.72352e-06 1.60906e-06 3.22006e-07" />
+                        <joint name="right_driver_joint" class="driver" />
+                        <geom class="gripper_visual" mesh="driver" material="gray" />
+                        <geom class="gripper_collision" mesh="driver" />
+                        <body name="right_coupler" pos="0 0.0315 -0.0041">
+                          <inertial mass="0.0140974" pos="0 0.00301209 0.0232175" quat="0.705636 -0.0455904 0.0455904 0.705636" diaginertia="4.16206e-06 3.52216e-06 8.88131e-07" />
+                          <joint name="right_coupler_joint" class="coupler" />
+                          <geom class="gripper_visual" mesh="coupler" material="black" />
+                          <geom class="gripper_collision" mesh="coupler" />
+                        </body>
+                      </body>
+                      <body name="right_spring_link" pos="0 0.0132 0.0609">
+                        <inertial mass="0.0221642" pos="-8.65005e-09 0.0181624 0.0212658" quat="0.663403 -0.244737 0.244737 0.663403" diaginertia="8.96853e-06 6.71733e-06 2.63931e-06" />
+                        <joint name="right_spring_link_joint" class="spring_link" />
+                        <geom class="gripper_visual" mesh="spring_link" material="black" />
+                        <geom class="gripper_collision" mesh="spring_link" />
+                        <body name="right_follower" pos="0 0.055 0.0375">
+                          <inertial mass="0.0125222" pos="0 -0.011046 0.0124786" quat="1 0.1664 0 0" diaginertia="2.67415e-06 2.4559e-06 6.02031e-07" />
+                          <joint name="right_follower_joint" class="follower" />
+                          <geom class="gripper_visual" mesh="follower" material="black" />
+                          <geom class="gripper_collision" mesh="follower" />
+                          <body name="right_pad" pos="0 -0.0189 0.01352">
+                            <geom class="pad_box1" name="right_pad1" />
+                            <geom class="pad_box2" name="right_pad2" />
+                            <inertial mass="0.0035" pos="0 -0.0025 0.0185" quat="0.707107 0 0 0.707107" diaginertia="4.73958e-07 3.64583e-07 1.23958e-07" />
+                            <geom class="gripper_visual" mesh="pad" />
+                            <body name="right_silicone_pad">
+                              <geom class="gripper_visual" mesh="silicone_pad" material="black" />
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+
+                      <!-- Left-hand side 4-bar linkage -->
+                      <body name="left_driver" pos="0 -0.0306011 0.054904" quat="0 0 0 1">
+                        <inertial mass="0.00899563" pos="0 0.0177547 0.00107314" quat="0.681301 0.732003 0 0" diaginertia="1.72352e-06 1.60906e-06 3.22006e-07" />
+                        <joint name="left_driver_joint" class="driver" />
+                        <geom class="gripper_visual" mesh="driver" material="gray" />
+                        <geom class="gripper_collision" mesh="driver" />
+                        <body name="left_coupler" pos="0 0.0315 -0.0041">
+                          <inertial mass="0.0140974" pos="0 0.00301209 0.0232175" quat="0.705636 -0.0455904 0.0455904 0.705636" diaginertia="4.16206e-06 3.52216e-06 8.88131e-07" />
+                          <joint name="left_coupler_joint" class="coupler" />
+                          <geom class="gripper_visual" mesh="coupler" material="black" />
+                          <geom class="gripper_collision" mesh="coupler" />
+                        </body>
+                      </body>
+                      <body name="left_spring_link" pos="0 -0.0132 0.0609" quat="0 0 0 1">
+                        <inertial mass="0.0221642" pos="-8.65005e-09 0.0181624 0.0212658" quat="0.663403 -0.244737 0.244737 0.663403" diaginertia="8.96853e-06 6.71733e-06 2.63931e-06" />
+                        <joint name="left_spring_link_joint" class="spring_link" />
+                        <geom class="gripper_visual" mesh="spring_link" material="black" />
+                        <geom class="gripper_collision" mesh="spring_link" />
+                        <body name="left_follower" pos="0 0.055 0.0375">
+                          <inertial mass="0.0125222" pos="0 -0.011046 0.0124786" quat="1 0.1664 0 0" diaginertia="2.67415e-06 2.4559e-06 6.02031e-07" />
+                          <joint name="left_follower_joint" class="follower" />
+                          <geom class="gripper_visual" mesh="follower" material="black" />
+                          <geom class="gripper_collision" mesh="follower" />
+                          <body name="left_pad" pos="0 -0.0189 0.01352">
+                            <geom class="pad_box1" name="left_pad1" />
+                            <geom class="pad_box2" name="left_pad2" />
+                            <inertial mass="0.0035" pos="0 -0.0025 0.0185" quat="1 0 0 1" diaginertia="4.73958e-07 3.64583e-07 1.23958e-07" />
+                            <geom class="gripper_visual" mesh="pad" />
+                            <body name="left_silicone_pad">
+                              <geom class="gripper_visual" mesh="silicone_pad" material="black" />
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </body>
+
+</mujoco>

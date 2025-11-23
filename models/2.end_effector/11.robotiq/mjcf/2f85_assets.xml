@@ -1,0 +1,16 @@
+<mujoco model="2f85_assets">
+
+  <asset>
+    <include file="../../../environments/color.xml"/>
+
+    <mesh class="2f85" file="base_mount.stl"/>
+    <mesh class="2f85" file="2f85base.stl"/>
+    <mesh class="2f85" file="driver.stl"/>
+    <mesh class="2f85" file="coupler.stl"/>
+    <mesh class="2f85" file="follower.stl"/>
+    <mesh class="2f85" file="pad.stl"/>
+    <mesh class="2f85" file="silicone_pad.stl"/>
+    <mesh class="2f85" file="spring_link.stl"/>
+  </asset>
+
+</mujoco>

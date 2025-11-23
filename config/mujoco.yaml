@@ -1,0 +1,34 @@
+world_rate: 1000.0
+control_rate: 1000.0
+render_rate: 60.0
+
+# Rendering
+vsync_enabled: false
+
+# Timing precision (busy-wait adds CPU load but improves timing)
+enable_busy_wait: true
+busy_wait_threshold_us: 100
+
+# Debug visualization
+show_ee_frame: false
+show_ee_fk_result: false
+show_motor_qFB: false
+show_motor_qdFB: false
+show_motor_qCmd: false
+show_motor_modes: false
+show_force_sensor: false
+show_traj: false
+show_camera_pic: false
+show_sensor_indexarray: false
+show_imu_data: false
+show_gripper_debug: false
+
+maxgeom: 5000
+sync_ros_time: false
+save_mjModel: false
+save_mjData: false
+uiObject_name: "cube"
+
+visualization:
+  ball_size: [0.003, 0.003, 0.003]
+  ball_rgba: [0.4, 0.4, 0.9, 0.1]

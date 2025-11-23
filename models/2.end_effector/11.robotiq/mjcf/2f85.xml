@@ -1,0 +1,35 @@
+<mujoco model="robotiq_2f85">
+  <compiler angle="radian" meshdir="../assets" texturedir="../assets" />
+
+  <option integrator="implicitfast" impratio="10" cone="elliptic" noslip_iterations="2">
+    <flag multiccd="enable" />
+  </option>
+
+  <include file="../mjcf/2f85_defaults.xml"/>
+
+  <include file="../mjcf/2f85_assets.xml"/>
+  <worldbody>
+    <light pos="0 0 4.5" dir="0 0 -1" directional="true" />
+    <light pos="0 -4.5 0.6" dir="0 1 0" directional="true" />
+
+    <include file="../mjcf/2f85_links.xml" />
+  </worldbody>
+
+  <contact>
+    <exclude body1="base" body2="left_driver"/>
+    <exclude body1="base" body2="right_driver"/>
+    <exclude body1="base" body2="left_spring_link"/>
+    <exclude body1="base" body2="right_spring_link"/>
+    <exclude body1="right_coupler" body2="right_follower"/>
+    <exclude body1="left_coupler" body2="left_follower"/>
+  </contact>
+
+
+  <include file="2f85_actuators.xml"/>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0"/>
+    <key name="stand" qpos="0 0 0.5 0 0 0 0 0 0 0 0 0 0 0" ctrl="0 0 0.5 0 0 0 0"/>
+  </keyframe>
+
+</mujoco>

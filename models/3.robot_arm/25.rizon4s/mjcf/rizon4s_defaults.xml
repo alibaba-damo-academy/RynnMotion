@@ -1,0 +1,20 @@
+<mujoco model="rizon4s_defaults">
+  <default>
+    <default class="rizon4s">
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2"/>
+      </default>
+      <default class="collision">
+        <geom group="3"/>
+        <default class="finger_collision">
+          <geom type="box" solimp="0 1 0.001 0.02 3" solref="0.001 1" friction="2 0.05 0.05" />
+        </default>
+      </default>
+    </default>
+    <default class="joint">
+      <geom contype="0" conaffinity="0"/>
+      <joint damping="1.0" frictionloss="0.1" armature="0.1"/>
+    </default>
+  </default>
+
+</mujoco>

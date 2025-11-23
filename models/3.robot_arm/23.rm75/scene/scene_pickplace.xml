@@ -1,0 +1,64 @@
+<mujoco model="rm75 pickplace scene">
+  <option timestep="0.001" gravity="0 0 -9.80665" integrator="implicitfast" />
+  <compiler angle="radian" meshdir="../assets" />
+  <statistic center="0.2 0 0.4" extent="0.8" />
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.1 0.1 0.1" specular="0 0 0" />
+    <rgba haze="0.15 0.25 0.35 1" />
+    <global azimuth="120" elevation="-20" />
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072" />
+    <texture type="2d" name="groundplane" builtin="flat" mark="edge" rgb1="0.1 0.1 0.1" rgb2="0.3 0.5 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2" />
+  </asset>
+
+  <include file="../mjcf/rm75_defaults.xml" />
+  <include file="../mjcf/rm75_assets.xml" />
+  <include file="../../../environments/mug_assets.xml" />
+
+  <worldbody>
+    <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" />
+    <camera name="ext_camera" pos="1.2 0.0 1.5" euler="0.0 0.78 1.57" mode="fixed" resolution="1920 1080" sensorsize="5.37 4.04" focal="2.9 2.9" />
+
+    <replicate count="1" offset="1.0 0 0" sep="_">
+      <include file="../mjcf/rm75_2f85_links.xml" />
+    </replicate>
+
+    <body name="mug" pos="0.2 -0.25 0.0">
+      <include file="../../../environments/mug_body.xml" />
+    </body>
+    <body name="cube1" pos="0.2 0.1 0.06">
+      <freejoint name="cube1" />
+      <geom type="box" mass="0.01" size="0.01 0.01 0.01" rgba="1 0 0 1" solref="0.001 1" solimp="0. 1 0.0001 0.02 3" />
+    </body>
+    <body name="cube2" pos="0.2 0.2 0.06">
+      <freejoint name="cube2" />
+      <geom type="box" mass="0.01" size="0.01 0.01 0.01" rgba="1 0.5 0 1" solref="0.001 1" solimp="0. 1 0.0001 0.02 3" />
+    </body>
+    <body name="cube3" pos="0.25 0.1 0.06">
+      <freejoint name="cube3" />
+      <geom type="box" mass="0.01" size="0.01 0.01 0.01" rgba="1 1 0 1" solref="0.001 1" solimp="0. 1 0.0001 0.02 3" />
+    </body>
+    <body name="cube4" pos="0.3 0.1 0.06">
+      <freejoint name="cube4" />
+      <geom type="box" mass="0.01" size="0.01 0.01 0.01" rgba="0 1 0 1" solref="0.001 1" solimp="0. 1 0.0001 0.02 3" />
+    </body>
+    <body name="cube5" pos="0.25 0.2 0.06">
+      <freejoint name="cube5" />
+      <geom type="box" mass="0.01" size="0.01 0.01 0.01" rgba="0 0 1 1" solref="0.001 1" solimp="0. 1 0.0001 0.02 3" />
+    </body>
+    <body name="cube6" pos="0.3 0.2 0.06">
+      <freejoint name="cube6" />
+      <geom type="box" mass="0.01" size="0.01 0.01 0.01" rgba="0 1 1 1" solref="0.001 1" solimp="0. 1 0.0001 0.02 3" />
+    </body>
+
+  </worldbody>
+
+  <include file="../mjcf/rm75_actuators.xml" />
+  <include file="../mjcf/rm75_sensors.xml" />
+
+</mujoco>

@@ -1,0 +1,20 @@
+<mujoco model="umi_actuators_sensors">
+
+  <tendon>
+    <fixed name="split">
+      <joint joint="right_finger_joint" coef="0.5" />
+      <joint joint="left_finger_joint" coef="0.5" />
+    </fixed>
+  </tendon>
+
+  <actuator>
+    <position name="umi_qx" joint="gripper_joint_x" class="gripper_actuator" />
+    <position name="umi_qy" joint="gripper_joint_y" class="gripper_actuator" />
+    <position name="umi_qz" joint="gripper_joint_z" class="gripper_actuator" />
+    <position name="umi_qrx" joint="gripper_joint_rx" class="gripper_rot_actuator" />
+    <position name="umi_qry" joint="gripper_joint_ry" class="gripper_rot_actuator" />
+    <position name="umi_qrz" joint="gripper_joint_rz" class="gripper_rot_actuator" />
+    <position name="gripper" tendon="split" class="finger_actuator"/>
+  </actuator>
+
+</mujoco>

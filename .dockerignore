@@ -1,0 +1,92 @@
+# Docker ignore file for RynnMotion
+
+# Git
+.git
+.gitignore
+.gitmodules
+.github
+
+# Build directories
+build/
+**/build/
+deps_build/
+cmake-build-*/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+python/venv/
+*.egg-info/
+dist/
+*.egg
+
+# C++
+*.o
+*.a
+*.so
+*.dylib
+*.out
+*.app
+*.dSYM/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Documentation
+docs/_build/
+*.pdf
+*.md
+!README.md
+!CLAUDE.md
+!README-DOCKER.md
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Data files (datasets can be large)
+data/
+datasets/
+*.bag
+*.hdf5
+*.h5
+
+# Models (if large)
+*.pth
+*.pt
+*.ckpt
+*.weights
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Robots submodules (these are large and not needed for base image)
+robots/*/venv/
+robots/*/.git/
+robots/*/build/
+
+# Dependencies that will be installed in container
+deps_build/

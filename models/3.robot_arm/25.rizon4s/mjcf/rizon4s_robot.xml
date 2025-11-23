@@ -1,0 +1,25 @@
+<mujoco model="rizon4s">
+  <option timestep="0.001" gravity="0 0 -9.80665" integrator="implicitfast" />
+  <compiler angle="radian" meshdir="../assets" autolimits="true" />
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.2 0.2 0.2" width="512" height="3072" />
+  </asset>
+
+  <include file="../mjcf/rizon4s_defaults.xml" />
+  <include file="../mjcf/rizon4s_assets.xml" />
+  <include file="../mjcf/rizon4s_actuators.xml" />
+  <include file="../mjcf/rizon4s_sensors.xml" />
+
+  <worldbody>
+    <geom type="cylinder" group="1" size="0.002 0.1" rgba="1 0 0 1" pos="0.1 0.0 0.0" euler="0 1.57079 0" class="visual" />
+    <geom type="cylinder" group="1" size="0.002 0.1" rgba="0 1 0 1" pos="0.0 0.1 0.0" euler="1.57079 0 0" class="visual" />
+    <geom type="cylinder" group="1" size="0.002 0.1" rgba="0 0 1 1" pos="0.0 0.0 0.1" euler="0 0 0" class="visual" />
+    <include file="../mjcf/rizon4s_links.xml" />
+  </worldbody>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0" />
+    <key name="standby1" qpos="0 0 0 1.57079 0 0 0" ctrl="0 0 0 1.57079 0 0 0" />
+    <key name="standby2" qpos="0 -0.7854 0 1.57079 0 0.7854 0" ctrl="0 -0.7854 0 1.57079 0 0.7854 0" />
+  </keyframe>
+</mujoco>

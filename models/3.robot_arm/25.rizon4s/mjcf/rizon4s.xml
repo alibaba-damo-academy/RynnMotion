@@ -1,0 +1,53 @@
+<mujoco model="Rizon4s">
+  <compiler angle="radian"/>
+
+  <asset>
+    <mesh name="collision_link0" content_type="model/stl" file="collision_link0.stl"/>
+    <mesh name="collision_link1" content_type="model/stl" file="collision_link1.stl"/>
+    <mesh name="collision_link2" content_type="model/stl" file="collision_link2.stl"/>
+    <mesh name="collision_link3" content_type="model/stl" file="collision_link3.stl"/>
+    <mesh name="collision_link4" content_type="model/stl" file="collision_link4.stl"/>
+    <mesh name="collision_link5" content_type="model/stl" file="collision_link5.stl"/>
+    <mesh name="collision_link6" content_type="model/stl" file="collision_link6.stl"/>
+    <mesh name="collision_link7" content_type="model/stl" file="collision_link7.stl"/>
+  </asset>
+
+  <worldbody>
+    <geom name="base_convex_mesh" type="mesh" mesh="collision_link0"/>
+    <body name="link1" pos="0 0 0.155" quat="0 0 0 -1">
+      <inertial pos="0 0 0.15" mass="3.6" diaginertia="0.03 0.03 0.01"/>
+      <joint name="joint1" pos="0 0 0" axis="0 0 1" range="-2.8798 2.8798" actuatorfrcrange="-123 123"/>
+      <geom name="link1_convex_mesh" type="mesh" mesh="collision_link1"/>
+      <body name="link2" pos="0 0.03 0.21">
+        <inertial pos="0 0.04 0.1" mass="2.7" diaginertia="0.02 0.02 0.01"/>
+        <joint name="joint2" pos="0 0 0" axis="0 1 0" range="-2.3562 2.3562" actuatorfrcrange="-123 123"/>
+        <geom name="link2_convex_mesh" type="mesh" mesh="collision_link2"/>
+        <body name="link3" pos="0 0.035 0.205">
+          <inertial pos="-0.01 0 0.14" mass="2.4" diaginertia="0.01 0.01 0.01"/>
+          <joint name="joint3" pos="0 0 0" axis="0 0 1" range="-3.0543 3.0543" actuatorfrcrange="-64 64"/>
+          <geom name="lin3_convex_mesh" type="mesh" mesh="collision_link3"/>
+          <body name="link4" pos="-0.02 -0.03 0.19" quat="0 0 0 -1">
+            <inertial pos="-0.01 0.03 0.1" mass="2.4" diaginertia="0.02 0.02 0.01"/>
+            <joint name="joint4" pos="0 0 0" axis="0 1 0" range="-1.9548 2.7751" actuatorfrcrange="-64 64"/>
+            <geom name="link4_convex_mesh" type="mesh" mesh="collision_link4"/>
+            <body name="link5" pos="-0.02 0.025 0.195" quat="0 0 0 -1">
+              <inertial pos="0 0 0.14" mass="2.3" diaginertia="0.01 0.01 0.01"/>
+              <joint name="joint5" pos="0 0 0" axis="0 0 1" range="-3.0543 3.0543" actuatorfrcrange="-39 39"/>
+              <geom name="link5_convex_mesh" type="mesh" mesh="collision_link5"/>
+              <body name="link6" pos="0 0.03 0.19">
+                <inertial pos="0.02 0.06 0.07" mass="2.2" diaginertia="0.01 0.01 0.01"/>
+                <joint name="joint6" pos="0 0 0" axis="0 1 0" range="-1.4835 4.6251" actuatorfrcrange="-39 39"/>
+                <geom name="link6_convex_mesh" type="mesh" mesh="collision_link6"/>
+                <body name="link7" pos="-0.015 0.073 0.11" quat="0.707107 0 -0.707107 0">
+                  <inertial pos="0 0 0.05" mass="1.4" diaginertia="0.01 0.01 0.01"/>
+                  <joint name="joint7" pos="0 0 0" axis="0 0 1" range="-3.0543 3.0543" actuatorfrcrange="-39 39"/>
+                  <geom name="link7_convex_mesh" type="mesh" mesh="collision_link7"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

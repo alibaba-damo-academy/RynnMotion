@@ -1,0 +1,55 @@
+<mujoco model="2f85_scene">
+  <compiler angle="radian" meshdir="../assets/" autolimits="true" />
+
+  <option integrator="implicitfast" impratio="10" cone="elliptic" noslip_iterations="2">
+    <flag multiccd="enable" />
+  </option>
+
+  <statistic center="0 0 0.05" extent="0.3" />
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+    <rgba haze="0.15 0.25 0.35 1" />
+    <global azimuth="60" elevation="-20" />
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072" />
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2" />
+  </asset>
+
+  <include file="../mjcf/2f85_defaults.xml" />
+  <include file="../mjcf/2f85_assets.xml" />
+
+  <worldbody>
+    <light pos="0 0 1" />
+    <light pos="0 -0.2 1" dir="0 0.2 -0.8" directional="true" />
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" />
+
+    <geom type="cylinder" size="0.002 0.05" rgba="1 0 0 1" pos="0.05 -0.0 0." euler="0 1.57079 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.05" rgba="0 1 0 1" pos="0 0.05 0." euler="1.57079 0 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.05" rgba="0 0 1 1" pos="0 -0.0 0.05" euler="0 0 0" class="visual" />
+
+    <body name="cube" pos="0 0 0.5" euler="0 0 0">
+      <freejoint />
+      <geom name="cube" type="box" size="0.01 0.01 0.01" rgba="0.9 0.9 0.1 0.9" />
+      <inertial mass="0.001" pos="0 0 0" diaginertia="0.001 0.001 0.001" />
+    </body>
+
+    <replicate count="2" offset="0.25 0 0" sep="_">
+      <include file="../mjcf/2f85_links.xml" />
+    </replicate>
+
+  </worldbody>
+
+  <!-- <tendon>
+    <spatial limited="true" range="0 0.02" width="0.001">
+      <site site="hook" />
+      <site site="anchor" />
+    </spatial>
+  </tendon> -->
+
+  <include file="../mjcf/2f85_actuators.xml" />
+
+</mujoco>

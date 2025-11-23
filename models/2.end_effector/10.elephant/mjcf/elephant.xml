@@ -1,0 +1,102 @@
+<mujoco model="elephant_gripper">
+  <option timestep="0.001" gravity="0 0 -9.80665"/>
+  <compiler angle="radian" meshdir="../assets/"/>
+
+  <asset>
+    <mesh name="base_link" file="gripper_base_link.STL"/>
+    <mesh name="l_link_1" file="gripper_l_link_1.STL"/>
+    <mesh name="l_link_2" file="gripper_l_link_2.STL"/>
+    <mesh name="r_link_1" file="gripper_r_link_1.STL"/>
+    <mesh name="r_link_2" file="gripper_r_link_2.STL"/>
+    <mesh name="l_link_3" file="gripper_l_link_3.STL"/>
+    <mesh name="r_link_3" file="gripper_r_link_3.STL"/>
+  </asset>
+
+  <contact>
+    <exclude body1="l_link_2" body2="l_link_3"/>
+    <exclude body1="l_link_2" body2="l_link_1"/>
+    <exclude body1="l_link_1" body2="l_link_3"/>
+    <exclude body1="l_link_1" body2="r_link_1"/>
+    <exclude body1="l_link_1" body2="r_link_2"/>
+    <exclude body1="l_link_1" body2="r_link_3"/>
+    <exclude body1="LballB" body2="l_link_2"/>
+    <exclude body1="RballB" body2="r_link_2"/>
+
+    <exclude body1="r_link_2" body2="r_link_3"/>
+    <exclude body1="r_link_2" body2="r_link_1"/>
+    <exclude body1="r_link_1" body2="r_link_3"/>
+    <exclude body1="handbase" body2="l_link_1"/>
+    <exclude body1="handbase" body2="l_link_2"/>
+    <exclude body1="handbase" body2="l_link_3"/>
+    <exclude body1="handbase" body2="r_link_1"/>
+    <exclude body1="handbase" body2="r_link_2"/>
+    <exclude body1="handbase" body2="r_link_3"/>
+  </contact>
+
+  <worldbody>
+    <body name="handbase" pos="0 0 0" quat="1 0 0 0">
+      <geom type="mesh" rgba="0.75294 0.75294 0.75294 1" mesh="base_link"/>
+      <!-- <site name="origin_site" pos="0 0 0" size="0.001" rgba="1 0 0 1" type="sphere"/> -->
+      <body name="l_link_1" pos="0 0 0" quat="1 0 0 0">
+        <inertial pos="0.00249405 0.000667774 0.0227231" quat="0.986402 0.164348 -0.000604487 0.000576867" mass="0.0010225" diaginertia="6.16352e-08 5.22901e-08 1.27916e-08"/>
+        <joint name="l_joint_1" pos="0.01 0.01325 0.0298" axis="1 0 0"/>
+        <geom type="mesh" rgba="0.498039 0.498039 0.498039 1" mesh="l_link_1"/>
+        <site name="lj1_site" pos="0.01 0.01325 0.0298" size="0.002" rgba="0 1 0 1" type="sphere"/>
+        <body name="l_link_2" pos="0 0 0" quat="1 0 0 0">
+          <inertial pos="0.005 -0.000242698 0.0344848" quat="0.70591 -0.0411173 0.0411173 0.70591" mass="0.0091567" diaginertia="1.97509e-06 1.78867e-06 3.93352e-07"/>
+          <joint name="l_joint_2" pos="0.01 0.03516985 0.05171997" axis="1 0 0"/>
+          <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="l_link_2"/>
+          <!-- <site name="lj2_site" pos="0.01 0.03516985 0.05171997" size="0.002" rgba="1 1 0 1" type="sphere"/> -->
+          <!-- <site name="lj5_site" pos="0.01 0.02791985 0.07354997" size="0.001" rgba="1 1 1 1" type="sphere"/> -->
+        </body>
+      </body>   
+      <body name="r_link_1" pos="0 0 0" quat="1 0 0 0">
+        <inertial pos="0.00249263 -0.000116357 0.0249006" quat="0.99702 -0.0771345 -0.000867314 -0.000367536" mass="0.000846765" diaginertia="3.13221e-08 2.53984e-08 8.78471e-09"/>
+        <joint name="r_joint_1" pos="0.01 -0.01225 0.0298" axis="1 0 0"/>
+        <geom type="mesh" rgba="0.498039 0.498039 0.498039 1" mesh="r_link_1"/>
+        <site name="rj1_site" pos="0.01 -0.01225 0.0298" size="0.002" rgba="0 1 0 1" type="sphere"/>
+        <body name="r_link_2" pos="0 0 0" quat="1 0 0 0">
+          <inertial pos="0.005 0.000242582 0.0344848" quat="0.70591 0.0411185 -0.0411185 0.70591" mass="0.0091567" diaginertia="1.97509e-06 1.78867e-06 3.93352e-07"/>
+          <joint name="r_joint_2" pos="0.01 -0.03416985 0.05171997" axis="1 0 0"/>
+          <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="r_link_2"/>
+          <!-- <site name="rj2_site" pos="0.01 -0.03416985 0.05171997" size="0.002" rgba="1 1 0 1" type="sphere"/> -->
+        </body>
+      </body>
+      <body name="l_link_3" pos="0 0 0" quat="1 0 0 0">
+        <inertial pos="0.00309099 -0.00011836 0.0221007" quat="0.707092 0.00346058 0.0270198 0.706597" mass="0.00238423" diaginertia="2.43328e-07 1.40407e-07 1.3392e-07"/>
+        <joint name="l_joint_3" pos="0.01 0.006 0.05163" axis="1 0 0"/>
+        <geom type="mesh" rgba="0.498039 0.498039 0.498039 1" mesh="l_link_3"/>
+        <!-- <site name="lj3_site" pos="0.01 0.006 0.05163" size="0.002" rgba="0 0 1 1" type="sphere"/> -->
+        <!-- <site name="lj4_site" pos="0.01 0.02791985 0.07354997" size="0.001" rgba="1 0 0 1" type="sphere"/> -->
+        <body name="LballB" pos="0.01 0.02791985 0.07354997">
+          <geom type="sphere" size="0.001" rgba="0 1 0 1" />
+          <joint name="lj_LballBx" type="hinge" pos="0 0 0" axis="1 0 0" />
+          <joint name="lj_LballBy" type="hinge" pos="0 0 0" axis="0 1 0" />
+        </body>
+      </body>
+      <body name="r_link_3" pos="0 0 0" quat="1 0 0 0">
+        <inertial pos="0.00310901 0.00011836 0.0221007" quat="0.707092 -0.00346058 -0.0270198 0.706597" mass="0.00238423" diaginertia="2.43328e-07 1.40407e-07 1.3392e-07"/>
+        <joint name="r_joint_3" pos="0.01 -0.005 0.05163" axis="1 0 0"/>
+        <geom type="mesh" rgba="0.498039 0.498039 0.498039 1" mesh="r_link_3"/>
+        <!-- <site name="rj3_site" pos="0.01 -0.005 0.05163" size="0.002" rgba="0 0 1 1" type="sphere"/> -->
+        <!-- <site name="rj4_site" pos="0.01 -0.02691985 0.07354997" size="0.002" rgba="1 0 0 1" type="sphere"/>  -->
+        <body name="RballB" pos="0.01 -0.02691985 0.07354997">
+          <geom type="sphere" size="0.001" rgba="0 1 0 1" />
+          <joint name="lj_RballBx" type="hinge" pos="0 0 0" axis="1 0 0" />
+          <joint name="lj_RballBy" type="hinge" pos="0 0 0" axis="0 1 0" />
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="handmotor" joint="l_joint_1" kp="0.05" kv="0.001"/>
+  </actuator>
+
+  <equality>
+    <joint name="opposite_motion" joint1="l_joint_1" joint2="r_joint_1" polycoef="0 -1 0 0"/>
+    <connect name="connect1" body1="l_link_2" body2="LballB" anchor="0.01 0.02791985 0.07354997" active="true"/> 
+    <connect name="connect2" body1="r_link_2" body2="RballB" anchor="0.01 -0.02691985 0.07354997" active="true"/> 
+  </equality>
+
+</mujoco>

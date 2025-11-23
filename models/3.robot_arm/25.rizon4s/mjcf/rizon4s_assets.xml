@@ -1,0 +1,27 @@
+<mujoco model="rizon4s_assets">
+
+  <asset>
+    <!-- Mesh files -->
+    <mesh name="link0" file="visual_link0.obj"/>
+    <mesh name="link1" file="visual_link1.obj"/>
+    <mesh name="link2" file="visual_link2.obj"/>
+    <mesh name="link3" file="visual_link3.obj"/>
+    <mesh name="link4" file="visual_link4.obj"/>
+    <mesh name="link5" file="visual_link5.obj"/>
+    <mesh name="link6" file="visual_link6.obj"/>
+    <mesh name="link7" file="visual_link7.obj"/>
+
+
+    <!-- Materials -->
+    <material name="link0_material" rgba="1 1 1 1"/>
+    <material name="link1_material" rgba="0.7 0.7 0.7 1"/>
+    <material name="link2_material" rgba="1 1 1 1"/>
+    <material name="link3_material" rgba="0.7 0.7 0.7 1"/>
+    <material name="link4_material" rgba="1 1 1 1"/>
+    <material name="link5_material" rgba="0.7 0.7 0.7 1"/>
+    <material name="link6_material" rgba="1 1 1 1"/>    
+    <material name="link7_material" rgba="0.7 0.7 0.7 1"/>    
+
+  </asset>
+
+</mujoco>

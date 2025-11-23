@@ -1,0 +1,56 @@
+<mujoco model="rizon4s_links">
+  <body name="base" childclass="rizon4s">
+
+    <inertial pos="0.0030905 -0.00024462 0.029293" mass="3.8" diaginertia="0.02 0.02 0.02" />
+    <geom type="mesh" class="visual" mesh="link0" material="link0_material" />
+
+    <body name="link1" pos="0 0 0.155" quat="0 0 0 -1">
+      <site name="link1_Site" pos="0.0 0 0.0" rgba="1 0 0 1" />
+      <inertial pos="0 0 0.15" mass="3.6" diaginertia="0.015 0.015 0.008" />
+      <joint name="joint1" pos="0 0 0" axis="0 0 1" range="-2.8798 2.8798" actuatorfrcrange="-123 123" class="joint" />
+      <geom type="mesh" class="visual" mesh="link1" material="link1_material" />
+
+      <body name="link2" pos="0 0.03 0.21">
+        <inertial pos="0 0.04 0.1" mass="2.7" diaginertia="0.01 0.01 0.005" />
+        <joint name="joint2" pos="0 0 0" axis="0 1 0" range="-2.3562 2.3562" actuatorfrcrange="-123 123" class="joint" />
+        <geom type="mesh" class="visual" mesh="link2" material="link2_material" />
+
+        <body name="link3" pos="0 0.035 0.205">
+          <site name="link3_Site" pos="0.0 0. 0.0182778" rgba="1 0 0 1" />
+          <inertial pos="-0.01 0 0.14" mass="2.4" diaginertia="0.008 0.008 0.003" />
+          <joint name="joint3" pos="0 0 0" axis="0 0 1" range="-3.0543 3.0543" actuatorfrcrange="-64 64" class="joint" />
+          <geom type="mesh" class="visual" mesh="link3" material="link3_material" />
+
+          <body name="link4" pos="-0.02 -0.03 0.19" quat="0 0 0 -1">
+            <site name="link4_Site" pos="0.0 0 0.0182778" rgba="1 0 0 1" />
+            <inertial pos="-0.01 0.03 0.1" mass="2.4" diaginertia="0.008 0.008 0.003" />
+            <joint name="joint4" pos="0 0 0" axis="0 1 0" range="-1.9548 2.7751" actuatorfrcrange="-64 64" class="joint" />
+            <geom type="mesh" class="visual" mesh="link4" material="link4_material" />
+
+            <body name="link5" pos="-0.02 0.025 0.195" quat="0 0 0 -1">
+              <inertial pos="0 0 0.14" mass="2.3" diaginertia="0.008 0.008 0.003" />
+              <joint name="joint5" pos="0 0 0" axis="0 0 1" range="-3.0543 3.0543" actuatorfrcrange="-39 39" class="joint" />
+              <geom type="mesh" class="visual" mesh="link5" material="link5_material" />
+
+              <body name="link6" pos="0 0.03 0.19">
+                <inertial pos="0.02 0.06 0.07" mass="2.2" diaginertia="0.008 0.008 0.005" />
+                <joint name="joint6" pos="0 0 0" axis="0 1 0" range="-1.4835 4.6251" actuatorfrcrange="-39 39" class="joint" />
+                <geom type="mesh" class="visual" mesh="link6" material="link6_material" />
+
+                <body name="link7" pos="-0.015 0.073 0.11" quat="0.707107 0 -0.707107 0">
+                  <inertial pos="0 0 0.1" mass="1.4" diaginertia="0.004 0.004 0.002" />
+                  <joint name="joint7" pos="0 0 0" axis="0 0 1" range="-3.0543 3.0543" actuatorfrcrange="-39 39" class="joint" />
+                  <geom type="mesh" class="visual" mesh="link7" material="link7_material" />
+
+                  <body name="tf1" pos="0 0 0.2" euler="3.1415926 0 0">
+                    <site name="EE" size="0.005" rgba="1 0 0 0.1" />
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </body>
+</mujoco>

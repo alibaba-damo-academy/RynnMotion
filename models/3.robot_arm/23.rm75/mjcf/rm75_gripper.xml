@@ -1,0 +1,24 @@
+<mujoco model="rm75_gripper">
+  <compiler angle="radian" meshdir="../assets/"/>
+
+  <include file="rm75_gripper_defaults.xml"/>
+  <include file="rm75_gripper_assets.xml"/>
+  <include file="rm75_2f85_links.xml"/>
+  <include file="rm75_gripper_actuators.xml"/>
+
+  <sensor>
+    <framepos name="eePos" objtype="site" objname="EE"/>
+    <framequat name="eeQuat" objtype="site" objname="EE"/>
+    <framelinvel name="eeLinVel" objtype="site" objname="EE"/>
+    <frameangvel name="eeAngVel" objtype="site" objname="EE"/>
+    <gyro name="eeGyro" site="EE"/>
+    <accelerometer name="eeAcc" site="EE"/>
+    <force name="eeForce" site="EE"/>
+  </sensor>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0 0"/>
+    <key name="stand" qpos="0.735522 0.388828 -0.9801 1.74523 -0.419516 -0.502513 0.699497 0" ctrl="0.735522 0.388828 -0.9801 1.74523 -0.419516 -0.502513 0.699497 0"/>
+  </keyframe>
+
+</mujoco>

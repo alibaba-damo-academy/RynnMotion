@@ -1,0 +1,85 @@
+<mujoco model="so101_6dofleader">
+  <compiler angle="radian" meshdir="../assets" autolimits="true"/>
+
+  <option timestep="0.002" solver="Newton" iterations="50" tolerance="1e-10"/>
+
+  <default>
+    <default class="so101_6dofleader">
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2"/>
+      </default>
+      <default class="collision">
+        <geom group="3"/>
+      </default>
+    </default>
+    <default class="sts3215">
+      <geom contype="0" conaffinity="0"/>
+      <joint damping="0.60" frictionloss="0.052" armature="0.028"/>
+      <position kp="50" dampratio="1"/>
+    </default>
+  </default>
+
+  <asset>
+    <mesh name="link0" file="link0.STL"/>
+    <mesh name="link1" file="link1.STL"/>
+    <mesh name="link2" file="link2.STL"/>
+    <mesh name="link3" file="link3.STL"/>
+    <mesh name="link4" file="link4.STL"/>
+    <mesh name="link5" file="link5.STL"/>
+    <mesh name="link6" file="link6.STL"/>
+    <mesh name="link7" file="link7.STL"/>
+  </asset>
+
+  <worldbody>
+    <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="link0" class="visual"/>
+    <geom type="mesh" mesh="link0" class="visual"/>
+    <body name="link1" pos="0 0 0.018957" childclass="so101_6dofleader">
+      <inertial pos="0.030989 6.7477e-05 0.070621" quat="0.698515 0.0490132 0.042294 0.712661" mass="0.2" diaginertia="0.0001 0.0001 0.00005"/>
+      <joint name="joint1" pos="0 0 0" axis="0 0 1" range="-1.9198621771937616 1.9198621771937634" class="sts3215" ref="0"/>
+      <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="link1" class="visual"/>
+      <geom type="mesh" mesh="link1" class="visual"/>
+
+      <body name="link2" pos="0.0306 0 0.10044">
+        <inertial pos="0.0074975 -0.00041663 0.088369" quat="0.999937 0.00717546 -0.00848347 0.00167263" mass="0.10147" diaginertia="0.0001 0.0001 0.00005"/>
+        <joint name="joint2" pos="0 0 0" axis="0 1 0" range="-1.7453292519943224 1.7453292519943366" class="sts3215" ref="0"/>
+        <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="link2" class="visual"/>
+        <geom type="mesh" mesh="link2" class="collision"/>
+        <body name="link3" pos="0.028 0 0.11248">
+          <inertial pos="0.095367 -0.0010139 0.0029488" quat="-0.00465535 0.713391 0.00569161 0.700727" mass="0.09724" diaginertia="5.81959e-05 4.73186e-05 2.10425e-05"/>
+          <joint name="joint3" pos="0 0 0" axis="0 1 0" range="-1.7 1.7" class="sts3215" ref="0"/>
+          <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="link3"/>
+          <body name="link4" pos="0.13485 0 0.0052">
+            <inertial pos="0.035618 -0.0010712 -0.00022605" quat="0.000479801 0.707579 -0.000372452 0.706634" mass="0.061621" diaginertia="1.2754e-05 9.95891e-06 6.12958e-06"/>
+            <joint name="joint4" pos="0 0 0" axis="0 1 0" range="-1.7 1.7" class="sts3215" ref="0"/>
+            <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="link4"/>
+            <body name="link5" pos="0.05175 -0.0012 0">
+              <inertial pos="0.0395734 0.000195111 -0.0125068" quat="0.697286 -0.0344273 -0.0342671 0.715145" mass="0.067412" diaginertia="1.82556e-05 1.66275e-05 8.78104e-06"/>
+              <joint name="joint5" pos="0 0 0" axis="0 0 1" range="-1.9 1.9" class="sts3215" ref="0"/>
+              <geom type="mesh" rgba="0.1 0.1 0.1 1" mesh="link5"/>
+              <body name="link6" pos="0.060497 0 -0.0011">
+                <inertial pos="0.0358639 0.000287019 -0.0118171" quat="0.673687 -0.124385 -0.113726 0.719542" mass="0.0982876" diaginertia="3.51223e-05 3.30232e-05 1.20109e-05"/>
+                <joint name="joint6" pos="0 0 0" axis="1 0 0" range="-2.8 2.8" class="sts3215" ref="0"/>
+                <geom type="mesh" rgba="1 1 1 1" mesh="link6"/>
+                <body name="link7" pos="0.024403 0 0.0202">
+                  <inertial pos="0.0244627 0.00933262 -0.00616883" quat="0.517744 0.715577 0.341818 0.321016" mass="0.00447082" diaginertia="1.90444e-06 1.68449e-06 5.33007e-07"/>
+                  <joint name="joint7" pos="0 0 0" axis="0 1 0" range="-2 0" class="sts3215" ref="0"/>
+                  <geom type="mesh" rgba="1 1 1 1" mesh="link7"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position class="sts3215" name="joint1" joint="joint1" ctrlrange="-1.9 1.9" forcerange="-3.35 3.35"/>
+    <position class="sts3215" name="joint2" joint="joint2" ctrlrange="-1.7 1.7" forcerange="-3.35 3.35"/>
+    <position class="sts3215" name="joint3" joint="joint3" ctrlrange="-1.7 1.7" forcerange="-3.35 3.35"/>
+    <position class="sts3215" name="joint4" joint="joint4" ctrlrange="-1.7 1.7" forcerange="-3.35 3.35"/>
+    <position class="sts3215" name="joint5" joint="joint5" ctrlrange="-1.9 1.9" forcerange="-3.35 3.35"/>
+    <position class="sts3215" name="joint6" joint="joint6" ctrlrange="-2.8 2.8" forcerange="-3.35 3.35"/>
+    <position class="sts3215" name="joint7" joint="joint7" ctrlrange="-2 0" forcerange="-3.35 3.35"/>
+  </actuator>
+</mujoco>

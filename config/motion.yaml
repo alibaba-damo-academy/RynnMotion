@@ -1,0 +1,26 @@
+module:
+  spaceMove:
+    # IK solver type: pinv | qp
+    solver: qp
+
+    # QP constraint configuration (independent flags)
+    constraints:
+      vel_limits: true       # Velocity: qdmin <= qd <= qdmax
+      pos_limits: false      # Position: qmin <= q+qd*dt <= qmax
+      acc_limits: false      # Acceleration: qddmin <= qdd <= qddmax
+      null_space: false      # Null-space task: drive joints to qTask
+
+    # QP tuning parameters
+    damping: 0.0009          # Cost regularization (lambda)
+    null_lambda: 0.01        # Null-space task weight
+    null_kp: 0.1             # Null-space proportional gain
+    max_iter: 30             # qpOASES max iterations (NWSR)
+
+    # Task-space PD gains
+    kpTask: 100.0            # Position error gain
+    kdTask: 0.0              # Velocity error gain (unused)
+
+  teleopfollow:
+    follow_type: 0
+    dls_lambda: 0.64
+    qref_lambda: 0.05

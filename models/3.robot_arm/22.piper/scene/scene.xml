@@ -1,0 +1,56 @@
+<mujoco model="piper_scene">
+  <compiler angle="radian" meshdir="../assets" />
+  <option timestep="0.001" integrator="implicitfast" cone="elliptic" impratio="10" gravity="0 0 -9.80665" />
+  <statistic center="0.3 0 0.4" extent="1" />
+
+  <include file="../mjcf/piper_defaults.xml" />
+  <include file="../mjcf/piper_assets.xml" />
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+    <rgba haze="0.15 0.25 0.35 1" />
+    <global azimuth="120" elevation="-20" />
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.2 0.2 0.2" width="512" height="3072" />
+    <texture type="2d" name="groundplane" builtin="flat" mark="edge" rgb1="0.1 0.1 0.1" rgb2="0.3 0.5 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.5" />
+  </asset>
+
+  <worldbody>
+    <light pos="5 0 1." dir="0 0 -1" directional="true" />
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" />
+    <camera name="ext_camera" pos="1.0 0 1.0" euler="0.0 0.78 1.57" mode="fixed" resolution="1920 1080" sensorsize="5.37 4.04" focal="2.9 2.9" />
+
+    <replicate count="1" offset="1 0 0" sep="_">
+      <include file="../mjcf/piper_links.xml" />
+    </replicate>
+
+  </worldbody>
+
+  <equality>
+    <joint joint1="joint8" joint2="joint7" polycoef="0 -1 0 0 0" />
+  </equality>
+
+  <actuator>
+    <position name="joint1" joint="joint1" class="piper" kp="80" kv="5" />
+    <position name="joint2" joint="joint2" class="piper" kp="80" kv="5" />
+    <position name="joint3" joint="joint3" class="piper" kp="80" kv="5" />
+    <position name="joint4" joint="joint4" class="piper" kp="40" kv="5" />
+    <position name="joint5" joint="joint5" class="piper" kp="10" kv="1.5" />
+    <position name="joint6" joint="joint6" class="piper" kp="10" kv="1.5" />
+    <position name="gripper" joint="joint7" class="finger" kp="40" kv="5" />
+  </actuator>
+
+  <sensor>
+    <framepos name="eePos" objtype="site" objname="EE" />
+    <framequat name="eeQuat" objtype="site" objname="EE" />
+    <framelinvel name="eeLinVel" objtype="site" objname="EE" />
+    <frameangvel name="eeAngVel" objtype="site" objname="EE" />
+    <gyro name="eeGyro" site="EE" />
+    <accelerometer name="eeAcc" site="EE" />
+    <force name="eeForce" site="EE" />
+  </sensor>
+
+</mujoco>

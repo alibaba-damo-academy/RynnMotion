@@ -1,0 +1,60 @@
+<mujoco model="twolink">
+
+  <compiler angle="radian" meshdir="../assets/"/>
+
+  <asset>
+    <mesh name="torso" file="base.STL"/>
+    <mesh name="link1" file="link1.STL"/>
+    <mesh name="link2" file="link2.STL"/>
+  </asset>
+
+  <contact>
+    <exclude body1="torso" body2="link1"/>
+  </contact>
+
+  <worldbody>
+    <body name="torso" pos="0 0 1.2" euler="0 0 0">
+      <geom type="mesh" rgba="0.89804 0.91765 0.92941 1" mesh="torso"/>
+      <body name="link1">
+        <inertial pos="0 0 -0.31061" mass="3.666" diaginertia="0.058335 0.058335 0.00063238"/>
+        <joint name="joint1" type="hinge" pos="0 0 0" axis="1 0 0"/>
+        <geom type="mesh" rgba="0.4 0.2 0.2 1" mesh="link1"/>
+        <!-- <site name="link1ee" pos="0.0 0 -0.5" euler="0 0 0" size="0.001"/> -->
+        <body name="link2" pos="0 0 -0.5">
+          <inertial pos="0 0 -0.29396" mass="1.4977" diaginertia="0.025788 0.025788 0.00010385"/>
+          <joint name="joint2" type="hinge" pos="0 0 0" axis="1 0 0"/>
+          <geom type="mesh" rgba="0.3 0.3 0.3 0.3" mesh="link2"/>
+          <site name="ee" pos="0.0 0 -0.5" euler="0 0 0" size="0.001"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <!-- <motor name="motor1" joint="joint1"/> -->
+    <!-- <motor name="motor2" joint="joint2"/> -->
+    <position name="motor1" joint="joint1" dampratio="1" kp="600" />
+    <position name="motor2" joint="joint2" dampratio="1" kp="600" />
+  </actuator>
+
+  <sensor>
+    <framepos name="eePos" objtype="site" objname="ee"/>
+    <framequat name="eeQuat" objtype="site" objname="ee"/>
+    <framelinvel name="eeLinVel" objtype="site" objname="ee"/>
+    <frameangvel name="eeAngVel" objtype="site" objname="ee"/>
+    <velocimeter name="eeVel" site="ee"/>
+    <gyro name="eeGyro" site="ee"/>
+    <accelerometer name="eeAcc" site="ee"/>
+    <force name="eeForce" site="ee"/>
+    <torque name="eeTorque" site="ee"/>
+  </sensor>
+
+  <keyframe>
+    <key name="home" qpos="0 0" ctrl="0 0"/>
+    <key name="stand1" qpos="-0.7853 1.57079" ctrl="-0.7853 1.57079"/>
+    <key name="stand2" qpos="0.7853 -1.57079" ctrl="0.7853 -1.57079"/>
+    <key name="stand3" qpos="-0.7853 -1.57079" ctrl="-0.7853 -1.57079"/>
+    <key name="stand4" qpos="0.7853 1.57079" ctrl="0.7853 1.57079"/>
+  </keyframe>
+
+</mujoco>

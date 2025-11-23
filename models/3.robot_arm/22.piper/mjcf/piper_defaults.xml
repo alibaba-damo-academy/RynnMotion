@@ -1,0 +1,20 @@
+<mujoco model="piper_defaults">
+
+  <default>
+    <default class="piper">
+      <joint frictionloss="0.3" armature="0.005" />
+      <position inheritrange="1" forcerange="-100 100" />
+      <default class="finger">
+        <joint frictionloss="0" type="slide" />
+        <position forcerange="-10 10" />
+      </default>
+      <default class="visual">
+        <geom group="2" type="mesh" contype="0" conaffinity="0" />
+      </default>
+      <default class="collision">
+        <geom group="3" type="capsule" />
+      </default>
+    </default>
+  </default>
+
+</mujoco>

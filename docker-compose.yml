@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  rynnmotion-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        USERNAME: developer
+        USER_UID: 1000
+        USER_GID: 1000
+    image: rynnmotion:dev
+    container_name: rynnmotion-dev
+
+    # Mount the project directory
+    volumes:
+      - .:/workspace:cached
+      # Persist build artifacts (optional)
+      - rynnmotion-build:/workspace/build
+      # Persist Python virtual environment (optional)
+      - rynnmotion-venv:/workspace/python/venv
+      # X11 socket for GUI applications (MuJoCo viewer)
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # GPU support (if available)
+      - /dev/dri:/dev/dri
+
+    # Environment variables
+    environment:
+      # X11 display for GUI applications
+      - DISPLAY=${DISPLAY:-:0}
+      # Enable GPU acceleration (if available)
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      # Development mode
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+
+    # Network mode (host for easier debugging, can change to bridge)
+    network_mode: host
+
+    # Enable privileged mode for hardware access (robots, sensors)
+    privileged: true
+
+    # Device access (adjust based on your hardware)
+    # devices:
+    #   - /dev/ttyUSB0:/dev/ttyUSB0  # Example: Serial device
+    #   - /dev/video0:/dev/video0     # Example: Camera
+
+    # Keep container running
+    stdin_open: true
+    tty: true
+
+    # Working directory
+    working_dir: /workspace
+
+    # Default command
+    command: /bin/bash
+
+  # Optional: Jupyter notebook service for data analysis
+  rynnmotion-jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    image: rynnmotion:dev
+    container_name: rynnmotion-jupyter
+
+    volumes:
+      - .:/workspace:cached
+      - rynnmotion-build:/workspace/build
+      - rynnmotion-venv:/workspace/python/venv
+
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - PYTHONUNBUFFERED=1
+
+    ports:
+      - "8888:8888"
+
+    working_dir: /workspace
+
+    command: >
+      bash -c "
+      pip install jupyter jupyterlab &&
+      jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+      "
+
+    profiles:
+      - jupyter
+
+volumes:
+  rynnmotion-build:
+  rynnmotion-venv:

@@ -1,0 +1,39 @@
+<mujoco model="rm75_gripper_assets">
+
+  <asset>
+    <!-- RM75 robot meshes -->
+    <mesh name="base_link" file="base_link.STL"/>
+    <mesh name="link1" file="link1.STL"/>
+    <mesh name="link2" file="link2.STL"/>
+    <mesh name="link3" file="link3.STL"/>
+    <mesh name="link4" file="link4.STL"/>
+    <mesh name="link5" file="link5.STL"/>
+    <mesh name="link6" file="link6.STL"/>
+    <mesh name="link7" file="link7.STL"/>
+
+    <!-- Materials for gripper -->
+    <material class="2f85" name="white" rgba="1 1 1 1"/>
+    <material class="2f85" name="off_white" rgba="0.901961 0.921569 0.929412 1"/>
+    <material class="2f85" name="black" rgba="0.2 0.2 0.2 1"/>
+    <material class="2f85" name="metal" rgba="0.58 0.58 0.58 1"/>
+    <material class="2f85" name="silicone" rgba="0.1882 0.1882 0.1882 1"/>
+    <material class="2f85" name="gray" rgba="0.863156 0.863156 0.863157 1"/>
+    <material name="red" rgba="1 0.072272 0.039546 1"/>
+    <material name="orange" rgba="1.0 0.5 0.0 1"/>
+    <material name="yellow" rgba="1.0 1.0 0.0 1"/>
+    <material name="green" rgba="0.0 1.0 0.0 1"/>
+    <material name="blue" rgba="0.0 0.0 1.0 1"/>
+    <material name="cyan" rgba="0.0 1.0 1.0 1" />
+
+    <!-- Robotiq 2F85 gripper meshes -->
+    <mesh class="2f85" name="base_mount" file="../../../2.end_effector/11.robotiq/assets/base_mount.stl"/>
+    <mesh class="2f85" name="2f85base" file="../../../2.end_effector/11.robotiq/assets/2f85base.stl"/>
+    <mesh class="2f85" name="driver" file="../../../2.end_effector/11.robotiq/assets/driver.stl"/>
+    <mesh class="2f85" name="coupler" file="../../../2.end_effector/11.robotiq/assets/coupler.stl"/>
+    <mesh class="2f85" name="follower" file="../../../2.end_effector/11.robotiq/assets/follower.stl"/>
+    <mesh class="2f85" name="pad" file="../../../2.end_effector/11.robotiq/assets/pad.stl"/>
+    <mesh class="2f85" name="silicone_pad" file="../../../2.end_effector/11.robotiq/assets/silicone_pad.stl"/>
+    <mesh class="2f85" name="spring_link" file="../../../2.end_effector/11.robotiq/assets/spring_link.stl"/>
+  </asset>
+
+</mujoco>

@@ -1,0 +1,22 @@
+<mujoco model="dm6dof">
+  <option timestep="0.001" gravity="0 0 -9.80665" integrator="implicitfast" />
+  <compiler angle="radian" meshdir="../assets" autolimits="true" />
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.2 0.2 0.2" width="512" height="3072" />
+  </asset>
+
+  <include file="../mjcf/dm6dof_defaults.xml" />
+  <include file="../mjcf/dm6dof_assets.xml" />
+  <include file="../mjcf/dm6dof_actuators.xml" />
+  <include file="../mjcf/dm6dof_sensors.xml" />
+
+  <worldbody>
+    <include file="../mjcf/dm6dof_links.xml" />
+  </worldbody>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0" ctrl="0 0 0 0 0 0" />
+    <key name="stand" qpos="0 -0.5 0.5 0 0 0" ctrl="0 -0.5 0.5 0 0 0" />
+    <key name="rest" qpos="0 0 0 0 0 0" ctrl="0 0 0 0 0 0" />
+  </keyframe>
+</mujoco>

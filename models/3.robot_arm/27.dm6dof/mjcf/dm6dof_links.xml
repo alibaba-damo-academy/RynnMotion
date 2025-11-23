@@ -1,0 +1,50 @@
+<mujoco model="dm6dof_links">
+  <body name="base" childclass="dm6dof">
+    <geom type="cylinder" size="0.002 0.06" rgba="1 0 0 1" pos="0.06 0.0 0.0" euler="0 1.57079 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.06" rgba="0 1 0 1" pos="0.0 0.06 0.0" euler="1.57079 0 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.06" rgba="0 0 1 1" pos="0.0 0.0 0.06" euler="0 0 0" class="visual" />
+
+    <inertial pos="0.0030905 -0.00024462 0.029293" mass="1.3011" fullinertia="0.002694 0.002574 0.002166 0 0 0" />
+    <geom type="mesh" class="visual" mesh="link0" material="link0_material" />
+
+    <body name="link1" pos="0 0 0.0585">
+      <site name="link1_Site" pos="0.0 0 0.0" rgba="1 0 0 1" />
+      <inertial pos="5.6073e-05 -0.00079028 0.063084" quat="0.707118 0.000148927 -0.000137117 0.707095" mass="1.1181" diaginertia="0.005976 0.005669 0.000850999"/>
+      <joint name="joint1" pos="0 0 0" axis="0 0 1" type="hinge" range="-2.79253 2.79253" class="dm8009"/>
+      <geom type="mesh" class="visual" mesh="link1" material="link1_material" />
+
+      <body name="link2" pos="0 0 0.071" quat="0.707105 0.707108 0 0">
+        <inertial pos="-0.19603 -2.3087e-05 0.00068956" quat="0.500232 0.499772 0.500177 0.499819" mass="1.1392" diaginertia="0.05725 0.057057 0.000895999"/>
+        <joint name="joint2" pos="0 0 0" axis="0 0 1" type="hinge" range="-3.14159 0" class="dm8009"/>
+        <geom type="mesh" class="visual" mesh="link2" material="link2_material" />
+        
+        <body name="link3" pos="-0.3 0 0" quat="0.99863 0 0 0.0523361">
+          <site name="link3_Site" pos="0.0 0. 0.0182778" rgba="1 0 0 1" />
+          <inertial pos="0.068822 0.050855 0.00044972" quat="-0.0204837 0.706732 0.0203332 0.706892" mass="0.63716" diaginertia="0.006139 0.00442624 0.00225276"/>
+          <joint name="joint3" pos="0 0 0" axis="0 0 1" type="hinge" range="0 3.14159" class="dm4340"/>
+          <geom type="mesh" class="visual" mesh="link3" material="link3_material" />
+          <body name="link4" pos="0.11502 0.06 0" quat="0.499998 -0.5 0.500002 -0.5">
+            <site name="link4_Site" pos="0.0 0 0.0182778" rgba="1 0 0 1" />
+            <inertial pos="4.6861e-05 -0.0033784 0.14947" quat="0.704411 0.00211362 -0.00213176 0.709786" mass="0.49378" diaginertia="0.0128445 0.012827 0.000210545"/>
+            <joint name="joint4" pos="0 0 0" axis="0 0 1" type="hinge" range="-2.79253 2.79253" class="dm4310" />
+            <geom type="mesh" class="visual" mesh="link4" material="link4_material" />
+
+            <body name="link5" pos="0 0 0.18398" quat="0.499998 0.5 -0.5 0.500002">
+              <inertial pos="0.054832 6.3774e-05 0.0042051" quat="0.497447 0.502596 0.501552 0.498387" mass="0.37865" diaginertia="0.00145 0.00140908 0.000184915"/>
+              <joint name="joint5" pos="0 0 0" axis="0 0 1" type="hinge" range="-1.5708 1.5708" class="dm4310" />
+              <geom type="mesh" class="visual" mesh="link5" material="link5_material" />
+
+              <body name="link6" pos="0.081038 0 0" quat="0.499998 -0.5 0.500002 -0.5">
+                <site name="EE" size="0.002" pos="0.0 0.0 0.0" />
+                <inertial pos="0.00010011 -0.0002483 0.0073789" quat="0.653301 0.653257 -0.268288 -0.2729" mass="0.0077993" diaginertia="1.02651e-06 9.99999e-07 9.73492e-07"/>
+                <joint name="joint6" pos="0 0 0" axis="0 0 1" type="hinge" range="-2.79253 2.79253" class="dm4310" />
+                <geom type="mesh" class="visual" mesh="link6" material="link6_material" />
+
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </body>
+</mujoco>

@@ -1,0 +1,52 @@
+<mujoco model="ur5e_assets">
+
+  <asset>
+    <material class="ur5e" name="black" rgba="0.033 0.033 0.033 1"/>
+    <material class="ur5e" name="jointgray" rgba="0.278 0.278 0.278 1"/>
+    <material class="ur5e" name="linkgray" rgba="0.82 0.82 0.82 1"/>
+    <material class="ur5e" name="urblue" rgba="0.49 0.678 0.8 1"/>
+    <material class="2f85" name="white" rgba="1 1 1 1"/>
+    <material class="2f85" name="off_white" rgba="0.901961 0.921569 0.929412 1"/>
+    <material class="2f85" name="metal" rgba="0.58 0.58 0.58 1"/>
+    <material class="2f85" name="silicone" rgba="0.1882 0.1882 0.1882 1"/>
+    <material class="2f85" name="gray" rgba="0.863156 0.863156 0.863157 1"/>
+    <material class="2f85" name="orange" rgba="1.0 0.5 0.0 1"/>
+    <material class="2f85" name="red" rgba="1 0.072272 0.039546 1"/>
+    <material class="2f85" name="yellow" rgba="1.0 1.0 0.0 1"/>
+    <material class="2f85" name="green" rgba="0.0 1.0 0.0 1"/>
+    <material class="2f85" name="blue" rgba="0.0 0.0 1.0 1"/>
+    <material name="cyan" rgba="0.0 1.0 1.0 1" />
+
+    <mesh class="ur5e" name="base_0" file="base_0.obj"/>
+    <mesh class="ur5e" name="base_1" file="base_1.obj"/>
+    <mesh class="ur5e" name="shoulder_0" file="shoulder_0.obj"/>
+    <mesh class="ur5e" name="shoulder_1" file="shoulder_1.obj"/>
+    <mesh class="ur5e" name="shoulder_2" file="shoulder_2.obj"/>
+    <mesh class="ur5e" name="upperarm_0" file="upperarm_0.obj"/>
+    <mesh class="ur5e" name="upperarm_1" file="upperarm_1.obj"/>
+    <mesh class="ur5e" name="upperarm_2" file="upperarm_2.obj"/>
+    <mesh class="ur5e" name="upperarm_3" file="upperarm_3.obj"/>
+    <mesh class="ur5e" name="forearm_0" file="forearm_0.obj"/>
+    <mesh class="ur5e" name="forearm_1" file="forearm_1.obj"/>
+    <mesh class="ur5e" name="forearm_2" file="forearm_2.obj"/>
+    <mesh class="ur5e" name="forearm_3" file="forearm_3.obj"/>
+    <mesh class="ur5e" name="wrist1_0" file="wrist1_0.obj"/>
+    <mesh class="ur5e" name="wrist1_1" file="wrist1_1.obj"/>
+    <mesh class="ur5e" name="wrist1_2" file="wrist1_2.obj"/>
+    <mesh class="ur5e" name="wrist2_0" file="wrist2_0.obj"/>
+    <mesh class="ur5e" name="wrist2_1" file="wrist2_1.obj"/>
+    <mesh class="ur5e" name="wrist2_2" file="wrist2_2.obj"/>
+    <mesh class="ur5e" name="wrist3" file="wrist3.obj"/>
+
+    <mesh class="2f85" name="base_mount" file="../../../2.end_effector/11.robotiq/assets/base_mount.stl"/>
+    <mesh class="2f85" name="2f85base" file="../../../2.end_effector/11.robotiq/assets/2f85base.stl"/>
+    <mesh class="2f85" name="driver" file="../../../2.end_effector/11.robotiq/assets/driver.stl"/>
+    <mesh class="2f85" name="coupler" file="../../../2.end_effector/11.robotiq/assets/coupler.stl"/>
+    <mesh class="2f85" name="follower" file="../../../2.end_effector/11.robotiq/assets/follower.stl"/>
+    <mesh class="2f85" name="pad" file="../../../2.end_effector/11.robotiq/assets/pad.stl"/>
+    <mesh class="2f85" name="silicone_pad" file="../../../2.end_effector/11.robotiq/assets/silicone_pad.stl"/>
+    <mesh class="2f85" name="spring_link" file="../../../2.end_effector/11.robotiq/assets/spring_link.stl"/>
+  </asset>
+
+
+</mujoco>

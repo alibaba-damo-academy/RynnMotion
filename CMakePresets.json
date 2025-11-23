@@ -1,0 +1,130 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "develop",
+      "displayName": "Develop Config",
+      "description": "Develop build configuration",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "USING_GDB": "ON",
+        "BUILD_MUJOCO": "ON",
+        "BUILD_TESTS": "OFF",
+        "BUILD_ROS_MUJOCO": "OFF",
+        "BUILD_STATIC": "OFF"
+      }
+    },
+    {
+      "name": "deployment",
+      "displayName": "Deploy Config",
+      "description": "Deploy build configuration",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "USING_GDB": "ON",
+        "BUILD_MUJOCO": "ON",
+        "BUILD_TESTS": "OFF",
+        "BUILD_ROS_MUJOCO": "OFF",
+        "BUILD_STATIC": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release Build",
+      "description": "Optimized build for native deployment",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "USING_GDB": "OFF",
+        "BUILD_MUJOCO": "ON",
+        "BUILD_TESTS": "OFF",
+        "BUILD_ROS_MUJOCO": "OFF",
+        "BUILD_STATIC": "ON"
+      }
+    },
+    {
+      "name": "rosMujoco",
+      "displayName": "ROS Mujoco Build",
+      "description": "Build with ROS Mujoco support",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "USING_GDB": "ON",
+        "BUILD_MUJOCO": "ON",
+        "BUILD_TESTS": "OFF",
+        "BUILD_ROS_MUJOCO": "ON",
+        "BUILD_STATIC": "OFF"
+      }
+    },
+    {
+      "name": "tests",
+      "displayName": "Tests Build",
+      "description": "Build with tests enabled",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "USING_GDB": "OFF",
+        "BUILD_MUJOCO": "ON",
+        "BUILD_TESTS": "ON",
+        "BUILD_ROS_MUJOCO": "OFF",
+        "BUILD_STATIC": "OFF"
+      }
+    },
+    {
+      "name": "cross-aarch64",
+      "displayName": "Cross-compilation for ARM64",
+      "description": "Cross-compile for aarch64 architecture",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build-aarch64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_SYSTEM_NAME": "Linux",
+        "CMAKE_SYSTEM_PROCESSOR": "aarch64",
+        "CMAKE_C_COMPILER": "/usr/bin/aarch64-linux-gnu-gcc",
+        "CMAKE_CXX_COMPILER": "/usr/bin/aarch64-linux-gnu-g++",
+        "USING_GDB": "OFF",
+        "BUILD_MUJOCO": "OFF",
+        "BUILD_TESTS": "OFF",
+        "BUILD_ROS_MUJOCO": "OFF",
+        "BUILD_STATIC": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "develop",
+      "configurePreset": "develop"
+    },
+    {
+      "name": "deployment",
+      "configurePreset": "deployment"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "rosMujoco",
+      "configurePreset": "rosMujoco"
+    },
+    {
+      "name": "tests",
+      "configurePreset": "tests"
+    },
+    {
+      "name": "cross-aarch64",
+      "configurePreset": "cross-aarch64"
+    }
+  ]
+}
