@@ -3,40 +3,19 @@
 #include <memory>
 
 #include "pose.hpp"
-#include "tinyfsm.hpp"
 #include "trajgen.hpp"
 
 namespace rynn {
-class PickPlaceController;
-}
 
-namespace rynn {
-
-template<int ArmIndex> struct PickPlaceIdle;
-template<int ArmIndex> struct MoveToPrePick;
-template<int ArmIndex> struct MoveToPick;
-template<int ArmIndex> struct Grasp;
-template<int ArmIndex> struct Lift;
-template<int ArmIndex> struct MoveToPlace;
-template<int ArmIndex> struct Drop;
-template<int ArmIndex> struct ReturnToStand;
-
-/**
- * @brief Tick event for pick-place FSM
- */
-struct PickPlaceEventTick : tinyfsm::Event {
-  explicit PickPlaceEventTick(float dt_sec) : duration(dt_sec) {
-  }
+struct PickPlaceEventTick {
+  explicit PickPlaceEventTick(float dt_sec) : duration(dt_sec) {}
   float duration;
 };
 
-/**
- * @brief Start pick-place sequence
- */
-struct PickPlaceEventStart : tinyfsm::Event {
+struct PickPlaceEventStart {
   explicit PickPlaceEventStart(const data::Pose &standPose, const data::Pose &placePose,
-                               const std::vector<data::Pose> &graspPoses, double dt = 0.001) : standPose(standPose), placePose(placePose), graspPoses(graspPoses), dt(dt) {
-  }
+                               const std::vector<data::Pose> &graspPoses, double dt = 0.001)
+      : standPose(standPose), placePose(placePose), graspPoses(graspPoses), dt(dt) {}
 
   data::Pose standPose;
   data::Pose placePose;
@@ -44,52 +23,21 @@ struct PickPlaceEventStart : tinyfsm::Event {
   double dt;
 };
 
-/**
- * @brief Reset pick-place FSM
- */
-struct PickPlaceEventReset : tinyfsm::Event {};
+struct PickPlaceEventReset {};
 
-enum class PickPlaceStateID {
-  Idle,
-  MoveToPrePick,
-  MoveToPick,
-  Grasp,
-  Lift,
-  MoveToPlace,
-  Drop,
-  ReturnToStand
-};
+enum class PickPlaceStateID { Idle, MoveToPrePick, MoveToPick, Grasp, Lift, MoveToPlace, Drop, ReturnToStand };
 
 /**
- * @brief Pick-and-place finite state machine (templated for dual-arm support)
- * @tparam ArmIndex Arm identifier (0=left/single-arm, 1=right)
+ * @class PickPlaceFsm
+ * @brief Instance-based pick-and-place finite state machine
  *
- * Template creates independent FSM instances:
- * - PickPlaceFsm<0> for left arm (and single-arm robots)
- * - PickPlaceFsm<1> for right arm in dual-arm setups
+ * Responsibilities:
+ * - Manage state transitions for pick-place sequences
+ * - Generate smooth trajectories between waypoints
+ * - Track gripper open/close commands per state
+ * - Support multiple independent instances for dual-arm robots
  */
-template<int ArmIndex = 0>
-struct PickPlaceFsm : tinyfsm::Fsm<PickPlaceFsm<ArmIndex>> {
-  friend class rynn::PickPlaceController;
-
-  virtual PickPlaceStateID getID() const = 0;
-
-  virtual void entry() {
-  }
-  virtual void exit() {
-  }
-
-  void react(tinyfsm::Event const &) {
-  }
-  virtual void react(PickPlaceEventTick const &) {
-  }
-  virtual void react(PickPlaceEventStart const &) {
-  }
-  virtual void react(PickPlaceEventReset const &) {
-  }
-
-  static void reset();
-
+class PickPlaceFsm {
 public:
   struct TrajectoryLimits {
     double velMax = 1.0;
@@ -118,86 +66,47 @@ public:
     bool printDebug = false;
   };
 
-protected:
-  // Each template instantiation gets its own static context
-  static Context ctx_;
+  explicit PickPlaceFsm(int armIndex = 0);
+  ~PickPlaceFsm() = default;
+
+  PickPlaceFsm(const PickPlaceFsm &) = delete;
+  PickPlaceFsm &operator=(const PickPlaceFsm &) = delete;
+  PickPlaceFsm(PickPlaceFsm &&) = default;
+  PickPlaceFsm &operator=(PickPlaceFsm &&) = default;
+
+  void start();
+  void dispatch(const PickPlaceEventTick &e);
+  void dispatch(const PickPlaceEventStart &e);
+  void dispatch(const PickPlaceEventReset &e);
+  void reset();
+
+  PickPlaceStateID getCurrentState() const { return currentState_; }
+  data::Pose getCurrentTargetPose() const;
+  bool shouldOpenGripper() const;
+  bool isCompleted() const { return ctx_.completed; }
+
+  void setLimits(double velMax, double accMax, double graspTime);
+  void setDebugPrint(bool enable) { ctx_.printDebug = enable; }
+  bool isDebugPrintEnabled() const { return ctx_.printDebug; }
+
+  int getArmIndex() const { return armIndex_; }
+  const Context &getContext() const { return ctx_; }
+
+private:
+  int armIndex_;
+  PickPlaceStateID currentState_ = PickPlaceStateID::Idle;
+  Context ctx_;
+
+  void transitTo(PickPlaceStateID newState);
+  void onEntry(PickPlaceStateID state);
+  void onTick(float dt);
 
   void generatePrePoses();
-  bool createTrajectory(const data::Pose &start, const data::Pose &end, double dt);
-  bool isTrajectoryComplete(const data::Pose &targetPose) const;
-  data::Pose getTargetPoseForState(PickPlaceStateID stateId) const;
-
-public:
-  static data::Pose getCurrentTargetPose();
-  static bool shouldOpenGripper();
-  static bool isCompleted();
-  static void setDebugPrint(bool enable) {
-    ctx_.printDebug = enable;
-  }
-  static bool isDebugPrintEnabled() {
-    return ctx_.printDebug;
-  }
-};
-
-// Type aliases for convenience
-using PickPlaceFsmLeft = PickPlaceFsm<0>;
-using PickPlaceFsmRight = PickPlaceFsm<1>;
-
-template<int ArmIndex = 0>
-struct PickPlaceIdle : PickPlaceFsm<ArmIndex> {
-  PickPlaceStateID getID() const override;
-  void entry() override;
-  void react(PickPlaceEventStart const &e) override;
-  void react(PickPlaceEventReset const &) override;
-};
-
-template<int ArmIndex = 0>
-struct MoveToPrePick : PickPlaceFsm<ArmIndex> {
-  PickPlaceStateID getID() const override;
-  void entry() override;
-  void react(PickPlaceEventTick const &e) override;
-};
-
-template<int ArmIndex = 0>
-struct MoveToPick : PickPlaceFsm<ArmIndex> {
-  PickPlaceStateID getID() const override;
-  void entry() override;
-  void react(PickPlaceEventTick const &e) override;
-};
-
-template<int ArmIndex = 0>
-struct Grasp : PickPlaceFsm<ArmIndex> {
-  PickPlaceStateID getID() const override;
-  void entry() override;
-  void react(PickPlaceEventTick const &e) override;
-};
-
-template<int ArmIndex = 0>
-struct Lift : PickPlaceFsm<ArmIndex> {
-  PickPlaceStateID getID() const override;
-  void entry() override;
-  void react(PickPlaceEventTick const &e) override;
-};
-
-template<int ArmIndex = 0>
-struct MoveToPlace : PickPlaceFsm<ArmIndex> {
-  PickPlaceStateID getID() const override;
-  void entry() override;
-  void react(PickPlaceEventTick const &e) override;
-};
-
-template<int ArmIndex = 0>
-struct Drop : PickPlaceFsm<ArmIndex> {
-  PickPlaceStateID getID() const override;
-  void entry() override;
-  void react(PickPlaceEventTick const &e) override;
-};
-
-template<int ArmIndex = 0>
-struct ReturnToStand : PickPlaceFsm<ArmIndex> {
-  PickPlaceStateID getID() const override;
-  void entry() override;
-  void react(PickPlaceEventTick const &e) override;
+  bool createTrajectory(const data::Pose &start, const data::Pose &end);
+  void updateTrajectory(float dt);
+  bool isTrajectoryComplete(const data::Pose &target) const;
+  data::Pose getTargetPoseForState(PickPlaceStateID state) const;
+  PickPlaceStateID getNextState(PickPlaceStateID current) const;
 };
 
 } // namespace rynn

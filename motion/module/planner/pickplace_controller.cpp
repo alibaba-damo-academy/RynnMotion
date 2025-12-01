@@ -1,8 +1,7 @@
 #include "pickplace_controller.hpp"
 
-#include <iostream>
-
 #include "orient_tools.hpp"
+#include "pickplace_fsm.hpp"
 
 namespace rynn {
 
@@ -55,70 +54,39 @@ PickPlaceConfig getPickPlaceConfigForRobot(RobotType robotType) {
     break;
 
   default:
-    std::cerr << "Warning: Unknown robot type " << static_cast<int>(robotType)
-              << ", using FR3 defaults" << std::endl;
     break;
   }
 
   return config;
 }
 
-PickPlaceController::PickPlaceController(RobotType robotType,
-                                         int armIndex,
-                                         const PickPlaceConfig *config) :
-    _robotType(robotType),
-    _armIndex(armIndex) {
-  if (config) {
-    _config = *config;
-  } else {
-    _config = getPickPlaceConfigForRobot(robotType);
-  }
+PickPlaceController::PickPlaceController(RobotType robotType, int armIndex, const PickPlaceConfig *config)
+    : _armIndex(armIndex) {
+  _config = config ? *config : getPickPlaceConfigForRobot(robotType);
 }
 
 bool PickPlaceController::initialize(const data::Pose &standPose,
                                      const data::Pose &dropPose,
                                      const std::vector<data::Pose> &objectPoses) {
-  if (objectPoses.empty()) {
-    std::cerr << "[PickPlaceController] Error: No objects to pick" << std::endl;
-    return false;
-  }
+  if (objectPoses.empty()) return false;
 
   _standPose = standPose;
   _dropPose = dropPose;
   _objectPoses = objectPoses;
 
-  if (!computeAllPoses()) {
-    std::cerr << "[PickPlaceController] Error: Failed to compute poses" << std::endl;
-    return false;
-  }
+  if (!computeAllPoses()) return false;
 
   constexpr double TRAJ_DT = 0.001;
-  auto startEvent = rynn::PickPlaceEventStart{_standPose, _dropPose, _graspPoses, TRAJ_DT};
 
-  if (_armIndex == 0) {
-    rynn::PickPlaceFsm<0>::start();
-    rynn::PickPlaceFsm<0>::dispatch(startEvent);
-
-    rynn::PickPlaceFsm<0>::ctx_.limits.velMax = _config.velMax;
-    rynn::PickPlaceFsm<0>::ctx_.limits.accMax = _config.accMax;
-    rynn::PickPlaceFsm<0>::ctx_.limits.graspTime = _config.graspTime;
-    rynn::PickPlaceFsm<0>::ctx_.printDebug = _config.printDebug;
-  } else {
-    rynn::PickPlaceFsm<1>::start();
-    rynn::PickPlaceFsm<1>::dispatch(startEvent);
-
-    rynn::PickPlaceFsm<1>::ctx_.limits.velMax = _config.velMax;
-    rynn::PickPlaceFsm<1>::ctx_.limits.accMax = _config.accMax;
-    rynn::PickPlaceFsm<1>::ctx_.limits.graspTime = _config.graspTime;
-    rynn::PickPlaceFsm<1>::ctx_.printDebug = _config.printDebug;
-  }
+  _fsm = std::make_unique<PickPlaceFsm>(_armIndex);
+  _fsm->start();
+  _fsm->dispatch(PickPlaceEventStart{_standPose, _dropPose, _graspPoses, TRAJ_DT});
+  _fsm->setLimits(_config.velMax, _config.accMax, _config.graspTime);
+  _fsm->setDebugPrint(_config.printDebug);
 
   _initialized = true;
   _currentObjectIndex = 0;
   _currentRetryCount = 0;
-
-  std::cout << "[PickPlaceController] Initialized with " << objectPoses.size()
-            << " objects (Robot: " << static_cast<int>(_robotType) << ")" << std::endl;
 
   return true;
 }
@@ -126,47 +94,29 @@ bool PickPlaceController::initialize(const data::Pose &standPose,
 PickPlaceController::Command PickPlaceController::update(double dt) {
   Command cmd;
 
-  if (!_initialized) {
-    std::cerr << "[PickPlaceController] Error: Not initialized" << std::endl;
+  if (!_initialized || !_fsm) {
     cmd.statusMessage = "Not initialized";
     return cmd;
   }
 
-  if (_armIndex == 0) {
-    rynn::PickPlaceFsm<0>::dispatch(rynn::PickPlaceEventTick{static_cast<float>(dt)});
-    cmd.targetPose = rynn::PickPlaceFsm<0>::getCurrentTargetPose();
-    cmd.openGripper = rynn::PickPlaceFsm<0>::shouldOpenGripper();
-    cmd.isCompleted = rynn::PickPlaceFsm<0>::isCompleted();
+  _fsm->dispatch(PickPlaceEventTick{static_cast<float>(dt)});
+  cmd.targetPose = _fsm->getCurrentTargetPose();
+  cmd.openGripper = _fsm->shouldOpenGripper();
+  cmd.isCompleted = _fsm->isCompleted();
 
-    auto &ctx = rynn::PickPlaceFsm<0>::ctx_;
-    if (cmd.isCompleted) {
-      cmd.statusMessage = "Sequence completed";
-    } else {
-      cmd.statusMessage = "Object " + std::to_string(ctx.currentObject + 1) + "/" + std::to_string(ctx.numObjects);
-    }
+  const auto &ctx = _fsm->getContext();
+  if (cmd.isCompleted) {
+    cmd.statusMessage = "Sequence completed";
   } else {
-    rynn::PickPlaceFsm<1>::dispatch(rynn::PickPlaceEventTick{static_cast<float>(dt)});
-    cmd.targetPose = rynn::PickPlaceFsm<1>::getCurrentTargetPose();
-    cmd.openGripper = rynn::PickPlaceFsm<1>::shouldOpenGripper();
-    cmd.isCompleted = rynn::PickPlaceFsm<1>::isCompleted();
-
-    auto &ctx = rynn::PickPlaceFsm<1>::ctx_;
-    if (cmd.isCompleted) {
-      cmd.statusMessage = "Sequence completed";
-    } else {
-      cmd.statusMessage = "Object " + std::to_string(ctx.currentObject + 1) + "/" + std::to_string(ctx.numObjects);
-    }
+    cmd.statusMessage =
+        "Object " + std::to_string(ctx.currentObject + 1) + "/" + std::to_string(ctx.numObjects);
   }
 
   return cmd;
 }
 
 void PickPlaceController::reset() {
-  if (_armIndex == 0) {
-    rynn::PickPlaceFsm<0>::reset();
-  } else {
-    rynn::PickPlaceFsm<1>::reset();
-  }
+  if (_fsm) _fsm->reset();
 
   _initialized = false;
   _currentObjectIndex = 0;
@@ -177,15 +127,7 @@ void PickPlaceController::reset() {
 }
 
 bool PickPlaceController::isComplete() const {
-  if (!_initialized) {
-    return false;
-  }
-
-  if (_armIndex == 0) {
-    return rynn::PickPlaceFsm<0>::isCompleted();
-  } else {
-    return rynn::PickPlaceFsm<1>::isCompleted();
-  }
+  return _initialized && _fsm && _fsm->isCompleted();
 }
 
 bool PickPlaceController::computeAllPoses() {
@@ -195,12 +137,9 @@ bool PickPlaceController::computeAllPoses() {
 
   for (const auto &objectPose : _objectPoses) {
     data::Pose graspPose = computeGraspPose(objectPose);
-    data::Pose prePickPose = computePrePickPose(graspPose);
-    data::Pose liftPose = computeLiftPose(graspPose);
-
     _graspPoses.push_back(graspPose);
-    _prePickPoses.push_back(prePickPose);
-    _liftPoses.push_back(liftPose);
+    _prePickPoses.push_back(computePrePickPose(graspPose));
+    _liftPoses.push_back(computeLiftPose(graspPose));
   }
 
   return !_graspPoses.empty();
@@ -213,11 +152,9 @@ bool PickPlaceController::isObjectReachable(const data::Pose &objectPose) const 
 
 data::Pose PickPlaceController::computeGraspPose(const data::Pose &objectPose) const {
   data::Pose graspPose;
-
   graspPose.pos = objectPose.pos;
   graspPose.pos.z() = _config.graspHeight;
   graspPose.quat = _standPose.quat;
-
   return graspPose;
 }
 
@@ -240,19 +177,13 @@ bool PickPlaceController::verifyGraspSuccess() {
 bool PickPlaceController::handleGraspFailure() {
   _currentRetryCount++;
 
-  if (_currentRetryCount < _config.maxGraspRetries) {
-    std::cout << "[PickPlaceController] Grasp failed, retry "
-              << _currentRetryCount << "/" << _config.maxGraspRetries << std::endl;
-    return true;
-  }
+  if (_currentRetryCount < _config.maxGraspRetries) return true;
 
   if (_config.skipFailedObjects) {
-    std::cout << "[PickPlaceController] Grasp failed, skipping object" << std::endl;
     _currentRetryCount = 0;
-    return false; // Skip to next object
+    return false;
   }
 
-  std::cerr << "[PickPlaceController] Grasp failed, aborting sequence" << std::endl;
   return false;
 }
 

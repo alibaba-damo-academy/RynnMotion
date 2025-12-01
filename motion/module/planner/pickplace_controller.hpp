@@ -128,71 +128,27 @@ public:
   }
 
 private:
-  // Configuration
-  RobotType _robotType;
-  int _armIndex = 0;  // Arm index for dual-arm support
+  int _armIndex = 0;
   PickPlaceConfig _config;
   bool _initialized = false;
+  std::unique_ptr<PickPlaceFsm> _fsm;
 
-  // Task data
   data::Pose _standPose;
   data::Pose _dropPose;
   std::vector<data::Pose> _objectPoses;
+  std::vector<data::Pose> _graspPoses;
+  std::vector<data::Pose> _prePickPoses;
+  std::vector<data::Pose> _liftPoses;
 
-  // Computed poses
-  std::vector<data::Pose> _graspPoses;   // Grasp poses (with height offset)
-  std::vector<data::Pose> _prePickPoses; // Pre-pick poses (hover above grasp)
-  std::vector<data::Pose> _liftPoses;    // Lift poses (after grasp)
-
-  // State tracking
   int _currentObjectIndex = 0;
   int _currentRetryCount = 0;
 
-  // Helper methods
-  /**
-   * @brief Compute all poses for the sequence
-   * @return true if all poses are valid
-   */
   bool computeAllPoses();
-
-  /**
-   * @brief Validate that object is within reach
-   * @param objectPose Object position to check
-   * @return true if reachable
-   */
   bool isObjectReachable(const data::Pose &objectPose) const;
-
-  /**
-   * @brief Compute grasp pose from object position
-   * @param objectPose Object position (from MuJoCo)
-   * @return Grasp pose (with height offset and orientation)
-   */
   data::Pose computeGraspPose(const data::Pose &objectPose) const;
-
-  /**
-   * @brief Compute pre-pick hover pose
-   * @param graspPose Grasp pose
-   * @return Pre-pick pose (above grasp)
-   */
   data::Pose computePrePickPose(const data::Pose &graspPose) const;
-
-  /**
-   * @brief Compute lift pose (after grasp)
-   * @param graspPose Grasp pose
-   * @return Lift pose (above grasp)
-   */
   data::Pose computeLiftPose(const data::Pose &graspPose) const;
-
-  /**
-   * @brief Validate grasp success (check gripper feedback)
-   * @return true if object is held
-   */
   bool verifyGraspSuccess();
-
-  /**
-   * @brief Handle grasp failure (retry or skip)
-   * @return true if should retry, false if should skip
-   */
   bool handleGraspFailure();
 };
 
