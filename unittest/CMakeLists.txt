@@ -13,7 +13,6 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../motion/fsm/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/../motion/manager/
     ${CMAKE_CURRENT_SOURCE_DIR}/../motion/utils/tools/
-    ${CMAKE_CURRENT_SOURCE_DIR}/../motion/utils/collision/
     ${CMAKE_CURRENT_SOURCE_DIR}/../motion/utils/curve/
     ${CMAKE_CURRENT_SOURCE_DIR}/../motion/utils/kinematics/
     ${CMAKE_CURRENT_SOURCE_DIR}/../motion/utils/trajectory/

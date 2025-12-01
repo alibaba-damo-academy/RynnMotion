@@ -27,11 +27,13 @@ RynnMotion/
 ### Key Characteristics
 
 1. **Core Package** (`python/`):
+
    - Contains shared algorithms, simulation, and dataset tools
    - Minimal dependencies
    - Hardware-agnostic
 
 2. **Satellite Submodules** (`robots/*`):
+
    - Git submodules for specific robot implementations
    - Own virtual environments with hardware SDKs
    - Install core package via editable install: `pip install -e ../../python/`
@@ -45,7 +47,7 @@ RynnMotion/
 
 ### Current Setup Method
 
-From `robots/RynnLeRobot/setup_lerobot.sh`:
+From `robots/RynnLeRobot/setup_env.sh`:
 
 ```bash
 # Install core package as editable without dependencies
@@ -72,11 +74,13 @@ uv pip install numpy scipy PyYAML matplotlib opencv-python ...
 #### 1.1 Convert to Namespace Packages
 
 **Current:**
+
 ```
 python/src/RynnMotion/
 ```
 
 **Proposed:**
+
 ```python
 python/src/
 ├── rynn_motion/           # Core namespace
@@ -247,21 +251,21 @@ jobs:
         python-version: ["3.10", "3.11", "3.13"]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install core dependencies
-      run: |
-        cd python
-        pip install -e .[all,dev]
+      - name: Install core dependencies
+        run: |
+          cd python
+          pip install -e .[all,dev]
 
-    - name: Run core tests
-      run: |
-        cd python
-        pytest tests/ --cov=rynn_motion
+      - name: Run core tests
+        run: |
+          cd python
+          pytest tests/ --cov=rynn_motion
 
   test-satellites:
     runs-on: ubuntu-latest
@@ -271,16 +275,16 @@ jobs:
         robot: [RynnLeRobot, franka, piper]
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
-    - name: Test ${{ matrix.robot }}
-      run: |
-        cd robots/${{ matrix.robot }}
-        if [ -f "tests/run_tests.sh" ]; then
-          ./tests/run_tests.sh
-        fi
+      - name: Test ${{ matrix.robot }}
+        run: |
+          cd robots/${{ matrix.robot }}
+          if [ -f "tests/run_tests.sh" ]; then
+            ./tests/run_tests.sh
+          fi
 ```
 
 ### Phase 4: Version Management
@@ -368,6 +372,7 @@ Create `docs/architecture/README.md`:
 # RynnMotion Architecture
 
 ## Package Structure
+
 - **Core Package**: Shared algorithms and simulation (`python/`)
 - **Satellite Packages**: Robot-specific implementations (`robots/*/`)
 - **Dependency Flow**: Satellites depend on Core (unidirectional)
@@ -375,6 +380,7 @@ Create `docs/architecture/README.md`:
 ## Development Guidelines
 
 ### Adding a New Robot
+
 1. Create submodule in `robots/`
 2. Implement `RobotInterface` from core
 3. Create setup script with core installation
@@ -382,12 +388,14 @@ Create `docs/architecture/README.md`:
 5. Write integration tests
 
 ### Modifying Core Package
+
 1. Check impact on all satellites
 2. Update compatibility matrix
 3. Use deprecation warnings for breaking changes
 4. Run full integration test suite
 
 ## API Stability
+
 - Core APIs follow semantic versioning
 - Breaking changes require major version bump
 - Deprecation period of 2 minor versions
@@ -401,18 +409,22 @@ Create `docs/migration/template.md`:
 # Migration Guide: vX.Y.Z to vA.B.C
 
 ## Breaking Changes
+
 - List all breaking changes
 - Provide before/after examples
 
 ## Deprecations
+
 - List deprecated features
 - Show migration path
 
 ## New Features
+
 - List new features
 - Provide usage examples
 
 ## Update Instructions
+
 1. Update core package
 2. Check compatibility matrix
 3. Update satellite packages
@@ -422,6 +434,7 @@ Create `docs/migration/template.md`:
 ## Best Practices
 
 ### Do's ✅
+
 1. **Keep core dependencies minimal** - Only essential packages
 2. **Use editable installs for development** - `-e` flag for real-time updates
 3. **Version everything** - Core, satellites, and compatibility matrix
@@ -431,6 +444,7 @@ Create `docs/migration/template.md`:
 7. **Isolate hardware SDKs** - Keep in satellite venvs only
 
 ### Don'ts ❌
+
 1. **Don't create circular dependencies** - Core should never import satellites
 2. **Don't hardcode paths** - Use relative imports and config files
 3. **Don't skip compatibility testing** - Test before merging
@@ -442,17 +456,20 @@ Create `docs/migration/template.md`:
 ## Monitoring and Maintenance
 
 ### Health Checks
+
 - Weekly compatibility tests
 - Monthly dependency updates
 - Quarterly architecture review
 
 ### Metrics to Track
+
 - Import time of core package
 - Test coverage percentage
 - Number of cross-dependencies
 - Time to set up new robot
 
 ### Warning Signs
+
 - Increasing setup complexity
 - Circular import attempts
 - Version conflict reports
@@ -461,6 +478,7 @@ Create `docs/migration/template.md`:
 ## Future Considerations
 
 ### Potential Improvements
+
 1. **Plugin System**: Dynamic robot loading
 2. **Docker Containers**: Isolated environments
 3. **Microservices**: Separate services for each robot
@@ -468,6 +486,7 @@ Create `docs/migration/template.md`:
 5. **Conda Environments**: Better binary dependency management
 
 ### Scalability Path
+
 - Current: 5-10 robot types
 - Medium-term: 20-30 robot types
 - Long-term: 50+ robot types → Consider microservices

@@ -136,9 +136,6 @@
 
                 <body name="tf1" pos="0 0 0.13503" euler="3.1415926 0 3.1415926">
                   <site name="EE" rgba="0.8 0.8 0 0" size="0.001" />
-                  <!-- <geom type="cylinder" size="0.002 0.05" rgba="1 0 0 1" pos="0.05 0 0" euler="0 1.57079 0" class="visual" />
-                  <geom type="cylinder" size="0.002 0.05" rgba="0 1 0 1" pos="0 0.05 0" euler="1.57079 0 0" class="visual" />
-                  <geom type="cylinder" size="0.002 0.05" rgba="0 0 1 1" pos="0 0 0.05" euler="0 0 0" class="visual" /> -->
                 </body>
 
               </body>

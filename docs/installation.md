@@ -100,7 +100,7 @@ pip install -e ".[dev]"
 
 # 5. Test installation
 cd ../build
-./mujocoExe fr3 1  # Should open MuJoCo viewer with FR3 robot
+./mujocoExe fr3 ui  # Should open MuJoCo viewer with FR3 robot
 ```
 
 ### What Gets Installed
@@ -209,7 +209,7 @@ cmake ..
 make -j$(nproc)
 
 # 5. Test
-./mujocoExe fr3 1
+./mujocoExe fr3 ui
 ```
 
 ### Full Docker Documentation
@@ -430,7 +430,7 @@ source ~/.bashrc
 
 ```bash
 cd RynnMotion/build
-./mujocoExe fr3 1
+./mujocoExe fr3 ui
 ```
 
 ---
@@ -447,13 +447,13 @@ ls -lh mujocoExe
 # Should show executable with size ~5-10 MB
 
 # 2. Run simple simulation
-./mujocoExe fr3 1
+./mujocoExe fr3 ui
 
-# Expected: MuJoCo viewer opens, FR3 robot loads, figure-8 trajectory
+# Expected: MuJoCo viewer opens, FR3 robot loads with interactive UI
 # Press Space to pause, Ctrl+Q to quit
 
 # 3. Test other robots
-./mujocoExe ur5e 1
+./mujocoExe ur5e ui
 ./mujocoExe dual_fr3 pickplace
 ```
 

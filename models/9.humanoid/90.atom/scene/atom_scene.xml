@@ -1,4 +1,0 @@
-<mujoco model="atom_scene">
-  <include file="../mjcf/atom_robot.xml"/>
-  <include file="../../../environments/ground.xml"/>
-</mujoco>
