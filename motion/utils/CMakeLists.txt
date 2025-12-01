@@ -198,59 +198,6 @@ if(NOT CMAKE_TOOLCHAIN_FILE AND BUILD_STATIC)
   )
 endif()
 
-# Create directories for development libraries
-file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/realman/src/telemotion/lib/)
-file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/piper/src/xiaoda/lib/)
-file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib/)
-
-# Copy libraries to appropriate locations
-if(CMAKE_TOOLCHAIN_FILE)
-  # For cross-compilation, copy the static library to development locations
-  add_custom_command(
-    TARGET ${LIBRARY_NAME}
-    POST_BUILD
-    COMMAND
-    ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}>
-    ${CMAKE_SOURCE_DIR}/robots/realman/src/telemotion/lib/lib${LIBRARY_NAME}.a
-    COMMAND
-    ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}>
-    ${CMAKE_SOURCE_DIR}/robots/piper/src/xiaoda/lib/lib${LIBRARY_NAME}.a
-    COMMAND
-    ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}>
-    ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib/lib${LIBRARY_NAME}.a
-  )
-else()
-  # For native build, copy dynamic library for development
-  add_custom_command(
-    TARGET ${LIBRARY_NAME}
-    POST_BUILD
-    COMMAND
-    ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}>
-    ${CMAKE_SOURCE_DIR}/robots/realman/src/telemotion/lib/$<TARGET_FILE_NAME:${LIBRARY_NAME}>
-    COMMAND
-    ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}>
-    ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib/$<TARGET_FILE_NAME:${LIBRARY_NAME}>
-  )
-
-  # For native build, also copy the static library if BUILD_STATIC is ON
-  if(BUILD_STATIC)
-    add_custom_command(
-      TARGET ${LIBRARY_NAME}_static
-      POST_BUILD
-      COMMAND
-      ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}_static>
-      ${CMAKE_SOURCE_DIR}/robots/piper/src/xiaoda/lib/lib${LIBRARY_NAME}.a
-      COMMAND
-      ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}_static>
-      ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib/lib${LIBRARY_NAME}.a
-      COMMAND
-      ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}_static>
-      ${CMAKE_SOURCE_DIR}/robots/realman/src/telemotion/lib/lib${LIBRARY_NAME}.a
-      COMMENT "Copying static libutility.a to deployment dirs"
-    )
-  endif()
-endif()
-
 # Set up include directories
 set(BUILD_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${LIBRARY_NAME}/include)
 file(MAKE_DIRECTORY ${BUILD_INCLUDE_DIR})
