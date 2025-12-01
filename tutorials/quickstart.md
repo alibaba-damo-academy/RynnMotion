@@ -64,7 +64,7 @@ make -j$(nproc)
 
 ```bash
 # From the build/ directory
-./mujocoExe fr3 1
+./mujocoExe fr3 ui
 ```
 
 **What you'll see:**
@@ -75,8 +75,8 @@ make -j$(nproc)
 
 **Try other robots:**
 ```bash
-./mujocoExe ur5e 1          # Universal Robots UR5e
-./mujocoExe piper 1         # AgileX Piper dual-arm
+./mujocoExe ur5e ui             # Universal Robots UR5e
+./mujocoExe piper ui            # AgileX Piper
 ./mujocoExe dual_fr3 pickplace  # Dual-arm pick-and-place
 ```
 
@@ -101,21 +101,25 @@ RynnMotion includes 8+ pre-configured robots:
 
 | Robot | Description | DOF | Command |
 |-------|-------------|-----|---------|
-| `fr3` | Franka Emika FR3 | 7 | `./mujocoExe fr3 1` |
-| `ur5e` | Universal Robots UR5e | 6 | `./mujocoExe ur5e 1` |
-| `piper` | AgileX Piper dual-arm | 14 | `./mujocoExe piper 1` |
-| `rm75` | RealMan RM75 | 7 | `./mujocoExe rm75 1` |
-| `so101` | SoArm SO101 | 7 | `./mujocoExe so101 1` |
-| `dual_fr3` | Dual FR3 arms | 14 | `./mujocoExe dual_fr3 1` |
-| `dual_ur5e` | Dual UR5e arms | 12 | `./mujocoExe dual_ur5e 1` |
+| `fr3` | Franka Emika FR3 | 7 | `./mujocoExe fr3 ui` |
+| `ur5e` | Universal Robots UR5e | 6 | `./mujocoExe ur5e ui` |
+| `piper` | AgileX Piper | 6 | `./mujocoExe piper ui` |
+| `rm75` | RealMan RM75 | 7 | `./mujocoExe rm75 ui` |
+| `so101` | SoArm SO101 | 5 | `./mujocoExe so101 ui` |
+| `dual_fr3` | Dual FR3 arms | 14 | `./mujocoExe dual_fr3 ui` |
+| `dual_ur5e` | Dual UR5e arms | 12 | `./mujocoExe dual_ur5e ui` |
 
-### Scene Numbers
+### Scene Names
 
-Each robot supports multiple demo scenes:
+Each robot supports multiple demo scenes (use names, not numbers):
 
-- `1` - **Tracking**: Figure-8 trajectory following
-- `2` - **Custom**: Define your own trajectories (see `config/robot.yaml`)
-- `pickplace` - **Pick-and-Place**: Dual-arm object manipulation (dual-arm robots only)
+| # | Scene | Aliases | Description |
+|---|-------|---------|-------------|
+| 1 | `joint` | default | Joint-space control (JointMove) |
+| 2 | `keyframe` | wobble, cycle | Keyframe cycling demo |
+| 3 | `ui` | tracking | Interactive UI with OSC tracking |
+| 4 | `predefined` | workspace | Predefined workspace motions |
+| 5 | `pickplace` | pick | Pick-and-place automation |
 
 ### Keyboard Controls
 
@@ -151,9 +155,9 @@ Changes take effect when you restart the simulation.
 
 1. Drop MJCF files into `models/3.robot_arm/{NUMBER}.{robot_name}/mjcf/`
 2. Rebuild: `cmake ..` (auto-generates robot enums)
-3. Run: `./mujocoExe {robot_name} 1`
+3. Run: `./mujocoExe {robot_name} ui`
 
-See [Adding New Robots](../models/how_to_add_new_robot_scene.md) for details.
+See [Adding New Robots](../docs/how_to_add_new_robot_scene.md) for details.
 
 ### 📊 Collect Datasets for Imitation Learning
 

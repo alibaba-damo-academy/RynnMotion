@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+# Copyright 2024 The HuggingFace Inc. team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""
+Types for dataset functionality - simplified version for lerobot_newapi.
+"""
+
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Protocol
+
+
+class FeatureType(str, Enum):
+    STATE = "STATE"
+    VISUAL = "VISUAL"
+    ENV = "ENV"
+    ACTION = "ACTION"
+    REWARD = "REWARD"
+
+
+class NormalizationMode(str, Enum):
+    MIN_MAX = "MIN_MAX"
+    MEAN_STD = "MEAN_STD"
+
+
+@dataclass
+class PolicyFeature:
+    name: str
+    feature_type: FeatureType
+    normalization_mode: NormalizationMode | None = None
+
+
+class DictLike(Protocol):
+    def __getitem__(self, key: str) -> Any: ...
+    def __setitem__(self, key: str, value: Any) -> None: ...
+    def get(self, key: str, default: Any = None) -> Any: ...
+    def keys(self): ...
+    def values(self): ...
+    def items(self): ...

@@ -1,0 +1,29 @@
+package lcmMotion;
+
+struct robot_observation {
+  int32_t sec;                          // Timestamp seconds
+  int32_t nanosec;                      // Timestamp nanoseconds
+  int64_t utime;                        // Microsecond timestamp
+
+  int32_t numJoint;                     // Number of joints
+  float jointPos[numJoint];             // Joint position
+  float jointVel[numJoint];             // Joint velocity
+  float jointTorque[numJoint];          // Joint torque
+
+  int8_t numEE;                         // Number of end-effectors
+  float eePose[numEE][7];                // End-effector pose [x, y, z]+[w, x, y, z]
+  float eeVel[numEE][6];                // End-effector velocity [vx, vy, vz]+[wx, wy, wz]
+
+  int8_t numGripper;                    // Number of grippers
+  float gripperPos[numGripper];         // Gripper position feedback
+  float gripperVel[numGripper];         // Gripper velocity feedback
+  float gripperForce[numGripper];       // Gripper force feedback
+
+  int32_t numSite;                      // Number of sites  
+  float sitePose[numSite][7];            // Site pose [x, y, z]+[w, x, y, z]
+  float siteQuat[numSite][6];            // Site velocity [vx, vy, vz]+[wx, wy, wz]
+
+  int8_t numFTsensor;
+  float ftSensorWrench[numFTsensor][6]; // F/T sensor wrench [fx, fy, fz]+[tx, ty, tz]
+  
+}

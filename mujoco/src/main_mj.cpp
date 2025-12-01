@@ -12,26 +12,20 @@
 /**
  * MuJoCo Robot Simulation Launcher
  *
- * Supports both robot names and legacy numbers for better usability:
+ * Usage (prefer names over numbers):
+ *   ./mujocoExe fr3 ui              # Robot + scene by name (recommended)
+ *   ./mujocoExe piper pickplace     # Pick-and-place scene
+ *   ./mujocoExe dual_fr3 tracking   # Dual arm tracking
+ *   ./mujocoExe --help              # Show all available robots
  *
- * Usage Examples:
- *   ./mujocoExe fr3 1          # Robot name + scene (recommended)
- *   ./mujocoExe 20 1                  # Robot number + scene (same as above)
- *   ./mujocoExe piper 1               # Piper robot (handles gripper/pen via scenes)
- *   ./mujocoExe dual_rm75 2           # Dual arm setup, scene 2
- *   ./mujocoExe --help                # Show all available robots
+ * Available Robots:
+ *   Single Arms: fr3, ur5e, piper, rm75, so101, rizon4s, eco65
+ *   Dual Arms: dual_fr3, dual_ur5e, dual_piper, dual_rm75, dual_so101
+ *   Mobile: diffmobile, lekiwi, mobile_fr3
  *
- * Available Robot Names (with numbers):
- *   Low DOF: oneLink(1), twoLink(2)
- *   Single Arms: fr3(20), ur5e(21), piper(22), rm75(23), eco65(24)
- *   LeRobot: lerobot(30), lekiwi(31), xlerobot(32)
- *   Dual Arms: dual_rm75(43), dual_eco65(44)
- *   Mobile: diffMobile(50), diffCar(51), diffMobile_Franka(60)
- *
- * Error Handling:
- *   - Invalid robot names show list of available robots
- *   - Case-insensitive matching with warnings (e.g., "fr3" → "fr3")
- *   - Missing arguments show usage help
+ * Available Scenes (1-5):
+ *   1: joint (default)  2: keyframe (wobble)  3: ui (tracking)
+ *   4: predefined       5: pickplace
  */
 
 void printUsage(const char *programName) {

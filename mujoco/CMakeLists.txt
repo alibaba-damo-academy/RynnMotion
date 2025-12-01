@@ -9,8 +9,10 @@ if(APPLE)
     function(clean_target_interface_libs target_name)
         if(TARGET ${target_name})
             get_target_property(INTERFACE_LIBS ${target_name} INTERFACE_LINK_LIBRARIES)
+
             if(INTERFACE_LIBS)
                 set(CLEANED_LIBS "")
+
                 foreach(lib ${INTERFACE_LIBS})
                     if(NOT lib MATCHES ".*MacOSX[0-9]+\\.sdk.*" AND NOT lib MATCHES ".*/libm\\..*")
                         list(APPEND CLEANED_LIBS ${lib})
@@ -18,6 +20,7 @@ if(APPLE)
                         message(STATUS "Filtering out old SDK reference: ${lib}")
                     endif()
                 endforeach()
+
                 set_target_properties(${target_name} PROPERTIES INTERFACE_LINK_LIBRARIES "${CLEANED_LIBS}")
             endif()
         endif()
@@ -89,7 +92,6 @@ set(COMMON_INCLUDE_DIRS
     ${MOTION_DIR}/utils/tools/
     ${MOTION_DIR}/utils/kinematics/
     ${MOTION_DIR}/utils/dynamics/
-    ${MOTION_DIR}/utils/collision/
     ${MOTION_DIR}/utils/curve/
     ${MOTION_DIR}/utils/generator/
     ${MOTION_DIR}/utils/trajectory/
@@ -189,6 +191,7 @@ if(BUILD_ROS_MUJOCO)
     find_package(rosgraph_msgs REQUIRED)
 
     find_package(rm_ros_interfaces QUIET)
+
     if(rm_ros_interfaces_FOUND)
         add_compile_definitions(USE_RM_INTERFACES)
         message(STATUS "Found rm_ros_interfaces - Building with RM robot support")
@@ -197,6 +200,7 @@ if(BUILD_ROS_MUJOCO)
     endif()
 
     find_library(CCD_LIBRARY NAMES ccd REQUIRED)
+
     if(NOT CCD_LIBRARY)
         message(FATAL_ERROR "libccd library not found")
     else()

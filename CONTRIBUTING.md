@@ -33,7 +33,7 @@ By participating in this project, you agree to maintain a respectful and profess
 - RynnMotion version: v0.9.0
 
 **To Reproduce:**
-1. Run `./mujocoExe fr3 1`
+1. Run `./mujocoExe fr3 ui`
 2. Observe segfault in Estimator module
 
 **Expected:** Simulation runs normally
@@ -130,7 +130,7 @@ cd ../python
 pytest tests/
 
 # Test your specific example
-./mujocoExe fr3 1
+./mujocoExe fr3 ui
 ```
 
 **Add tests for new features:**

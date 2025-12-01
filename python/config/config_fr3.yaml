@@ -1,0 +1,24 @@
+logging:
+  log_dir: ~/RynnRcplog/robotMotion
+  log_file: robotMotion.log
+robot_monitor:
+  enable_joint_pos: true
+  enable_ee_pose: true
+robotmodel:
+  robot_name: fr3
+  robot_control_freq: 100
+  robot_mjcf: "../models/3.robot_arm/20.fr3/scene/scene.xml"
+  pino_mjcf: "../models/3.robot_arm/20.fr3/mjcf/fr3_pinocchio.xml"
+communicator: 
+  type: "lcm"
+trajgen:
+  trajmodule: "sim_motion"
+  generator: 
+    type: "sine"
+    signal_home_position: [0, 0, 0, -1.57, 0, 1.57, 0, 100]
+    signal_amplitude: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 100]
+    signal_frequency: 0.1
+robotinterface:
+  robot_type: "mujoco"
+  controller:
+    mode: "pd"

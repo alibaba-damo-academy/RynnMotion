@@ -203,11 +203,6 @@ file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/realman/src/telemotion/lib/)
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/piper/src/xiaoda/lib/)
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib/)
 
-# Create directory for damiao if needed
-if(CMAKE_TOOLCHAIN_FILE OR BUILD_STATIC)
-  file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/damiao/lib/)
-endif()
-
 # Copy libraries to appropriate locations
 if(CMAKE_TOOLCHAIN_FILE)
   # For cross-compilation, copy the static library to development locations
@@ -220,9 +215,6 @@ if(CMAKE_TOOLCHAIN_FILE)
     COMMAND
     ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}>
     ${CMAKE_SOURCE_DIR}/robots/piper/src/xiaoda/lib/lib${LIBRARY_NAME}.a
-    COMMAND
-    ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}>
-    ${CMAKE_SOURCE_DIR}/robots/damiao/lib/lib${LIBRARY_NAME}.a
     COMMAND
     ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}>
     ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib/lib${LIBRARY_NAME}.a
@@ -245,9 +237,6 @@ else()
     add_custom_command(
       TARGET ${LIBRARY_NAME}_static
       POST_BUILD
-      COMMAND
-      ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}_static>
-      ${CMAKE_SOURCE_DIR}/robots/damiao/lib/lib${LIBRARY_NAME}.a
       COMMAND
       ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}_static>
       ${CMAKE_SOURCE_DIR}/robots/piper/src/xiaoda/lib/lib${LIBRARY_NAME}.a

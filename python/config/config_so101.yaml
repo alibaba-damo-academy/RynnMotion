@@ -1,0 +1,24 @@
+logging:
+  log_dir: ~/RynnRcplog/robotMotion
+  log_file: robotMotion.log
+robot_monitor:
+  enable_joint_pos: false
+  enable_ee_pose: false
+robotmodel:
+  robot_name: so101
+  robot_control_freq: 100
+  robot_mjcf: "../models/3.robot_arm/24.so101/scene/scene.xml"
+  pino_mjcf: "../models/3.robot_arm/24.so101/mjcf/so101_pinocchio.xml"
+communicator: 
+  type: "lcm"
+trajgen:
+  trajmodule: "sim_motion"
+  generator: 
+    type: "sine"
+    signal_home_position: [0.0, 0, 0, 0, 0, 0]
+    signal_amplitude: [0.2, 0.2, 0.2, 0.2, 0.2, 0.5]
+    signal_frequency: 0.1
+robotinterface:
+  robot_type: "mujoco"
+  controller:
+    mode: "pd"

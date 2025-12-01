@@ -57,7 +57,7 @@ pip install -e ".[dev]"
 python scripts/pinkine_viewer.py --robot fr3
 
 # Or test without GUI
-python -c "from RynnMotion.manager import PRobotManager; robot = PRobotManager('fr3'); print('Success!')"
+python -c "from RynnMotion.manager.robot_manager import RobotManager; print('Success!')"
 ```
 
 ## GUI Support (Optional)

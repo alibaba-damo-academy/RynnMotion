@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "RynnMotion"
+version = "1.0.0"
+description = "Base classes for RynnMotion robot interfaces, controllers, and MuJoCo simulation"
+authors = [{ name = "RynnMotion Team" }]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.13"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Robotics",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy==2.2.6",
+    "scipy>=1.10.0",
+    "PyYAML>=6.0.0",
+    "matplotlib>=3.8.0",
+    "opencv-python>=4.8.0",
+    "tqdm>=4.60.0",
+    "mujoco>=3.3.0",
+    "fsspec>=2023.1.0,<=2025.3.0",
+    "pin>=3.7.0",
+    "pillow>=8.0.0",
+    "build>=0.10.0",
+    "lcm>=1.5.0",
+    "python-statemachine>=2.0.0",
+    "datasets>=2.0.0",
+    "huggingface_hub>=0.20.0",
+    "torch>=1.13.0",
+    "packaging>=21.0",
+    "ruckig>=0.15.0",
+]
+
+[tool.rynnmotion.paths]
+project_root = ".."
+models_root = "../models"
+config_root = "../config"
+
+[project.optional-dependencies]
+full = ["draccus>=0.10.0"]
+dev = ["build>=0.10.0", "wheel>=0.38.0", "twine>=4.0.0", "pytest>=7.0.0"]
+
+[project.urls]
+Repository = "https://github.com/alibaba-damo-academy/RynnMotion"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["RynnMotion*", "Deprecated*"]

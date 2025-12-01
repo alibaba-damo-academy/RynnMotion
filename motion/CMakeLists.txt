@@ -29,7 +29,6 @@ set(SOURCE_FILES
     runtime/timing_manager.cpp
 )
 
-
 # Find packages before creating targets
 find_package(Eigen3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
@@ -85,7 +84,6 @@ set(COMMON_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/tools/
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/kinematics/
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/dynamics/
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils/collision/
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/curve/
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/generator/
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/trajectory/
@@ -120,7 +118,11 @@ if(NOT CMAKE_TOOLCHAIN_FILE AND BUILD_STATIC)
         MODEL_DIR="${MODEL_DIR}"
         MOTION_DIR="${MOTION_DIR}"
     )
-    target_include_directories(${LIBRARY_NAME}_static PUBLIC ${COMMON_INCLUDE_DIRS})
+    target_include_directories(${LIBRARY_NAME}_static PUBLIC
+        ${COMMON_INCLUDE_DIRS}
+        ${CMAKE_BINARY_DIR}/robotDiscovery
+        ${CMAKE_SOURCE_DIR}/models
+    )
     target_link_libraries(${LIBRARY_NAME}_static PUBLIC
         Eigen3::Eigen ${YAML_LIB}
         ${LCM_LIBRARY}
@@ -213,17 +215,11 @@ file(MAKE_DIRECTORY
     ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib/
 )
 
-# Create directory for damiao if needed
-if(CMAKE_TOOLCHAIN_FILE OR BUILD_STATIC)
-    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/damiao/lib/)
-endif()
-
 # Copy libraries to appropriate locations
 if(CMAKE_TOOLCHAIN_FILE)
     add_custom_command(TARGET ${LIBRARY_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}> ${CMAKE_SOURCE_DIR}/robots/realman/src/telemotion/lib/lib${LIBRARY_NAME}.a
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}> ${CMAKE_SOURCE_DIR}/robots/piper/src/xiaoda/lib/lib${LIBRARY_NAME}.a
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}> ${CMAKE_SOURCE_DIR}/robots/damiao/lib/lib${LIBRARY_NAME}.a
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}> ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib/lib${LIBRARY_NAME}.a
     )
 else()
@@ -234,7 +230,6 @@ else()
 
     if(BUILD_STATIC)
         add_custom_command(TARGET ${LIBRARY_NAME}_static POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}_static> ${CMAKE_SOURCE_DIR}/robots/damiao/lib/lib${LIBRARY_NAME}.a
             COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}_static> ${CMAKE_SOURCE_DIR}/robots/piper/src/xiaoda/lib/lib${LIBRARY_NAME}.a
             COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}_static> ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib/lib${LIBRARY_NAME}.a
             COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}_static> ${CMAKE_SOURCE_DIR}/robots/realman/src/telemotion/lib/lib${LIBRARY_NAME}.a
@@ -277,7 +272,6 @@ file(GLOB_RECURSE HEADER_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/interface/*.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/fsm/include/*.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/utils/kinematics/*.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/utils/collision/*.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/utils/curve/*.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/utils/generator/*.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/utils/logger/*.hpp"

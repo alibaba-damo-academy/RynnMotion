@@ -115,13 +115,6 @@ if(BUILD_TESTS)
     add_subdirectory(unittest)
 endif()
 
-if(BUILD_STATIC)
-    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/damiao/lib)
-    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/piper/src/xiaoda/lib)
-    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib)
-    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/robots/realman/src/telemotion/lib)
-endif()
-
 add_custom_target(clean-all
     COMMAND ${CMAKE_BUILD_TOOL} clean
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/CMakeFiles
@@ -129,3 +122,36 @@ add_custom_target(clean-all
     COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/cmake_install.cmake
     COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/Makefile
 )
+
+if(BUILD_STATIC)
+    set(RYNN_INSTALL_DIR ${CMAKE_BINARY_DIR}/rynn_install)
+    set(RYNN_ROOT ${CMAKE_SOURCE_DIR})
+    set(RYNN_LIB_DIR ${RYNN_INSTALL_DIR}/lib)
+
+    file(MAKE_DIRECTORY ${RYNN_INSTALL_DIR}/lib)
+    file(MAKE_DIRECTORY ${RYNN_INSTALL_DIR}/cmake)
+    file(MAKE_DIRECTORY ${RYNN_INSTALL_DIR}/include)
+
+    configure_file(
+        ${CMAKE_SOURCE_DIR}/cmake/RynnMotionConfig.cmake.in
+        ${RYNN_INSTALL_DIR}/cmake/RynnMotionConfig.cmake
+        @ONLY
+    )
+
+    file(COPY ${CMAKE_BINARY_DIR}/robotDiscovery/
+        DESTINATION ${RYNN_INSTALL_DIR}/include/robotDiscovery
+    )
+
+    add_custom_target(rynn_install ALL
+        COMMAND ${CMAKE_COMMAND} -E copy
+            $<TARGET_FILE:motion_static> ${RYNN_INSTALL_DIR}/lib/libmotion.a
+        COMMAND ${CMAKE_COMMAND} -E copy
+            $<TARGET_FILE:utility_static> ${RYNN_INSTALL_DIR}/lib/libutility.a
+        COMMAND ${CMAKE_COMMAND} -E copy
+            $<TARGET_FILE:manager_static> ${RYNN_INSTALL_DIR}/lib/libmanager.a
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_BINARY_DIR}/robotDiscovery ${RYNN_INSTALL_DIR}/include/robotDiscovery
+        DEPENDS motion_static utility_static manager_static
+        COMMENT "Installing RynnMotion package to ${RYNN_INSTALL_DIR}"
+    )
+endif()

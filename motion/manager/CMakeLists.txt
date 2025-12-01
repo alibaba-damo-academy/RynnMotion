@@ -48,7 +48,6 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
   ${CMAKE_SOURCE_DIR}/motion/utils/tools/
   ${CMAKE_SOURCE_DIR}/motion/utils/kinematics/
   ${CMAKE_SOURCE_DIR}/motion/utils/dynamics/
-  ${CMAKE_SOURCE_DIR}/motion/utils/collision/
   ${CMAKE_SOURCE_DIR}/motion/utils/curve/
   ${CMAKE_SOURCE_DIR}/motion/utils/generator/
   ${CMAKE_SOURCE_DIR}/motion/utils/trajectory/
@@ -90,7 +89,6 @@ if(BUILD_STATIC)
     ${CMAKE_SOURCE_DIR}/motion/utils/tools/
     ${CMAKE_SOURCE_DIR}/motion/utils/kinematics/
     ${CMAKE_SOURCE_DIR}/motion/utils/dynamics/
-    ${CMAKE_SOURCE_DIR}/motion/utils/collision/
     ${CMAKE_SOURCE_DIR}/motion/utils/curve/
     ${CMAKE_SOURCE_DIR}/motion/utils/generator/
     ${CMAKE_SOURCE_DIR}/motion/utils/trajectory/
@@ -112,11 +110,6 @@ if(BUILD_STATIC)
 
   set_target_properties(${LIBRARY_NAME}_static PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/motion/manager
-  )
-
-  add_custom_command(TARGET ${LIBRARY_NAME}_static POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIBRARY_NAME}_static> ${CMAKE_SOURCE_DIR}/robots/damiao/lib/lib${LIBRARY_NAME}.a
-    COMMENT "Copying static libmanager.a to robots/damiao/lib/"
   )
 endif()
 
