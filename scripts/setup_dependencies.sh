@@ -172,6 +172,9 @@ init_linux() {
     echo "Installing basic system dependencies..."
     apt-get install -y libgflags-dev xorg-dev libgl1-mesa-dev libglib2.0-dev libccd-dev
 
+    echo "Installing HDF5 and FFmpeg (for data recording)..."
+    apt-get install -y libhdf5-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev
+
     echo "Installing FCL-specific dependencies..."
     apt-get install -y libfcl-dev || echo "FCL not available via apt, will build from source"
     apt-get install -y liboctomap-dev libccd-dev libassimp-dev
@@ -211,6 +214,9 @@ init_macos() {
     echo "Installing GLFW..."
     brew install glfw
     echo "GLFW installed via Homebrew."
+
+    echo "Installing HDF5 and FFmpeg (for data recording)..."
+    brew install hdf5 ffmpeg
 
     echo ""
     echo "=========================================================="

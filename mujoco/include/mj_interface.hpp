@@ -19,6 +19,7 @@
 #include "kine_pin.hpp"
 #include "math_tools.hpp"
 #include "mj_actuator.hpp"
+#include "mj_recorder.hpp"
 #include "mj_scene.hpp"
 #include "mj_sensor.hpp"
 #include "mj_ui.hpp"
@@ -39,6 +40,7 @@ class MujocoActuator;
 class MujocoSensor;
 class MujocoUI;
 class MujocoScene;
+class MujocoRecorder;
 
 struct PerformanceMonitor {
   std::chrono::steady_clock::time_point startTime;
@@ -117,6 +119,7 @@ class MujocoInterface : public InterfaceBase {
   friend class MujocoSensor;
   friend class MujocoUI;
   friend class MujocoScene;
+  friend class MujocoRecorder;
 
 public:
   MujocoInterface(const YAML::Node &mujocoYaml, const YAML::Node &motionYaml, int robotNumber, int sceneNumber = 1);
@@ -227,6 +230,7 @@ protected:
   std::unique_ptr<MujocoSensor> mjSensor;
   std::unique_ptr<MujocoUI> mjUI;
   std::unique_ptr<MujocoScene> mjScene;
+  std::unique_ptr<MujocoRecorder> mjRecorder;
   std::unique_ptr<utils::PinKine> pinkine;
 
 protected:
@@ -264,6 +268,8 @@ private:
   bool _vsync_enabled{false};
   bool _enable_busy_wait{false};
   int _busy_wait_threshold_us{100};
+
+  void initRecorder();
 };
 
 } // namespace mujoco

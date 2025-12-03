@@ -52,5 +52,7 @@ deps_build/
 lerobot-egg.info/
 MJMODEL.TXT
 MJDATA.TXT
+CLAUDE.md
 claude/
+record/
 package-lock.json

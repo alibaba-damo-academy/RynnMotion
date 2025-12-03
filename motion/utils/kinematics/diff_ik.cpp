@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "debug_config.hpp"
 #include "diff_ik.hpp"
 
 namespace utils {
@@ -13,13 +14,15 @@ DiffIKQP::DiffIKQP(int numDOF, const DiffIKConfig &cfg) :
   int numC = _computeNumConstraints();
   _sqp = std::make_unique<qpOASES::SQProblem>(numDOF, numC);
 
-  std::cout << "[DiffIKQP] Initialized: DOF=" << numDOF
-            << ", Constraints=" << numC << " ("
-            << (_cfg.enableVelLimits ? "Vel " : "")
-            << (_cfg.enablePosLimits ? "Pos " : "")
-            << (_cfg.enableAccLimits ? "Acc " : "")
-            << (_cfg.enableNullSpace ? "Null" : "")
-            << ")" << std::endl;
+  if (DebugConfig::getInstance().isVerbose()) {
+    std::cout << "[DiffIKQP] Initialized: DOF=" << numDOF
+              << ", Constraints=" << numC << " ("
+              << (_cfg.enableVelLimits ? "Vel " : "")
+              << (_cfg.enablePosLimits ? "Pos " : "")
+              << (_cfg.enableAccLimits ? "Acc " : "")
+              << (_cfg.enableNullSpace ? "Null" : "")
+              << ")" << std::endl;
+  }
 }
 
 DiffIKQP::~DiffIKQP() {

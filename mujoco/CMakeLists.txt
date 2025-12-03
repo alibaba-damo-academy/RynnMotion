@@ -4,6 +4,14 @@ project(mujocoProject_cpp)
 find_package(yaml-cpp REQUIRED)
 find_package(fcl REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(HDF5 REQUIRED COMPONENTS CXX)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
+    libavcodec
+    libavformat
+    libavutil
+    libswscale
+)
 
 if(APPLE)
     function(clean_target_interface_libs target_name)
@@ -102,6 +110,8 @@ set(COMMON_INCLUDE_DIRS
     ${YAML_CPP_INCLUDE_DIR}
     ${LCM_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
+    ${HDF5_INCLUDE_DIRS}
+    ${LIBAV_INCLUDE_DIRS}
 )
 
 if(APPLE)
@@ -135,6 +145,9 @@ add_executable(mujocoExe
     src/mj_sensor.cpp
     src/mj_ui.cpp
     src/mj_scene.cpp
+    src/mj_hdf5_writer.cpp
+    src/mj_video_encoder.cpp
+    src/mj_recorder.cpp
 )
 
 target_include_directories(mujocoExe PUBLIC ${COMMON_INCLUDE_DIRS})
@@ -154,6 +167,8 @@ target_link_libraries(mujocoExe
     ${COMMON_LIBRARIES}
     ${FCL_LIBRARIES}
     ${OpenCV_LIBS}
+    ${HDF5_CXX_LIBRARIES}
+    PkgConfig::LIBAV
 )
 
 if(APPLE)
@@ -215,6 +230,9 @@ if(BUILD_ROS_MUJOCO)
         src/mj_sensor.cpp
         src/mj_ui.cpp
         src/mj_scene.cpp
+        src/mj_hdf5_writer.cpp
+        src/mj_video_encoder.cpp
+        src/mj_recorder.cpp
     )
 
     ament_target_dependencies(rosMujocoExe
@@ -247,6 +265,8 @@ if(BUILD_ROS_MUJOCO)
         ${FCL_LIBRARIES}
         ${CCD_LIBRARY}
         ${OpenCV_LIBS}
+        ${HDF5_CXX_LIBRARIES}
+        PkgConfig::LIBAV
     )
 
     add_dependencies(rosMujocoExe utility motion)

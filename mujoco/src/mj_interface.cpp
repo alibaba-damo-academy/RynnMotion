@@ -16,6 +16,7 @@ MujocoInterface::MujocoInterface(const YAML::Node &mujocoYaml, const YAML::Node 
   mjSensor = std::make_unique<MujocoSensor>(*this);
   mjUI = std::make_unique<MujocoUI>(*this);
   mjScene = std::make_unique<MujocoScene>(*this);
+  mjRecorder = std::make_unique<MujocoRecorder>(*this);
   initMuJoCo();
   initDataStream();
   pinkine = std::make_unique<utils::PinKine>(robotManager->getPinoMJCF(), robotManager->getSiteNames());
@@ -121,7 +122,7 @@ void MujocoInterface::keyboard(GLFWwindow *window, int key, int scancode, int ac
       glfwSetWindowShouldClose(window, GLFW_TRUE);
       break;
 
-    case GLFW_KEY_B: // Toggle busy wait
+    case GLFW_KEY_B:
       busyWait_.store(!busyWait_.load());
       break;
 
@@ -217,6 +218,7 @@ void MujocoInterface::initMuJoCo() {
   mjActuator->initActuatorSystem();
   mjSensor->initSensors();
   mjScene->initScene();
+  initRecorder();
   initRenderingComponents();
 }
 
@@ -267,8 +269,15 @@ void MujocoInterface::runApplication() {
   std::cout << "Physics frequency: " << physicsFreq << " Hz" << std::endl;
   std::cout << "Control frequency: " << 1.0 / timingManager->getPeriod("control") << " Hz (period: " << timingManager->getPeriod("control") << " s)" << std::endl;
   std::cout << "Render frequency: " << 1.0 / timingManager->getPeriod("render") << " Hz (period: " << timingManager->getPeriod("render") << " s)" << std::endl;
-  std::cout << "==========================================\n"
-            << std::endl;
+  std::cout << "==========================================\n" << std::endl;
+
+  std::cout << "=== Keyboard Controls ===" << std::endl;
+  std::cout << "SPACE      Pause/Resume" << std::endl;
+  std::cout << "BACKSPACE  Reset" << std::endl;
+  std::cout << "ESC        Exit" << std::endl;
+  std::cout << "R          Toggle recording" << std::endl;
+  std::cout << "N          New episode" << std::endl;
+  std::cout << "==========================\n" << std::endl;
 
   std::thread physicsThread([this, &physicsStepCount, &controllerUpdateCount, &renderUpdateCount,
                              &debugStartTime, &lastDebugTime, &lastSimTime, &lastDebugSimTime, &nextPhysicsTime, physicsPeriod]() {
@@ -625,7 +634,10 @@ void MujocoInterface::renderLoop() {
 
       callRendering();
 
-      mjSensor->updateRGB();
+      if (mjRecorder && mjRecorder->isRecording()) {
+        auto images = mjSensor->captureAllCameras();
+        mjRecorder->recordFrame(runtimeData_, images);
+      }
 
       auto renderEnd = std::chrono::steady_clock::now();
       perfMonitor_.recordRender(
@@ -633,7 +645,6 @@ void MujocoInterface::renderLoop() {
     }
     glfwPollEvents();
 
-    // Prevent busy-wait - add small sleep to reduce CPU usage
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
   exitRequest_.store(true);
@@ -651,6 +662,10 @@ void MujocoInterface::saveModelInfo() {
   if (_save_mjData) {
     mj_printData(mjModel_, mjData_, "mjData.txt");
   }
+}
+
+void MujocoInterface::initRecorder() {
+  mjRecorder->initRecorder();
 }
 
 } // namespace mujoco

@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iostream>
 
+#include "debug_config.hpp"
 #include "orient_tools.hpp"
 
 namespace rynn {
@@ -37,8 +38,10 @@ void CPlanner::initModule() {
 
   _circleStates.resize(_numEE);
 
-  std::cout << "[CPlanner] Configured for " << _numEE
-            << " end-effector(s)" << std::endl;
+  if (utils::DebugConfig::getInstance().isVerbose()) {
+    std::cout << "[CPlanner] Configured for " << _numEE
+              << " end-effector(s)" << std::endl;
+  }
 }
 
 void CPlanner::update() {

@@ -30,6 +30,7 @@ public:
 
 private:
   void getKeyboardAction();
+  void getKeyboardActionRecording();
   void getKeyboardActionFranka();
   void getKeyboardActionDiffCar();
 
@@ -67,6 +68,10 @@ private:
   int numEE_ = 0;
   bool isDualArm_ = false;
   Eigen::Vector3d robotBaseOffset_{Eigen::Vector3d::Zero()};
+
+  // Recording key states (for edge detection)
+  bool keyR_pressed_{false};
+  bool keyN_pressed_{false};
 };
 
 } // namespace mujoco

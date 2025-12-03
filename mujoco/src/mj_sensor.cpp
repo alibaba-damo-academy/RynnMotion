@@ -2,9 +2,13 @@
 
 namespace mujoco {
 
-MujocoSensor::MujocoSensor(MujocoInterface &mj) :
-    mj_(mj),
-    robotType_(mj.robotManager->getRobotType()) {
+MujocoSensor::MujocoSensor(MujocoInterface &mj)
+    : mj_(mj), robotType_(mj.robotManager->getRobotType()) {}
+
+MujocoSensor::~MujocoSensor() {
+  for (auto &[name, scene] : cameraScenes_) {
+    mjv_freeScene(&scene);
+  }
 }
 
 void MujocoSensor::initSensors() {
@@ -127,26 +131,75 @@ void MujocoSensor::initSensors() {
     }
   }
 
-  initRGB();
+  initAllCameras();
 }
 
-void MujocoSensor::initRGB() {
-  int cam_id = -1;
-  frontCamera_.fixedcamid = cam_id;
+void MujocoSensor::initAllCameras() {
+  cameraConfigs_.clear();
+  for (auto &[name, scene] : cameraScenes_) {
+    mjv_freeScene(&scene);
+  }
+  cameraScenes_.clear();
+  cameraCameras_.clear();
+
   for (int i = 0; i < mj_.mjModel_->ncam; i++) {
     const char *camName = mj_id2name(mj_.mjModel_, mjOBJ_CAMERA, i);
-    if (camName && strcmp(camName, "front_cam") == 0) {
-      cam_id = i;
-      break;
+    if (!camName) continue;
+
+    data::CameraConfig config;
+    config.name = camName;
+    config.mjCamId = i;
+    config.width = 640;
+    config.height = 480;
+    cameraConfigs_.push_back(config);
+
+    mjvScene scene;
+    mjv_defaultScene(&scene);
+    mjv_makeScene(mj_.mjModel_, &scene, mj_._maxgeom);
+    cameraScenes_[camName] = scene;
+
+    mjvCamera cam;
+    mjv_defaultCamera(&cam);
+    cam.type = mjCAMERA_FIXED;
+    cam.fixedcamid = i;
+    cameraCameras_[camName] = cam;
+  }
+}
+
+std::map<std::string, data::ImageFrame> MujocoSensor::captureAllCameras() {
+  std::map<std::string, data::ImageFrame> frames;
+
+  for (const auto &config : cameraConfigs_) {
+    data::ImageFrame frame;
+    frame.cameraName = config.name;
+    frame.allocate(config.width, config.height, 3);
+    frame.timestamp = mj_.mjData_->time;
+
+    mjrRect viewport = {0, 0, config.width, config.height};
+
+    auto &scene = cameraScenes_[config.name];
+    auto &cam = cameraCameras_[config.name];
+
+    mjv_updateScene(mj_.mjModel_, mj_.mjData_, &mj_.mjvOption_, nullptr, &cam, mjCAT_ALL, &scene);
+    mjr_render(viewport, &scene, &mj_.mjContext_);
+
+    std::vector<unsigned char> rgbBuffer(config.width * config.height * 3);
+    mjr_readPixels(rgbBuffer.data(), nullptr, viewport, &mj_.mjContext_);
+
+    int rowSize = config.width * 3;
+    for (int y = 0; y < config.height; y++) {
+      int srcRow = config.height - 1 - y;
+      std::memcpy(frame.data.data() + y * rowSize, rgbBuffer.data() + srcRow * rowSize, rowSize);
     }
+
+    frames[config.name] = std::move(frame);
   }
-  if (cam_id >= 0) {
-    mjv_defaultCamera(&frontCamera_);
-    frontCamera_.type = mjCAMERA_FIXED;
-    frontCamera_.fixedcamid = cam_id;
-    mjv_defaultScene(&mjSceneFrontCamera_);
-    mjv_makeScene(mj_.mjModel_, &mjSceneFrontCamera_, mj_._maxgeom);
-  }
+
+  return frames;
+}
+
+const std::vector<data::CameraConfig> &MujocoSensor::getCameraConfigs() const {
+  return cameraConfigs_;
 }
 
 void MujocoSensor::update() {
@@ -333,46 +386,6 @@ void MujocoSensor::updateMultiRay() {
               include_static_flag ? 1 : 0, -1, geomids, dists, num_rays, max_dis_check);
   mj_.multiRayDistances_.clear();
   mj_.multiRayDistances_.assign(dists, dists + num_rays);
-}
-
-void MujocoSensor::updateRGB() {
-  if (robotType_ != rynn::RobotType::diffmobile && robotType_ != rynn::RobotType::mobile_fr3) return;
-
-  if (frontCamera_.fixedcamid < 0) return;
-
-  const int width = 640;
-  const int height = 480;
-  mjrRect viewport = {0, 0, width, height};
-
-  mjv_updateScene(mj_.mjModel_, mj_.mjData_, &mj_.mjvOption_, NULL, &frontCamera_, mjCAT_ALL, &mjSceneFrontCamera_);
-
-  mjr_render(viewport, &mjSceneFrontCamera_, &mj_.mjContext_);
-
-  unsigned char rgb[width * height * 3];
-  float depth[width * height];
-  mjr_readPixels(rgb, depth, viewport, &mj_.mjContext_);
-
-  cv::Mat img(height, width, CV_8UC3, rgb);
-
-  // Optional: Convert RGB to BGR since OpenCV uses BGR by default
-  cv::Mat bgr;
-  cv::cvtColor(img, bgr, cv::COLOR_RGB2BGR);
-  cv::flip(bgr, bgr, 1);
-
-  if (!mj_._show_camera_pic) return;
-  cv::imshow("MuJoCo Offscreen Render", bgr);
-  cv::waitKey(1);
-}
-
-void MujocoSensor::updateSites() {
-  for (int i = 0; i < mj_.mjModel_->nsite; i++) {
-    const char *siteName = mj_id2name(mj_.mjModel_, mjOBJ_SITE, i);
-    std::string name = siteName ? siteName : "site" + std::to_string(i);
-    mjtNum quat[4];
-    mju_mat2Quat(quat, mj_.mjData_->site_xmat + 9 * i);
-    mjtNum velocity[6];
-    mj_objectVelocity(mj_.mjModel_, mj_.mjData_, mjOBJ_SITE, i, velocity, 0);
-  }
 }
 
 } // namespace mujoco

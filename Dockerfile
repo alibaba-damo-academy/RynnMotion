@@ -29,6 +29,12 @@ RUN apt-get update && apt-get install -y \
     # FCL dependencies
     liboctomap-dev \
     libassimp-dev \
+    # HDF5 and FFmpeg (for data recording)
+    libhdf5-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libavutil-dev \
     # Python (for some dependencies)
     python3 \
     python3-pip \

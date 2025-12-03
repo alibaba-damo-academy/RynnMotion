@@ -1,6 +1,9 @@
 #include "mj_ui.hpp"
 
+#include <iostream>
+
 #include "mj_interface.hpp"
+#include "mj_recorder.hpp"
 
 namespace mujoco {
 
@@ -80,6 +83,8 @@ void MujocoUI::getKeyboardAction() {
   motion_dxyz.setZero();
   motion_drpy.setZero();
 
+  getKeyboardActionRecording();
+
   if (sceneType_ == rynn::SceneType::kUI || sceneType_ == rynn::SceneType::kTracking) {
     getKeyboardActionFranka();
     return;
@@ -89,6 +94,29 @@ void MujocoUI::getKeyboardAction() {
     getKeyboardActionDiffCar();
     return;
   }
+}
+
+void MujocoUI::getKeyboardActionRecording() {
+  bool keyR_current = (glfwGetKey(mj_.glfwWindow, GLFW_KEY_R) == GLFW_PRESS);
+  bool keyN_current = (glfwGetKey(mj_.glfwWindow, GLFW_KEY_N) == GLFW_PRESS);
+
+  if (keyR_current && !keyR_pressed_) {
+    if (mj_.mjRecorder) {
+      if (mj_.mjRecorder->isRecording()) {
+        mj_.mjRecorder->stopRecording();
+      } else {
+        mj_.mjRecorder->startRecording();
+      }
+    }
+  }
+  keyR_pressed_ = keyR_current;
+
+  if (keyN_current && !keyN_pressed_) {
+    if (mj_.mjRecorder && mj_.mjRecorder->isRecording()) {
+      mj_.mjRecorder->newEpisode();
+    }
+  }
+  keyN_pressed_ = keyN_current;
 }
 
 void MujocoUI::getKeyboardActionDiffCar() {

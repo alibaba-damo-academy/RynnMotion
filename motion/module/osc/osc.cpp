@@ -3,6 +3,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "debug_config.hpp"
+
 namespace rynn {
 
 OSC::OSC(const YAML::Node &yamlNode) :
@@ -20,7 +22,9 @@ void OSC::loadYaml() {
 
   if (solverStr == "pinv") {
     _solver = IKSolver::kPseudoInverse;
-    std::cout << "[OSC] Using PseudoInverse solver" << std::endl;
+    if (utils::DebugConfig::getInstance().isVerbose()) {
+      std::cout << "[OSC] Using PseudoInverse solver" << std::endl;
+    }
 
   } else if (solverStr == "qp") {
     _solver = IKSolver::kDiffQP;
@@ -38,12 +42,14 @@ void OSC::loadYaml() {
     _diffIKCfg.nullKp = spaceMoveYaml["null_kp"].as<double>(0.1);
     _diffIKCfg.maxIter = spaceMoveYaml["max_iter"].as<int>(30);
 
-    std::cout << "[OSC] Using DiffQP solver with constraints: "
-              << (_diffIKCfg.enableVelLimits ? "Vel " : "")
-              << (_diffIKCfg.enablePosLimits ? "Pos " : "")
-              << (_diffIKCfg.enableAccLimits ? "Acc " : "")
-              << (_diffIKCfg.enableNullSpace ? "Null" : "")
-              << std::endl;
+    if (utils::DebugConfig::getInstance().isVerbose()) {
+      std::cout << "[OSC] Using DiffQP solver with constraints: "
+                << (_diffIKCfg.enableVelLimits ? "Vel " : "")
+                << (_diffIKCfg.enablePosLimits ? "Pos " : "")
+                << (_diffIKCfg.enableAccLimits ? "Acc " : "")
+                << (_diffIKCfg.enableNullSpace ? "Null" : "")
+                << std::endl;
+    }
 
   } else {
     throw std::runtime_error("Unsupported IK solver: " + solverStr);
@@ -63,8 +69,10 @@ void OSC::initModule() {
 
   _eeStates.resize(_numEE);
 
-  std::cout << "[OSC] Configured for " << _numEE
-            << " end-effector(s)" << std::endl;
+  if (utils::DebugConfig::getInstance().isVerbose()) {
+    std::cout << "[OSC] Configured for " << _numEE
+              << " end-effector(s)" << std::endl;
+  }
 
   int mdof = robotManager->getMotionDOF();
   if (mdof == 0) return;
