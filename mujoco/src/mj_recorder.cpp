@@ -7,12 +7,14 @@
 #include <iostream>
 #include <sstream>
 
+#include <yaml-cpp/yaml.h>
+
 #include "mj_interface.hpp"
 
 namespace mujoco {
 
-MujocoRecorder::MujocoRecorder(MujocoInterface &mj)
-    : mj_(mj), hdf5Writer_(std::make_unique<HDF5Writer>()) {}
+MujocoRecorder::MujocoRecorder(MujocoInterface &mj) : mj_(mj) {
+}
 
 MujocoRecorder::~MujocoRecorder() {
   if (isRecording_) {
@@ -21,14 +23,57 @@ MujocoRecorder::~MujocoRecorder() {
   finalize();
 }
 
+void MujocoRecorder::loadRecorderConfig() {
+  std::filesystem::path projectRoot = std::filesystem::path(MODEL_DIR).parent_path();
+  std::filesystem::path configPath = projectRoot / "config" / "mujoco.yaml";
+
+  config_.dataFormat = getDefaultDataFormat();
+
+  if (std::filesystem::exists(configPath)) {
+    try {
+      YAML::Node yamlConfig = YAML::LoadFile(configPath.string());
+
+      if (yamlConfig["recorder"]) {
+        auto recorderNode = yamlConfig["recorder"];
+
+        if (recorderNode["data_format"]) {
+          config_.dataFormat = parseDataFormat(recorderNode["data_format"].as<std::string>());
+        }
+        if (recorderNode["record_video"]) {
+          config_.recordVideo = recorderNode["record_video"].as<bool>();
+        }
+        if (recorderNode["video_codec"]) {
+          std::string codec = recorderNode["video_codec"].as<std::string>();
+          if (codec == "h264") {
+            config_.videoCodec = VideoCodec::H264;
+          } else if (codec == "av1") {
+            config_.videoCodec = VideoCodec::AV1;
+          }
+        }
+        if (recorderNode["crf"]) {
+          config_.crf = recorderNode["crf"].as<int>();
+        }
+        if (recorderNode["chunks_size"]) {
+          config_.chunksSize = recorderNode["chunks_size"].as<int>();
+        }
+      }
+    } catch (const std::exception &e) {
+      std::cerr << "[Recorder] Failed to load config: " << e.what() << std::endl;
+    }
+  }
+
+  std::cout << "[Recorder] Data format: " << dataFormatToString(config_.dataFormat) << std::endl;
+}
+
 void MujocoRecorder::initRecorder() {
+  loadRecorderConfig();
+
   std::filesystem::path projectRoot = std::filesystem::path(MODEL_DIR).parent_path();
   config_.datasetRoot = projectRoot / "record";
   config_.repoId = generateTimestampRepoId();
   config_.fps = static_cast<int>(1.0 / mj_.timingManager->getPeriod("camera"));
-  config_.videoCodec = VideoCodec::H264;
-  config_.crf = 23;
-  config_.recordVideo = true;
+
+  dataWriter_ = createDataWriter(config_.dataFormat);
 
   cameraConfigs_ = mj_.mjSensor->getCameraConfigs();
 
@@ -36,9 +81,24 @@ void MujocoRecorder::initRecorder() {
   if (robotManager) {
     config_.robotType = "robot";
     int mdof = robotManager->getMotionDOF();
+    int numEE = robotManager->getNumEndEffectors();
 
     features_["observation.state"] = {"float32", {mdof}, {}};
+    features_["observation.velocity"] = {"float32", {mdof}, {}};
+    features_["observation.torque"] = {"float32", {mdof}, {}};
     features_["action"] = {"float32", {mdof}, {}};
+    features_["action.velocity"] = {"float32", {mdof}, {}};
+    features_["action.torque"] = {"float32", {mdof}, {}};
+
+    if (numEE > 0) {
+      features_["observation.ee_pos"] = {"float32", {numEE * 3}, {}};
+      features_["observation.ee_quat"] = {"float32", {numEE * 4}, {}};
+      features_["observation.gripper"] = {"float32", {numEE}, {}};
+      features_["action.ee_pos"] = {"float32", {numEE * 3}, {}};
+      features_["action.ee_quat"] = {"float32", {numEE * 4}, {}};
+      features_["action.gripper"] = {"float32", {numEE}, {}};
+    }
+
     features_["timestamp"] = {"float64", {1}, {}};
     features_["frame_index"] = {"int64", {1}, {}};
     features_["episode_index"] = {"int64", {1}, {}};
@@ -79,8 +139,7 @@ void MujocoRecorder::initDirectories() {
   std::filesystem::create_directories(root / "meta");
   std::filesystem::create_directories(root / "data" / "chunk-000");
   for (const auto &cam : cameraConfigs_) {
-    std::filesystem::create_directories(root / "videos" / "chunk-000" /
-                                        ("observation.images." + cam.name));
+    std::filesystem::create_directories(root / "videos" / "chunk-000" / ("observation.images." + cam.name));
   }
 }
 
@@ -88,6 +147,14 @@ void MujocoRecorder::writeInfoJson() {
   auto infoPath = config_.datasetRoot / config_.repoId / "meta" / "info.json";
   std::ofstream ofs(infoPath);
   if (!ofs) return;
+
+  std::string dataExt = dataWriter_ ? dataWriter_->getExtension() : "";
+  std::string dataPathTemplate;
+  if (dataExt.empty()) {
+    dataPathTemplate = "";
+  } else {
+    dataPathTemplate = "data/chunk-{episode_chunk:03d}/episode_{episode_index:06d}" + dataExt;
+  }
 
   ofs << "{\n";
   ofs << "  \"codebase_version\": \"v2.1\",\n";
@@ -99,7 +166,10 @@ void MujocoRecorder::writeInfoJson() {
   ofs << "  \"total_chunks\": " << (getEpisodeChunk(totalEpisodes_) + 1) << ",\n";
   ofs << "  \"chunks_size\": " << config_.chunksSize << ",\n";
   ofs << "  \"fps\": " << config_.fps << ",\n";
-  ofs << "  \"data_path\": \"data/chunk-{episode_chunk:03d}/episode_{episode_index:06d}.hdf5\",\n";
+  ofs << "  \"data_format\": \"" << dataFormatToString(config_.dataFormat) << "\",\n";
+  if (!dataPathTemplate.empty()) {
+    ofs << "  \"data_path\": \"" << dataPathTemplate << "\",\n";
+  }
   ofs << "  \"video_path\": \"videos/chunk-{episode_chunk:03d}/{video_key}/episode_{episode_index:06d}.mp4\",\n";
   ofs << "  \"features\": {\n";
 
@@ -141,8 +211,7 @@ void MujocoRecorder::startEpisode(const std::string &task) {
   if (config_.recordVideo) {
     for (const auto &cam : cameraConfigs_) {
       auto encoder = std::make_unique<VideoEncoder>(config_.videoCodec, config_.fps, config_.crf);
-      auto videoPath = config_.datasetRoot / config_.repoId /
-                       getVideoFilePath(currentEpisodeIndex_, cam.name);
+      auto videoPath = config_.datasetRoot / config_.repoId / getVideoFilePath(currentEpisodeIndex_, cam.name);
       encoder->open(videoPath, cam.width, cam.height);
       videoEncoders_[cam.name] = std::move(encoder);
     }
@@ -170,8 +239,17 @@ void MujocoRecorder::recordFrame(const data::RuntimeData &runtimeData,
     frame.eeQuats.push_back(state.quat);
   }
 
+  for (const auto &plan : runtimeData.bodyPlans) {
+    frame.eePosCmd.push_back(plan.pos);
+    frame.eeQuatCmd.push_back(plan.quat);
+  }
+
   for (const auto &gripper : runtimeData.gripperFeedbacks) {
     frame.gripperPositions.push_back(gripper.posFb);
+  }
+
+  for (const auto &gripper : runtimeData.gripperCommands) {
+    frame.gripperCommands.push_back(gripper.posCmd);
   }
 
   frameBuffer_.push_back(frame);
@@ -180,8 +258,7 @@ void MujocoRecorder::recordFrame(const data::RuntimeData &runtimeData,
     if (imageBuffers_.find(camName) != imageBuffers_.end()) {
       imageBuffers_[camName].push_back(imgFrame);
 
-      if (videoEncoders_.find(camName) != videoEncoders_.end() &&
-          videoEncoders_[camName]->isOpen()) {
+      if (videoEncoders_.find(camName) != videoEncoders_.end() && videoEncoders_[camName]->isOpen()) {
         videoEncoders_[camName]->writeFrame(imgFrame.ptr(), imgFrame.width, imgFrame.height);
       }
     }
@@ -218,38 +295,116 @@ void MujocoRecorder::endEpisode() {
 }
 
 void MujocoRecorder::writeEpisodeData() {
-  auto dataPath = config_.datasetRoot / config_.repoId /
-                  getDataFilePath(currentEpisodeIndex_);
+  if (config_.dataFormat == DataFormat::None || !dataWriter_) {
+    return;
+  }
 
-  hdf5Writer_->create(dataPath);
+  auto dataPath = config_.datasetRoot / config_.repoId / getDataFilePath(currentEpisodeIndex_);
+
+  dataWriter_->create(dataPath);
 
   size_t numFrames = frameBuffer_.size();
   if (numFrames == 0) {
-    hdf5Writer_->close();
+    dataWriter_->close();
     return;
   }
 
   int mdof = frameBuffer_[0].qFb.size();
+  size_t numEE = frameBuffer_[0].eePoses.size();
 
-  std::vector<Eigen::VectorXd> qFbVecs, qCmdVecs;
+  if (mdof == 0) {
+    dataWriter_->close();
+    return;
+  }
+
+  std::vector<Eigen::VectorXd> qFbVecs, qdFbVecs, qtauFbVecs;
+  std::vector<Eigen::VectorXd> qCmdVecs, qdCmdVecs, qtauCmdVecs;
+  std::vector<double> eePosObs, eeQuatObs;
+  std::vector<double> eePosCmd, eeQuatCmd;
+  std::vector<double> gripperObs, gripperCmd;
   std::vector<double> timestamps;
   std::vector<int64_t> frameIndices, episodeIndices;
 
   for (const auto &frame : frameBuffer_) {
     qFbVecs.push_back(frame.qFb);
+    qdFbVecs.push_back(frame.qdFb);
+    qtauFbVecs.push_back(frame.qtauFb);
     qCmdVecs.push_back(frame.qCmd);
+    qdCmdVecs.push_back(frame.qdCmd);
+    qtauCmdVecs.push_back(frame.qtauCmd);
+
+    for (const auto &pos : frame.eePoses) {
+      eePosObs.push_back(pos.x());
+      eePosObs.push_back(pos.y());
+      eePosObs.push_back(pos.z());
+    }
+    for (const auto &quat : frame.eeQuats) {
+      eeQuatObs.push_back(quat.x());
+      eeQuatObs.push_back(quat.y());
+      eeQuatObs.push_back(quat.z());
+      eeQuatObs.push_back(quat.w());
+    }
+
+    for (const auto &pos : frame.eePosCmd) {
+      eePosCmd.push_back(pos.x());
+      eePosCmd.push_back(pos.y());
+      eePosCmd.push_back(pos.z());
+    }
+    for (const auto &quat : frame.eeQuatCmd) {
+      eeQuatCmd.push_back(quat.x());
+      eeQuatCmd.push_back(quat.y());
+      eeQuatCmd.push_back(quat.z());
+      eeQuatCmd.push_back(quat.w());
+    }
+
+    for (double g : frame.gripperPositions) {
+      gripperObs.push_back(g);
+    }
+
+    for (double g : frame.gripperCommands) {
+      gripperCmd.push_back(g);
+    }
+
     timestamps.push_back(frame.timestamp);
     frameIndices.push_back(frame.frameIndex);
     episodeIndices.push_back(currentEpisodeIndex_);
   }
 
-  hdf5Writer_->writeEigenVectors("observation.state", qFbVecs);
-  hdf5Writer_->writeEigenVectors("action", qCmdVecs);
-  hdf5Writer_->writeDataset("timestamp", timestamps, {numFrames});
-  hdf5Writer_->writeDataset("frame_index", frameIndices, {numFrames});
-  hdf5Writer_->writeDataset("episode_index", episodeIndices, {numFrames});
+  dataWriter_->writeEigenVectors("observation.state", qFbVecs);
+  dataWriter_->writeEigenVectors("observation.velocity", qdFbVecs);
+  dataWriter_->writeEigenVectors("observation.torque", qtauFbVecs);
+  dataWriter_->writeEigenVectors("action", qCmdVecs);
+  dataWriter_->writeEigenVectors("action.velocity", qdCmdVecs);
+  dataWriter_->writeEigenVectors("action.torque", qtauCmdVecs);
 
-  hdf5Writer_->close();
+  if (numEE > 0) {
+    dataWriter_->writeDataset("observation.ee_pos", eePosObs,
+                              {numFrames, numEE * 3});
+    dataWriter_->writeDataset("observation.ee_quat", eeQuatObs,
+                              {numFrames, numEE * 4});
+    dataWriter_->writeDataset("observation.gripper", gripperObs,
+                              {numFrames, numEE});
+
+    if (!eePosCmd.empty()) {
+      size_t numEECmd = frameBuffer_[0].eePosCmd.size();
+      dataWriter_->writeDataset("action.ee_pos", eePosCmd,
+                                {numFrames, numEECmd * 3});
+      dataWriter_->writeDataset("action.ee_quat", eeQuatCmd,
+                                {numFrames, numEECmd * 4});
+    }
+
+    if (!gripperCmd.empty()) {
+      size_t numGripper = frameBuffer_[0].gripperCommands.size();
+      dataWriter_->writeDataset("action.gripper", gripperCmd,
+                                {numFrames, numGripper});
+    }
+  }
+
+  dataWriter_->writeDataset("timestamp", timestamps, {numFrames});
+  dataWriter_->writeDataset("frame_index", frameIndices, {numFrames});
+  dataWriter_->writeDataset("episode_index", episodeIndices, {numFrames});
+
+  dataWriter_->close();
 }
 
 void MujocoRecorder::appendEpisodeMetadata(int episodeLength) {
@@ -296,10 +451,15 @@ int MujocoRecorder::getEpisodeChunk(int episodeIndex) const {
 }
 
 std::string MujocoRecorder::getDataFilePath(int episodeIndex) const {
+  if (config_.dataFormat == DataFormat::None || !dataWriter_) {
+    return "";
+  }
+
   int chunk = getEpisodeChunk(episodeIndex);
   std::ostringstream ss;
   ss << "data/chunk-" << std::setfill('0') << std::setw(3) << chunk
-     << "/episode_" << std::setfill('0') << std::setw(6) << episodeIndex << ".hdf5";
+     << "/episode_" << std::setfill('0') << std::setw(6) << episodeIndex
+     << dataWriter_->getExtension();
   return ss.str();
 }
 

@@ -8,6 +8,24 @@
     <gyro name="eeGyro" site="EE"/>
     <accelerometer name="eeAcc" site="EE"/>
     <force name="eeForce" site="EE"/>
+
+    <jointpos name="shoulder_pan_pos" joint="shoulder_pan"/>
+    <jointpos name="shoulder_lift_pos" joint="shoulder_lift"/>
+    <jointpos name="elbow_flex_pos" joint="elbow_flex"/>
+    <jointpos name="wrist_flex_pos" joint="wrist_flex"/>
+    <jointpos name="wrist_roll_pos" joint="wrist_roll"/>
+
+    <jointvel name="shoulder_pan_vel" joint="shoulder_pan"/>
+    <jointvel name="shoulder_lift_vel" joint="shoulder_lift"/>
+    <jointvel name="elbow_flex_vel" joint="elbow_flex"/>
+    <jointvel name="wrist_flex_vel" joint="wrist_flex"/>
+    <jointvel name="wrist_roll_vel" joint="wrist_roll"/>
+
+    <actuatorfrc name="shoulder_pan_frc" actuator="shoulder_pan"/>
+    <actuatorfrc name="shoulder_lift_frc" actuator="shoulder_lift"/>
+    <actuatorfrc name="elbow_flex_frc" actuator="elbow_flex"/>
+    <actuatorfrc name="wrist_flex_frc" actuator="wrist_flex"/>
+    <actuatorfrc name="wrist_roll_frc" actuator="wrist_roll"/>
   </sensor>
 
 </mujoco>

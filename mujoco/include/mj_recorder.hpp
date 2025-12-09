@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "image_buffer.hpp"
-#include "mj_hdf5_writer.hpp"
+#include "mj_data_writer.hpp"
 #include "mj_video_encoder.hpp"
 #include "runtime_data.hpp"
 
@@ -42,6 +42,7 @@ struct RecorderConfig {
   int crf{30};
   int chunksSize{1000};
   bool recordVideo{true};
+  DataFormat dataFormat{DataFormat::None};
 };
 
 struct FeatureInfo {
@@ -53,22 +54,35 @@ struct FeatureInfo {
 struct EpisodeFrame {
   double timestamp;
   int frameIndex;
+
+  // Joint feedback
   Eigen::VectorXd qFb;
   Eigen::VectorXd qdFb;
   Eigen::VectorXd qtauFb;
+
+  // Joint commands
   Eigen::VectorXd qCmd;
   Eigen::VectorXd qdCmd;
   Eigen::VectorXd qtauCmd;
+
+  // EE feedback (from bodyStates)
   std::vector<Eigen::Vector3d> eePoses;
   std::vector<Eigen::Quaterniond> eeQuats;
-  std::vector<double> gripperPositions;
+
+  // EE commands (from bodyPlans)
+  std::vector<Eigen::Vector3d> eePosCmd;
+  std::vector<Eigen::Quaterniond> eeQuatCmd;
+
+  // Gripper
+  std::vector<double> gripperPositions;  // feedback
+  std::vector<double> gripperCommands;   // commands
 };
 
 class MujocoInterface;
 
 /**
  * @class MujocoRecorder
- * @brief Records robot data and camera frames to HDF5/MP4 datasets
+ * @brief Records robot data and camera frames to HDF5/Parquet/MP4 datasets
  */
 class MujocoRecorder {
 public:
@@ -95,6 +109,7 @@ public:
   int totalEpisodes() const;
 
 private:
+  void loadRecorderConfig();
   void initDirectories();
   void writeInfoJson();
   void writeEpisodeData();
@@ -108,7 +123,7 @@ private:
   MujocoInterface &mj_;
 
   RecorderConfig config_;
-  std::unique_ptr<HDF5Writer> hdf5Writer_;
+  std::unique_ptr<IDataWriter> dataWriter_;
   std::map<std::string, std::unique_ptr<VideoEncoder>> videoEncoders_;
 
   std::vector<EpisodeFrame> frameBuffer_;

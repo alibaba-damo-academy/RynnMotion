@@ -8,6 +8,30 @@
     <gyro name="eeGyro" site="EE"/>
     <accelerometer name="eeAcc" site="EE"/>
     <force name="eeForce" site="EE"/>
+
+    <jointpos name="joint1_pos" joint="joint1"/>
+    <jointpos name="joint2_pos" joint="joint2"/>
+    <jointpos name="joint3_pos" joint="joint3"/>
+    <jointpos name="joint4_pos" joint="joint4"/>
+    <jointpos name="joint5_pos" joint="joint5"/>
+    <jointpos name="joint6_pos" joint="joint6"/>
+    <jointpos name="joint7_pos" joint="joint7"/>
+
+    <jointvel name="joint1_vel" joint="joint1"/>
+    <jointvel name="joint2_vel" joint="joint2"/>
+    <jointvel name="joint3_vel" joint="joint3"/>
+    <jointvel name="joint4_vel" joint="joint4"/>
+    <jointvel name="joint5_vel" joint="joint5"/>
+    <jointvel name="joint6_vel" joint="joint6"/>
+    <jointvel name="joint7_vel" joint="joint7"/>
+
+    <actuatorfrc name="lj1_frc" actuator="lj1"/>
+    <actuatorfrc name="lj2_frc" actuator="lj2"/>
+    <actuatorfrc name="lj3_frc" actuator="lj3"/>
+    <actuatorfrc name="lj4_frc" actuator="lj4"/>
+    <actuatorfrc name="lj5_frc" actuator="lj5"/>
+    <actuatorfrc name="lj6_frc" actuator="lj6"/>
+    <actuatorfrc name="lj7_frc" actuator="lj7"/>
   </sensor>
 
 </mujoco>

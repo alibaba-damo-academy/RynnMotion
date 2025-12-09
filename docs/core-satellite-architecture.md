@@ -18,11 +18,10 @@ RynnMotion/
 │       └── utils/            # Shared utilities
 │
 └── robots/                   # SATELLITES: Robot-specific submodules
-    ├── RynnFranka/          # Franka robots
-    ├── RynnUR/              # Universal Robots
-    ├── RynnRealman/         # RealMan robots
-    ├── RynnPiper/           # Piper robots
-    └── RynnLeRobot/         # LeRobot integration
+    ├── RynnLeRobot/         # LeRobot implementation (own venv)
+    ├── franka/              # Franka robots (own venv)
+    ├── piper/               # Piper robots (own venv)
+    └── realman/             # RealMan robots (own venv)
 ```
 
 ### Key Characteristics
@@ -273,7 +272,7 @@ jobs:
     needs: test-core
     strategy:
       matrix:
-        robot: [RynnFranka, RynnUR, RynnRealman, RynnPiper, RynnLeRobot]
+        robot: [RynnLeRobot, franka, piper]
 
     steps:
       - uses: actions/checkout@v3
@@ -300,30 +299,20 @@ compatibility_matrix:
   core_version: "1.0.0"
 
   satellites:
-    RynnFranka:
-      min_version: "0.1.0"
-      max_version: "1.0.0"
-      tested_versions: ["0.1.0"]
-
-    RynnUR:
-      min_version: "0.1.0"
-      max_version: "1.0.0"
-      tested_versions: ["0.1.0"]
-
-    RynnRealman:
-      min_version: "0.1.0"
-      max_version: "1.0.0"
-      tested_versions: ["0.1.0"]
-
-    RynnPiper:
-      min_version: "0.1.0"
-      max_version: "1.0.0"
-      tested_versions: ["0.1.0"]
-
     RynnLeRobot:
       min_version: "0.5.0"
       max_version: "1.0.0"
       tested_versions: ["0.5.0", "0.6.0", "0.7.0"]
+
+    franka:
+      min_version: "1.2.0"
+      max_version: "2.0.0"
+      tested_versions: ["1.2.0", "1.3.0"]
+
+    piper:
+      min_version: "0.3.0"
+      max_version: "1.0.0"
+      tested_versions: ["0.3.0", "0.4.0"]
 
 # Breaking changes log
 breaking_changes:

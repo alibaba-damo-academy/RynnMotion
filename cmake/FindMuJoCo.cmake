@@ -1,4 +1,4 @@
-set(MUJOCO_VERSION_CANDIDATES "3.3.7" "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0")
+set(MUJOCO_VERSION_CANDIDATES "3.4.0" "3.3.7" "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0")
 
 function(find_mujoco)
     set(MUJOCO_DIR "" CACHE PATH "Path to MuJoCo installation")
@@ -80,11 +80,13 @@ function(find_mujoco)
     endif()
 
     set(LIB_NAMES "")
+
     foreach(VERSION ${MUJOCO_VERSION_CANDIDATES})
         foreach(EXT ${LIB_EXTENSIONS})
             list(APPEND LIB_NAMES "libmujoco.${VERSION}.${EXT}")
         endforeach()
     endforeach()
+
     list(APPEND LIB_NAMES "libmujoco.${LIB_EXTENSIONS}" "libmujoco" "mujoco")
 
     find_library(

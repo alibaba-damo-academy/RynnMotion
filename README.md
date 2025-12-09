@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/C%2B%2B-20-blue" alt="C++20">
   <img src="https://img.shields.io/badge/Python-3.13%2B-blue" alt="Python 3.13+">
   <img src="https://img.shields.io/badge/version-0.9.0--pre-orange" alt="Version">
-  <img src="https://img.shields.io/badge/MuJoCo-3.3.7-green" alt="MuJoCo 3.3.5">
+  <img src="https://img.shields.io/badge/MuJoCo-3.4.0-green" alt="MuJoCo 3.4.0">
   <img src="https://img.shields.io/badge/Pinocchio-3.7.0-green" alt="Pinocchio 3.7.0">
 </p>
 
@@ -60,7 +60,7 @@ cd RynnMotion
 # Inside container: build
 mkdir build && cd build
 cmake .. && make -j$(nproc)
-./mujocoExe fr3 1~5 #
+./mujocoExe fr3 ui
 ```
 
 **See detailed guide:** [Docker Setup](docs/DOCKER-SETUP.md) (experimental)
@@ -130,7 +130,7 @@ mkdir build && cd build
 cmake .. && make -j$(nproc)
 
 # 4. Test
-./mujocoExe fr3 ui # or scenenumber 1 ~ 5
+./mujocoExe fr3 ui
 ```
 
 ## 🎬 Demos & Features
@@ -148,8 +148,8 @@ High-performance operational space control with MuJoCo simulation. Track complex
 ```bash
 # Run single-arm demo
 cd build
-./mujocoExe fr3 1  # FR3 robot figure-8 tracking
-./mujocoExe ur5e 1  # UR5e robot tracking
+./mujocoExe fr3 ui       # FR3 robot with interactive UI
+./mujocoExe ur5e ui      # UR5e robot with interactive UI
 ```
 
 ---
@@ -166,9 +166,9 @@ Coordinate two robot arms seamlessly. Each arm runs independent OSC with nullspa
 
 ```bash
 # Run dual-arm demo
-./mujocoExe dual_fr3 1      # Dual FR3 tracking
-./mujocoExe dual_ur5e 1     # Dual UR5e tracking
-./mujocoExe piper 1         # Piper dual-arm robot
+./mujocoExe dual_fr3 ui      # Dual FR3 with interactive UI
+./mujocoExe dual_ur5e ui     # Dual UR5e with interactive UI
+./mujocoExe piper ui         # Piper with interactive UI
 ```
 
 ---
@@ -202,8 +202,101 @@ One SO101 master arm controlling 4 different slave robots (FR3, UR5e, Piper, RM7
 
 ```bash
 cd robots/RynnLeRobot
-./setup_lerobot.sh && source .venv/bin/activate
+./setup_env.sh && source .venv/bin/activate
 multi-teleop -d
+```
+
+---
+
+### 5. Data Recording
+
+**Record simulation data** for imitation learning and analysis:
+
+Record joint states, end-effector poses, actions, and video during simulation. Data is saved in LeRobot-compatible format for training.
+
+#### Configuration
+
+Edit `config/mujoco.yaml`:
+
+```yaml
+recorder:
+  data_format: "auto"      # "auto", "parquet", "hdf5", or "none"
+  record_video: true       # Record camera video
+  video_codec: "h264"      # "h264" or "av1"
+  crf: 23                  # Video quality (lower = better, 18-28 typical)
+  chunks_size: 1000        # Frames per data chunk
+```
+
+| Format | Description | Dependency |
+|--------|-------------|------------|
+| `auto` | Auto-detect best available (Parquet → HDF5 → None) | - |
+| `parquet` | Apache Parquet (recommended for ML) | libarrow-dev, libparquet-dev |
+| `hdf5` | HDF5 format | libhdf5-dev |
+| `none` | Disable data recording (video only if enabled) | - |
+
+#### Recording Data
+
+```bash
+# Run simulation - press 'R' to start/stop recording
+./build/mujocoExe fr3 ui
+
+# Keyboard controls:
+#   R - Start/Stop recording episode
+#   N - Start new episode (auto-saves current)
+#   ESC - Exit (auto-saves if recording)
+```
+
+#### Output Location
+
+Data is saved to `record/` directory:
+
+```
+record/
+└── mj_YYYYMMDD_HHMM/           # Session folder (auto-generated)
+    ├── meta/
+    │   ├── info.json           # Dataset metadata
+    │   ├── episodes.jsonl      # Episode index
+    │   └── tasks.jsonl         # Task descriptions
+    ├── data/
+    │   ├── chunk-000/
+    │   │   └── episode_000000.parquet  # Joint states, actions, timestamps
+    │   └── chunk-001/
+    │       └── ...
+    └── videos/
+        ├── chunk-000/
+        │   └── episode_000000/
+        │       └── camera_0.mp4        # Camera recordings
+        └── ...
+```
+
+#### Recorded Features
+
+| Feature | Shape | Description |
+|---------|-------|-------------|
+| `observation.state` | (mdof,) | Joint positions |
+| `observation.velocity` | (mdof,) | Joint velocities |
+| `action` | (mdof,) | Commanded joint positions |
+| `observation.ee_pos` | (num_ee * 3,) | End-effector positions |
+| `observation.ee_quat` | (num_ee * 4,) | End-effector orientations |
+| `timestamp` | scalar | Simulation time |
+| `frame_index` | scalar | Frame number in episode |
+
+#### Optional Dependencies
+
+Parquet support requires Apache Arrow (auto-detected at build time):
+
+```bash
+# Ubuntu/Debian
+wget -q https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb -O /tmp/arrow.deb
+sudo apt install -y /tmp/arrow.deb && sudo apt update
+sudo apt install -y libarrow-dev libparquet-dev
+
+# macOS
+brew install apache-arrow
+
+# Verify detection
+cd build && cmake .. | grep -i parquet
+# Output: -- Parquet recording support: ENABLED (auto-detected)
 ```
 
 ---

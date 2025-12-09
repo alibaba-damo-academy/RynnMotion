@@ -77,6 +77,9 @@ void MujocoInterface::loadYaml() {
   if (_mujocoYaml["busy_wait_threshold_us"]) {
     _busy_wait_threshold_us = _mujocoYaml["busy_wait_threshold_us"].as<int>();
   }
+  if (_mujocoYaml["use_sensor_feedback"]) {
+    _use_sensor_feedback = _mujocoYaml["use_sensor_feedback"].as<bool>();
+  }
 }
 
 void MujocoInterface::getJointFeedbacks() {
@@ -215,6 +218,7 @@ void MujocoInterface::initMuJoCo() {
   double controlPeriod = timingManager->getPeriod("control");
   moduleManager->setDt(controlPeriod);
   saveModelInfo();
+  mjActuator->setUseSensorFeedback(_use_sensor_feedback);
   mjActuator->initActuatorSystem();
   mjSensor->initSensors();
   mjScene->initScene();

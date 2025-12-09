@@ -13,7 +13,7 @@ echo "Version Compatibility:"
 echo "  - Eigen:      >= 3.3.0"
 echo "  - Pinocchio:  v3.7.0"
 echo "  - Boost:      >= 1.65"
-echo "  - MuJoCo:     3.3.5"
+echo "  - MuJoCo:     3.4.0"
 echo ""
 echo "Prerequisites:"
 echo "  Linux:  Run with sudo"
@@ -167,13 +167,24 @@ init_linux() {
     echo "Installing base build tools..."
     apt-get update || echo "apt-get update failed, but continuing script..."
 
-    apt-get install -y build-essential cmake git
+    apt-get install -y build-essential cmake git ccache ninja-build
 
     echo "Installing basic system dependencies..."
     apt-get install -y libgflags-dev xorg-dev libgl1-mesa-dev libglib2.0-dev libccd-dev
 
     echo "Installing HDF5 and FFmpeg (for data recording)..."
     apt-get install -y libhdf5-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev
+
+    echo "Installing Apache Arrow and Parquet (for Parquet data recording)..."
+    if ! dpkg -l | grep -q libarrow-dev; then
+        echo "Adding Apache Arrow apt repository..."
+        apt-get install -y apt-transport-https lsb-release wget
+        wget -q https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb -O /tmp/apache-arrow-apt-source.deb
+        apt-get install -y /tmp/apache-arrow-apt-source.deb
+        rm -f /tmp/apache-arrow-apt-source.deb
+        apt-get update
+    fi
+    apt-get install -y libarrow-dev libparquet-dev
 
     echo "Installing FCL-specific dependencies..."
     apt-get install -y libfcl-dev || echo "FCL not available via apt, will build from source"
@@ -217,6 +228,9 @@ init_macos() {
 
     echo "Installing HDF5 and FFmpeg (for data recording)..."
     brew install hdf5 ffmpeg
+
+    echo "Installing Apache Arrow and Parquet (for Parquet data recording)..."
+    brew install apache-arrow
 
     echo ""
     echo "=========================================================="
@@ -663,7 +677,7 @@ install_mujoco_linux() {
     local MUJOCO_VERSION=""
     local MUJOCO_PERMANENT_DIR=""
 
-    for version in "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0"; do
+    for version in "3.4.0" "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0"; do
         if [ -d "/usr/local/mujoco-${version}" ]; then
             echo "✓ Found existing MuJoCo installation at: /usr/local/mujoco-${version}"
             MUJOCO_VERSION="$version"
@@ -675,22 +689,22 @@ install_mujoco_linux() {
     if [ -n "$MUJOCO_PERMANENT_DIR" ]; then
         echo "✓ Using existing MuJoCo installation: $MUJOCO_PERMANENT_DIR"
         echo ""
-        if [ "$MUJOCO_VERSION" != "3.3.5" ]; then
-            echo "Note: You have MuJoCo $MUJOCO_VERSION, but the recommended version is 3.3.5."
-            read -p "Would you like to install MuJoCo 3.3.5? (y/n) " -n 1 -r
+        if [ "$MUJOCO_VERSION" != "3.4.0" ]; then
+            echo "Note: You have MuJoCo $MUJOCO_VERSION, but the recommended version is 3.4.0."
+            read -p "Would you like to install MuJoCo 3.4.0? (y/n) " -n 1 -r
             echo
             if [[ ! $REPLY =~ ^[Yy]$ ]]; then
                 echo "Continuing with existing MuJoCo $MUJOCO_VERSION installation."
                 return 0
             fi
-            echo "Proceeding to install MuJoCo 3.3.5..."
+            echo "Proceeding to install MuJoCo 3.4.0..."
         else
-            echo "You already have the recommended version (3.3.5)."
+            echo "You already have the recommended version (3.4.0)."
             return 0
         fi
     fi
 
-    echo "MuJoCo 3.3.5 needs to be installed."
+    echo "MuJoCo 3.4.0 needs to be installed."
     echo ""
     echo "Choose installation method:"
     echo "1. Automatic download and install (recommended)"
@@ -700,7 +714,7 @@ install_mujoco_linux() {
     echo
 
     if [[ $REPLY == "1" ]]; then
-        echo "Downloading MuJoCo 3.3.5..."
+        echo "Downloading MuJoCo 3.4.0..."
 
         # Detect architecture
         ARCH=$(uname -m)
@@ -713,9 +727,9 @@ install_mujoco_linux() {
             MUJOCO_ARCH="linux-x86_64"
         fi
 
-        DOWNLOAD_URL="https://github.com/google-deepmind/mujoco/releases/download/3.3.5/mujoco-3.3.5-${MUJOCO_ARCH}.tar.gz"
-        DOWNLOAD_FILE="/tmp/mujoco-3.3.5-${MUJOCO_ARCH}.tar.gz"
-        EXTRACT_DIR="/tmp/mujoco-3.3.5-extract"
+        DOWNLOAD_URL="https://github.com/google-deepmind/mujoco/releases/download/3.4.0/mujoco-3.4.0-${MUJOCO_ARCH}.tar.gz"
+        DOWNLOAD_FILE="/tmp/mujoco-3.4.0-${MUJOCO_ARCH}.tar.gz"
+        EXTRACT_DIR="/tmp/mujoco-3.4.0-extract"
 
         if wget -O "$DOWNLOAD_FILE" "$DOWNLOAD_URL" || curl -L -o "$DOWNLOAD_FILE" "$DOWNLOAD_URL"; then
             echo "✓ Download completed successfully"
@@ -725,14 +739,14 @@ install_mujoco_linux() {
             if tar -xzf "$DOWNLOAD_FILE" -C "$EXTRACT_DIR" --strip-components=1; then
                 echo "✓ Extraction completed successfully"
 
-                echo "Installing MuJoCo 3.3.5 to /usr/local/mujoco-3.3.5..."
-                mkdir -p /usr/local/mujoco-3.3.5
-                cp -r "$EXTRACT_DIR"/* /usr/local/mujoco-3.3.5/
+                echo "Installing MuJoCo 3.4.0 to /usr/local/mujoco-3.4.0..."
+                mkdir -p /usr/local/mujoco-3.4.0
+                cp -r "$EXTRACT_DIR"/* /usr/local/mujoco-3.4.0/
 
-                if [ -f "/usr/local/mujoco-3.3.5/lib/libmujoco.so.3.3.5" ] && [ -d "/usr/local/mujoco-3.3.5/include" ]; then
-                    echo "✓ MuJoCo 3.3.5 installed successfully!"
-                    echo "  Library: /usr/local/mujoco-3.3.5/lib/"
-                    echo "  Headers: /usr/local/mujoco-3.3.5/include/"
+                if [ -f "/usr/local/mujoco-3.4.0/lib/libmujoco.so.3.4.0" ] && [ -d "/usr/local/mujoco-3.4.0/include" ]; then
+                    echo "✓ MuJoCo 3.4.0 installed successfully!"
+                    echo "  Library: /usr/local/mujoco-3.4.0/lib/"
+                    echo "  Headers: /usr/local/mujoco-3.4.0/include/"
 
                     # Update library cache
                     ldconfig
@@ -751,8 +765,8 @@ install_mujoco_linux() {
                     echo
                     if [[ $REPLY =~ ^[Yy]$ ]]; then
                         # Check if the path is already in bashrc
-                        if ! grep -q "LD_LIBRARY_PATH.*mujoco-3.3.5" ~/.bashrc 2>/dev/null; then
-                            echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mujoco-3.3.5/lib' >> ~/.bashrc
+                        if ! grep -q "LD_LIBRARY_PATH.*mujoco-3.4.0" ~/.bashrc 2>/dev/null; then
+                            echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mujoco-3.4.0/lib' >> ~/.bashrc
                             echo "✓ Added MuJoCo library path to ~/.bashrc"
                             echo "Please run: source ~/.bashrc"
                         else
@@ -760,7 +774,7 @@ install_mujoco_linux() {
                         fi
                     else
                         echo "Add manually to your ~/.bashrc:"
-                        echo "   echo 'export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/mujoco-3.3.5/lib' >> ~/.bashrc"
+                        echo "   echo 'export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/mujoco-3.4.0/lib' >> ~/.bashrc"
                         echo "   source ~/.bashrc"
                     fi
                 else
@@ -775,17 +789,17 @@ install_mujoco_linux() {
         else
             echo "✗ Error: Download failed"
             echo "Please download manually from: $DOWNLOAD_URL"
-            echo "Extract to /usr/local/mujoco-3.3.5"
+            echo "Extract to /usr/local/mujoco-3.4.0"
             return 1
         fi
     elif [[ $REPLY == "2" ]]; then
         echo "Please follow these manual steps:"
-        echo "1. Download MuJoCo 3.3.5 from https://github.com/google-deepmind/mujoco/releases"
-        echo "   Direct link: https://github.com/google-deepmind/mujoco/releases/download/3.3.5/mujoco-3.3.5-linux-x86_64.tar.gz"
-        echo "2. Extract: tar -xzf mujoco-3.3.5-linux-x86_64.tar.gz"
-        echo "3. Move: sudo mv mujoco-3.3.5 /usr/local/mujoco-3.3.5"
+        echo "1. Download MuJoCo 3.4.0 from https://github.com/google-deepmind/mujoco/releases"
+        echo "   Direct link: https://github.com/google-deepmind/mujoco/releases/download/3.4.0/mujoco-3.4.0-linux-x86_64.tar.gz"
+        echo "2. Extract: tar -xzf mujoco-3.4.0-linux-x86_64.tar.gz"
+        echo "3. Move: sudo mv mujoco-3.4.0 /usr/local/mujoco-3.4.0"
         echo "4. Update library path:"
-        echo "   echo 'export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/mujoco-3.3.5/lib' >> ~/.bashrc"
+        echo "   echo 'export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/mujoco-3.4.0/lib' >> ~/.bashrc"
         echo "   source ~/.bashrc"
         echo "5. Run: sudo ldconfig"
     else
@@ -799,7 +813,7 @@ install_mujoco_macos() {
     local MUJOCO_PERMANENT_DIR=""
 
     # Check if MuJoCo is already installed
-    for version in "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0"; do
+    for version in "3.4.0" "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0"; do
         if [ -d "/usr/local/mujoco-${version}" ]; then
             echo "✓ Found existing MuJoCo installation at: /usr/local/mujoco-${version}"
             MUJOCO_VERSION="$version"
@@ -811,23 +825,23 @@ install_mujoco_macos() {
     if [ -n "$MUJOCO_PERMANENT_DIR" ]; then
         echo "✓ Using existing MuJoCo installation: $MUJOCO_PERMANENT_DIR"
         echo ""
-        if [ "$MUJOCO_VERSION" != "3.3.5" ]; then
-            echo "Note: You have MuJoCo $MUJOCO_VERSION, but the recommended version is 3.3.5."
-            read -p "Would you like to install MuJoCo 3.3.5? (y/n) " -n 1 -r
+        if [ "$MUJOCO_VERSION" != "3.4.0" ]; then
+            echo "Note: You have MuJoCo $MUJOCO_VERSION, but the recommended version is 3.4.0."
+            read -p "Would you like to install MuJoCo 3.4.0? (y/n) " -n 1 -r
             echo
             if [[ ! $REPLY =~ ^[Yy]$ ]]; then
                 return 0
             fi
-            echo "Proceeding to install MuJoCo 3.3.5..."
+            echo "Proceeding to install MuJoCo 3.4.0..."
         else
-            echo "You already have the recommended version (3.3.5)."
+            echo "You already have the recommended version (3.4.0)."
             return 0
         fi
     fi
 
     # Check if DMG is mounted
     if [ ! -d "$DMG_MOUNT_PATH" ]; then
-        echo "MuJoCo 3.3.5 needs to be installed."
+        echo "MuJoCo 3.4.0 needs to be installed."
         echo ""
         echo "Choose installation method:"
         echo "1. Automatic download and install (recommended)"
@@ -837,9 +851,9 @@ install_mujoco_macos() {
         echo
 
         if [[ $REPLY == "1" ]]; then
-            echo "Downloading MuJoCo 3.3.5..."
-            DOWNLOAD_URL="https://github.com/google-deepmind/mujoco/releases/download/3.3.5/mujoco-3.3.5-macos-universal2.dmg"
-            DOWNLOAD_FILE="/tmp/mujoco-3.3.5-macos-universal2.dmg"
+            echo "Downloading MuJoCo 3.4.0..."
+            DOWNLOAD_URL="https://github.com/google-deepmind/mujoco/releases/download/3.4.0/mujoco-3.4.0-macos-universal2.dmg"
+            DOWNLOAD_FILE="/tmp/mujoco-3.4.0-macos-universal2.dmg"
 
             if curl -L -o "$DOWNLOAD_FILE" "$DOWNLOAD_URL"; then
                 echo "✓ Download completed successfully"
@@ -857,8 +871,8 @@ install_mujoco_macos() {
             fi
         elif [[ $REPLY == "2" ]]; then
             echo "Please follow these steps:"
-            echo "1. Download MuJoCo 3.3.5 .dmg from https://github.com/google-deepmind/mujoco/releases"
-            echo "   Direct link: https://github.com/google-deepmind/mujoco/releases/download/3.3.5/mujoco-3.3.5-macos-universal2.dmg"
+            echo "1. Download MuJoCo 3.4.0 .dmg from https://github.com/google-deepmind/mujoco/releases"
+            echo "   Direct link: https://github.com/google-deepmind/mujoco/releases/download/3.4.0/mujoco-3.4.0-macos-universal2.dmg"
             echo "2. Mount the .dmg file (double-click)"
             echo "3. Re-run this script to install it permanently"
             echo ""
@@ -874,7 +888,7 @@ install_mujoco_macos() {
     fi
 
     if [ -d "$DMG_MOUNT_PATH/mujoco.framework" ]; then
-        for version in "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0"; do
+        for version in "3.4.0" "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0"; do
             if [ -f "$DMG_MOUNT_PATH/mujoco.framework/Versions/A/libmujoco.${version}.dylib" ]; then
                 MUJOCO_VERSION="$version"
                 break
@@ -882,7 +896,7 @@ install_mujoco_macos() {
         done
 
         if [ -z "$MUJOCO_VERSION" ]; then
-            MUJOCO_VERSION="3.3.5"
+            MUJOCO_VERSION="3.4.0"
         fi
 
         MUJOCO_PERMANENT_DIR="/usr/local/mujoco-${MUJOCO_VERSION}"
@@ -910,8 +924,8 @@ install_mujoco_macos() {
             hdiutil detach "$DMG_MOUNT_PATH" -quiet 2>/dev/null || true
 
             # Remove downloaded file if it exists
-            if [ -f "/tmp/mujoco-3.3.5-macos-universal2.dmg" ]; then
-                rm -f "/tmp/mujoco-3.3.5-macos-universal2.dmg"
+            if [ -f "/tmp/mujoco-3.4.0-macos-universal2.dmg" ]; then
+                rm -f "/tmp/mujoco-3.4.0-macos-universal2.dmg"
                 echo "✓ Downloaded DMG file cleaned up"
             fi
 

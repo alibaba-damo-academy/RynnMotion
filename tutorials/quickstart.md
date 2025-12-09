@@ -37,7 +37,7 @@ sudo ./scripts/setup_dependencies.sh
 **What gets installed?**
 - Eigen 3.3.0+ (linear algebra)
 - Pinocchio 3.7.0 (rigid body dynamics)
-- MuJoCo 3.3.5 (physics simulation)
+- MuJoCo 3.4.0 (physics simulation)
 - Boost, yaml-cpp, qpOASES, Ruckig, and more
 
 **Troubleshooting:** If the script fails, check the [Installation Guide](../docs/installation.md) for manual steps.
@@ -59,6 +59,7 @@ make -j$(nproc)
 - `cmake -DCMAKE_BUILD_TYPE=Release ..` - Optimized build (default)
 - `cmake -DCMAKE_BUILD_TYPE=Debug ..` - Debug symbols
 - `cmake -DBUILD_TESTS=ON ..` - Include unit tests
+- `cmake -G Ninja ..` then `ninja -j$(nproc)` - Faster builds with Ninja
 
 ## Step 4: Run Your First Simulation
 

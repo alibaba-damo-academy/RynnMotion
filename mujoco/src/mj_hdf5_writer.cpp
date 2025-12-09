@@ -1,9 +1,23 @@
+#ifdef RYNN_USE_HDF5
+
 #include "mj_hdf5_writer.hpp"
 
 #include <algorithm>
 #include <sstream>
 
 namespace mujoco {
+
+namespace {
+
+std::vector<hsize_t> toHsize(const std::vector<size_t> &shape) {
+  std::vector<hsize_t> result(shape.size());
+  for (size_t i = 0; i < shape.size(); ++i) {
+    result[i] = static_cast<hsize_t>(shape[i]);
+  }
+  return result;
+}
+
+} // namespace
 
 HDF5Writer::HDF5Writer() = default;
 
@@ -28,35 +42,42 @@ bool HDF5Writer::isOpen() const {
   return file_ != nullptr;
 }
 
+std::string HDF5Writer::getExtension() const {
+  return ".hdf5";
+}
+
 void HDF5Writer::writeDataset(const std::string &name,
                               const std::vector<double> &data,
-                              const std::vector<hsize_t> &shape) {
+                              const std::vector<size_t> &shape) {
   if (!file_) return;
 
+  auto hshape = toHsize(shape);
   ensureParentGroupExists(name);
-  H5::DataSpace dataspace(static_cast<int>(shape.size()), shape.data());
+  H5::DataSpace dataspace(static_cast<int>(hshape.size()), hshape.data());
   H5::DataSet dataset = file_->createDataSet(name, H5::PredType::NATIVE_DOUBLE, dataspace);
   dataset.write(data.data(), H5::PredType::NATIVE_DOUBLE);
 }
 
 void HDF5Writer::writeDataset(const std::string &name,
                               const std::vector<float> &data,
-                              const std::vector<hsize_t> &shape) {
+                              const std::vector<size_t> &shape) {
   if (!file_) return;
 
+  auto hshape = toHsize(shape);
   ensureParentGroupExists(name);
-  H5::DataSpace dataspace(static_cast<int>(shape.size()), shape.data());
+  H5::DataSpace dataspace(static_cast<int>(hshape.size()), hshape.data());
   H5::DataSet dataset = file_->createDataSet(name, H5::PredType::NATIVE_FLOAT, dataspace);
   dataset.write(data.data(), H5::PredType::NATIVE_FLOAT);
 }
 
 void HDF5Writer::writeDataset(const std::string &name,
                               const std::vector<int64_t> &data,
-                              const std::vector<hsize_t> &shape) {
+                              const std::vector<size_t> &shape) {
   if (!file_) return;
 
+  auto hshape = toHsize(shape);
   ensureParentGroupExists(name);
-  H5::DataSpace dataspace(static_cast<int>(shape.size()), shape.data());
+  H5::DataSpace dataspace(static_cast<int>(hshape.size()), hshape.data());
   H5::DataSet dataset = file_->createDataSet(name, H5::PredType::NATIVE_INT64, dataspace);
   dataset.write(data.data(), H5::PredType::NATIVE_INT64);
 }
@@ -65,8 +86,8 @@ void HDF5Writer::writeEigenVectors(const std::string &name,
                                    const std::vector<Eigen::VectorXd> &frames) {
   if (!file_ || frames.empty()) return;
 
-  hsize_t numFrames = frames.size();
-  hsize_t vecSize = frames[0].size();
+  size_t numFrames = frames.size();
+  size_t vecSize = frames[0].size();
 
   std::vector<double> flatData;
   flatData.reserve(numFrames * vecSize);
@@ -76,7 +97,7 @@ void HDF5Writer::writeEigenVectors(const std::string &name,
     }
   }
 
-  std::vector<hsize_t> shape = {numFrames, vecSize};
+  std::vector<size_t> shape = {numFrames, vecSize};
   writeDataset(name, flatData, shape);
 }
 
@@ -157,3 +178,5 @@ void HDF5Writer::ensureParentGroupExists(const std::string &path) {
 }
 
 } // namespace mujoco
+
+#endif // RYNN_USE_HDF5

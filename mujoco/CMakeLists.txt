@@ -4,7 +4,6 @@ project(mujocoProject_cpp)
 find_package(yaml-cpp REQUIRED)
 find_package(fcl REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(HDF5 REQUIRED COMPONENTS CXX)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
     libavcodec
@@ -12,6 +11,38 @@ pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
     libavutil
     libswscale
 )
+
+option(RYNN_USE_PARQUET "Enable Parquet recording support" ON)
+option(RYNN_USE_HDF5 "Enable HDF5 recording support" OFF)
+
+set(PARQUET_AVAILABLE FALSE)
+if(RYNN_USE_PARQUET)
+    set(_OLD_CMAKE_MESSAGE_LOG_LEVEL ${CMAKE_MESSAGE_LOG_LEVEL})
+    set(CMAKE_MESSAGE_LOG_LEVEL WARNING)
+    find_package(Arrow QUIET)
+    find_package(Parquet QUIET)
+    set(CMAKE_MESSAGE_LOG_LEVEL ${_OLD_CMAKE_MESSAGE_LOG_LEVEL})
+
+    if(Arrow_FOUND AND Parquet_FOUND)
+        add_compile_definitions(RYNN_USE_PARQUET)
+        set(PARQUET_AVAILABLE TRUE)
+        message(STATUS "Parquet recording: ENABLED")
+    else()
+        message(STATUS "Parquet recording: DISABLED (Arrow/Parquet not found)")
+    endif()
+endif()
+
+set(HDF5_AVAILABLE FALSE)
+if(RYNN_USE_HDF5)
+    find_package(HDF5 QUIET COMPONENTS CXX)
+    if(HDF5_FOUND)
+        add_compile_definitions(RYNN_USE_HDF5)
+        set(HDF5_AVAILABLE TRUE)
+        message(STATUS "HDF5 recording: ENABLED")
+    else()
+        message(STATUS "HDF5 recording: DISABLED (HDF5 not found)")
+    endif()
+endif()
 
 if(APPLE)
     function(clean_target_interface_libs target_name)
@@ -110,9 +141,16 @@ set(COMMON_INCLUDE_DIRS
     ${YAML_CPP_INCLUDE_DIR}
     ${LCM_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
-    ${HDF5_INCLUDE_DIRS}
     ${LIBAV_INCLUDE_DIRS}
 )
+
+if(HDF5_AVAILABLE)
+    list(APPEND COMMON_INCLUDE_DIRS ${HDF5_INCLUDE_DIRS})
+endif()
+
+if(PARQUET_AVAILABLE)
+    list(APPEND COMMON_INCLUDE_DIRS ${Arrow_INCLUDE_DIRS} ${Parquet_INCLUDE_DIRS})
+endif()
 
 if(APPLE)
     set(COMMON_LIBRARIES
@@ -145,7 +183,9 @@ add_executable(mujocoExe
     src/mj_sensor.cpp
     src/mj_ui.cpp
     src/mj_scene.cpp
+    src/mj_data_writer.cpp
     src/mj_hdf5_writer.cpp
+    src/mj_parquet_writer.cpp
     src/mj_video_encoder.cpp
     src/mj_recorder.cpp
 )
@@ -167,9 +207,16 @@ target_link_libraries(mujocoExe
     ${COMMON_LIBRARIES}
     ${FCL_LIBRARIES}
     ${OpenCV_LIBS}
-    ${HDF5_CXX_LIBRARIES}
     PkgConfig::LIBAV
 )
+
+if(HDF5_AVAILABLE)
+    target_link_libraries(mujocoExe ${HDF5_CXX_LIBRARIES})
+endif()
+
+if(PARQUET_AVAILABLE)
+    target_link_libraries(mujocoExe Arrow::arrow_shared Parquet::parquet_shared)
+endif()
 
 if(APPLE)
     set_target_properties(mujocoExe PROPERTIES
@@ -230,7 +277,9 @@ if(BUILD_ROS_MUJOCO)
         src/mj_sensor.cpp
         src/mj_ui.cpp
         src/mj_scene.cpp
+        src/mj_data_writer.cpp
         src/mj_hdf5_writer.cpp
+        src/mj_parquet_writer.cpp
         src/mj_video_encoder.cpp
         src/mj_recorder.cpp
     )
@@ -265,9 +314,16 @@ if(BUILD_ROS_MUJOCO)
         ${FCL_LIBRARIES}
         ${CCD_LIBRARY}
         ${OpenCV_LIBS}
-        ${HDF5_CXX_LIBRARIES}
         PkgConfig::LIBAV
     )
+
+    if(HDF5_AVAILABLE)
+        target_link_libraries(rosMujocoExe ${HDF5_CXX_LIBRARIES})
+    endif()
+
+    if(PARQUET_AVAILABLE)
+        target_link_libraries(rosMujocoExe Arrow::arrow_shared Parquet::parquet_shared)
+    endif()
 
     add_dependencies(rosMujocoExe utility motion)
 

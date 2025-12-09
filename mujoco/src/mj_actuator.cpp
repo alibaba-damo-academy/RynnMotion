@@ -59,6 +59,7 @@ void MujocoActuator::initActuatorSystem() {
     printMapping();
   }
 
+  initJointSensors();
   initFromKeyframe(0);
 }
 
@@ -100,12 +101,115 @@ void MujocoActuator::initFromKeyframe(int keyframeIndex) {
   DEBUG_LOG("Actuator initialization complete: " << mdof_ << " joints, " << numEE_ << " end-effectors");
 }
 
+void MujocoActuator::initJointSensors() {
+  jointPosSensorAdr_.resize(mdof_, -1);
+  jointVelSensorAdr_.resize(mdof_, -1);
+  jointFrcSensorAdr_.resize(mdof_, -1);
+
+  for (int i = 0; i < mj_.mjModel_->nsensor; i++) {
+    int type = mj_.mjModel_->sensor_type[i];
+    int adr = mj_.mjModel_->sensor_adr[i];
+    int objid = mj_.mjModel_->sensor_objid[i];
+
+    if (type == mjSENS_JOINTPOS) {
+      // Match sensor's joint ID to our joint actuators
+      for (int j = 0; j < mdof_; j++) {
+        int actuatorIdx = jointIndices_[j];
+        int jntId = mj_.mjModel_->actuator_trnid[2 * actuatorIdx];
+        if (objid == jntId) {
+          jointPosSensorAdr_[j] = adr;
+          break;
+        }
+      }
+    } else if (type == mjSENS_JOINTVEL) {
+      for (int j = 0; j < mdof_; j++) {
+        int actuatorIdx = jointIndices_[j];
+        int jntId = mj_.mjModel_->actuator_trnid[2 * actuatorIdx];
+        if (objid == jntId) {
+          jointVelSensorAdr_[j] = adr;
+          break;
+        }
+      }
+    } else if (type == mjSENS_ACTUATORFRC) {
+      // actuatorfrc sensor's objid is actuator ID directly
+      for (int j = 0; j < mdof_; j++) {
+        if (objid == jointIndices_[j]) {
+          jointFrcSensorAdr_[j] = adr;
+          break;
+        }
+      }
+    }
+  }
+
+  // Validate sensor discovery and report status
+  int foundPos = 0, foundVel = 0, foundFrc = 0;
+  for (int j = 0; j < mdof_; j++) {
+    if (jointPosSensorAdr_[j] >= 0) foundPos++;
+    if (jointVelSensorAdr_[j] >= 0) foundVel++;
+    if (jointFrcSensorAdr_[j] >= 0) foundFrc++;
+  }
+
+  bool allFound = (foundPos == mdof_ && foundVel == mdof_ && foundFrc == mdof_);
+
+  if (useSensorFeedback_) {
+    if (allFound) {
+      std::cout << "✓ Sensor feedback enabled: " << mdof_ << " joints with pos/vel/frc sensors" << std::endl;
+      // Print detailed sensor addresses for verification
+      for (int j = 0; j < mdof_; j++) {
+        std::cout << "  Joint " << j << ": sensordata[pos=" << jointPosSensorAdr_[j]
+                  << ", vel=" << jointVelSensorAdr_[j]
+                  << ", frc=" << jointFrcSensorAdr_[j] << "]" << std::endl;
+      }
+    } else {
+      std::cerr << "[MujocoActuator] Warning: Not all joint sensors found (pos:" << foundPos
+                << "/" << mdof_ << ", vel:" << foundVel << "/" << mdof_
+                << ", frc:" << foundFrc << "/" << mdof_ << "), falling back to direct state" << std::endl;
+      useSensorFeedback_ = false;
+    }
+  } else {
+    if (utils::DebugConfig::getInstance().isVerbose()) {
+      std::cout << "[MujocoActuator] Sensor feedback disabled, using direct state. "
+                << "Found sensors: pos:" << foundPos << "/" << mdof_
+                << ", vel:" << foundVel << "/" << mdof_
+                << ", frc:" << foundFrc << "/" << mdof_ << std::endl;
+    }
+  }
+}
+
 void MujocoActuator::update() {
   updateJointsFeedback();
   updateEEFeedback();
 }
 
+void MujocoActuator::updateJointsFeedbackFromSensors() {
+  auto &ds = mj_.runtimeData_;
+
+  for (int i = 0; i < mdof_; ++i) {
+    ds.qFb[i] = mj_.mjData_->sensordata[jointPosSensorAdr_[i]];
+    ds.qdFb[i] = mj_.mjData_->sensordata[jointVelSensorAdr_[i]];
+    ds.qtauFb[i] = mj_.mjData_->sensordata[jointFrcSensorAdr_[i]];
+  }
+
+  // Debug: Compare sensor vs ground truth (print once per second)
+  static double lastPrintTime = -1.0;
+  if (mj_.mjData_->time - lastPrintTime > 1.0) {
+    lastPrintTime = mj_.mjData_->time;
+    int actuatorIdx = jointIndices_[0];
+    int jntAdr = mj_.mjModel_->actuator_trnid[2 * actuatorIdx];
+    double sensorPos = mj_.mjData_->sensordata[jointPosSensorAdr_[0]];
+    double truePos = mj_.mjData_->qpos[jntAdr];
+    double diff = sensorPos - truePos;
+    std::cout << "[SensorFB] Joint0: sensor=" << std::fixed << std::setprecision(4) << sensorPos
+              << ", true=" << truePos << ", diff=" << diff << " rad" << std::endl;
+  }
+}
+
 void MujocoActuator::updateJointsFeedback() {
+  if (useSensorFeedback_) {
+    updateJointsFeedbackFromSensors();
+    return;
+  }
+
   auto &ds = mj_.runtimeData_;
 
   for (int i = 0; i < mdof_; ++i) {

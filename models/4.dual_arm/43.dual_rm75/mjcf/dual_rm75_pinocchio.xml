@@ -5,30 +5,30 @@
     <body name="dual_base">
       <inertial pos="0 0 0" mass="0.001" diaginertia="0.001 0.001 0.001" />
 
-      <!-- Left Arm -->
-      <body name="base_left" pos="0 0.4 0" euler="0 0 0">
-        <body name="Link1_left" pos="0 0 0.2405" quat="0.707105 -0.707108 0 0">
+      <!-- Arm 0 -->
+      <body name="base_0" pos="0 0.4 0" euler="0 0 0">
+        <body name="Link1_0" pos="0 0 0.2405" quat="0.707105 -0.707108 0 0">
           <inertial pos="0.0251854 1.19161e-08 -0.021108" quat="0.568743 0.42008 0.419865 0.569015" mass="0.593563" diaginertia="0.00126614 0.00124677 0.000496264" />
-          <joint name="joint1_left" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-60 60" />
-          <body name="Link2_left" quat="0.707105 0.707108 0 0">
+          <joint name="joint1_0" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-60 60" />
+          <body name="Link2_0" quat="0.707105 0.707108 0 0">
             <inertial pos="2.72859e-07 0.0110778 0.0761295" quat="0.700418 0.0973711 -0.0973581 0.700325" mass="0.43285" diaginertia="0.00130156 0.00125838 0.000238372" />
-            <joint name="joint2_left" pos="0 0 0" axis="0 1 0" range="-2.268 2.268" actuatorfrcrange="-60 60" />
-            <body name="Link3_left" pos="0 0 0.256" quat="0.707105 -0.707108 0 0">
+            <joint name="joint2_0" pos="0 0 0" axis="0 1 0" range="-2.268 2.268" actuatorfrcrange="-60 60" />
+            <body name="Link3_0" pos="0 0 0.256" quat="0.707105 -0.707108 0 0">
               <inertial pos="6.84676e-07 0.0273475 -0.023544" quat="0.59313 0.805106 0.000113224 -7.25221e-05" mass="0.431325" diaginertia="0.000794333 0.000774632 0.000270805" />
-              <joint name="joint3_left" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-30 30" />
-              <body name="Link4_left" quat="0.707105 0.707108 0 0">
+              <joint name="joint3_0" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-30 30" />
+              <body name="Link4_0" quat="0.707105 0.707108 0 0">
                 <inertial pos="5.05313e-06 0.0105691 0.0595926" quat="0.699779 0.0991943 -0.0993927 0.700422" mass="0.289634" diaginertia="0.00065604 0.000637371 0.000114622" />
-                <joint name="joint4_left" pos="0 0 0" axis="0 1 0" range="-2.355 2.355" actuatorfrcrange="-30 30" />
-                <body name="Link5_left" pos="0 0 0.21" quat="0.707105 -0.707108 0 0">
+                <joint name="joint4_0" pos="0 0 0" axis="0 1 0" range="-2.355 2.355" actuatorfrcrange="-30 30" />
+                <body name="Link5_0" pos="0 0 0.21" quat="0.707105 -0.707108 0 0">
                   <inertial pos="1.15517e-06 0.0215395 -0.0180424" quat="0.602604 0.798041 -8.31168e-05 7.31986e-05" mass="0.23942" diaginertia="0.000285939 0.000275318 0.000107298" />
-                  <joint name="joint5_left" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-10 10" />
-                  <body name="Link6_left" quat="0.707105 0.707108 0 0">
+                  <joint name="joint5_0" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-10 10" />
+                  <body name="Link6_0" quat="0.707105 0.707108 0 0">
                     <inertial pos="3.19795e-06 0.00736804 0.0593808" quat="0.698922 0.105284 -0.105471 0.6995" mass="0.2188" diaginertia="0.000358615 0.00035054 8.07958e-05" />
-                    <joint name="joint6_left" pos="0 0 0" axis="0 1 0" range="-2.233 2.233" actuatorfrcrange="-10 10" />
-                    <body name="Link7_left" pos="0 0 0.144">
+                    <joint name="joint6_0" pos="0 0 0" axis="0 1 0" range="-2.233 2.233" actuatorfrcrange="-10 10" />
+                    <body name="Link7_0" pos="0 0 0.144">
                       <inertial pos="0.000714238 -0.000396712 -0.0126724" quat="0.613063 0.350717 -0.614301 0.351831" mass="0.0649018" diaginertia="3.17886e-05 2.10548e-05 1.80205e-05" />
-                      <joint name="joint7_left" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorfrcrange="-10 10" />
-                      <site name="EE_left" pos="0.0 0 0.15" euler="0 3.1415926 1.57079" size="0.0001" />
+                      <joint name="joint7_0" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorfrcrange="-10 10" />
+                      <site name="EE_0" pos="0.0 0 0.15" euler="0 3.1415926 1.57079" size="0.0001" />
                     </body>
                   </body>
                 </body>
@@ -38,30 +38,30 @@
         </body>
       </body>
 
-      <!-- Right Arm -->
-      <body name="base_right" pos="0 -0.4 0" euler="0 0 0">
-        <body name="Link1_right" pos="0 0 0.2405" quat="0.707105 -0.707108 0 0">
+      <!-- Arm 1 -->
+      <body name="base_1" pos="0 -0.4 0" euler="0 0 0">
+        <body name="Link1_1" pos="0 0 0.2405" quat="0.707105 -0.707108 0 0">
           <inertial pos="0.0251854 1.19161e-08 -0.021108" quat="0.568743 0.42008 0.419865 0.569015" mass="0.593563" diaginertia="0.00126614 0.00124677 0.000496264" />
-          <joint name="joint1_right" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-60 60" />
-          <body name="Link2_right" quat="0.707105 0.707108 0 0">
+          <joint name="joint1_1" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-60 60" />
+          <body name="Link2_1" quat="0.707105 0.707108 0 0">
             <inertial pos="2.72859e-07 0.0110778 0.0761295" quat="0.700418 0.0973711 -0.0973581 0.700325" mass="0.43285" diaginertia="0.00130156 0.00125838 0.000238372" />
-            <joint name="joint2_right" pos="0 0 0" axis="0 1 0" range="-2.268 2.268" actuatorfrcrange="-60 60" />
-            <body name="Link3_right" pos="0 0 0.256" quat="0.707105 -0.707108 0 0">
+            <joint name="joint2_1" pos="0 0 0" axis="0 1 0" range="-2.268 2.268" actuatorfrcrange="-60 60" />
+            <body name="Link3_1" pos="0 0 0.256" quat="0.707105 -0.707108 0 0">
               <inertial pos="6.84676e-07 0.0273475 -0.023544" quat="0.59313 0.805106 0.000113224 -7.25221e-05" mass="0.431325" diaginertia="0.000794333 0.000774632 0.000270805" />
-              <joint name="joint3_right" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-30 30" />
-              <body name="Link4_right" quat="0.707105 0.707108 0 0">
+              <joint name="joint3_1" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-30 30" />
+              <body name="Link4_1" quat="0.707105 0.707108 0 0">
                 <inertial pos="5.05313e-06 0.0105691 0.0595926" quat="0.699779 0.0991943 -0.0993927 0.700422" mass="0.289634" diaginertia="0.00065604 0.000637371 0.000114622" />
-                <joint name="joint4_right" pos="0 0 0" axis="0 1 0" range="-2.355 2.355" actuatorfrcrange="-30 30" />
-                <body name="Link5_right" pos="0 0 0.21" quat="0.707105 -0.707108 0 0">
+                <joint name="joint4_1" pos="0 0 0" axis="0 1 0" range="-2.355 2.355" actuatorfrcrange="-30 30" />
+                <body name="Link5_1" pos="0 0 0.21" quat="0.707105 -0.707108 0 0">
                   <inertial pos="1.15517e-06 0.0215395 -0.0180424" quat="0.602604 0.798041 -8.31168e-05 7.31986e-05" mass="0.23942" diaginertia="0.000285939 0.000275318 0.000107298" />
-                  <joint name="joint5_right" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-10 10" />
-                  <body name="Link6_right" quat="0.707105 0.707108 0 0">
+                  <joint name="joint5_1" pos="0 0 0" axis="0 -1 0" range="-3.1 3.1" actuatorfrcrange="-10 10" />
+                  <body name="Link6_1" quat="0.707105 0.707108 0 0">
                     <inertial pos="3.19795e-06 0.00736804 0.0593808" quat="0.698922 0.105284 -0.105471 0.6995" mass="0.2188" diaginertia="0.000358615 0.00035054 8.07958e-05" />
-                    <joint name="joint6_right" pos="0 0 0" axis="0 1 0" range="-2.233 2.233" actuatorfrcrange="-10 10" />
-                    <body name="Link7_right" pos="0 0 0.144">
+                    <joint name="joint6_1" pos="0 0 0" axis="0 1 0" range="-2.233 2.233" actuatorfrcrange="-10 10" />
+                    <body name="Link7_1" pos="0 0 0.144">
                       <inertial pos="0.000714238 -0.000396712 -0.0126724" quat="0.613063 0.350717 -0.614301 0.351831" mass="0.0649018" diaginertia="3.17886e-05 2.10548e-05 1.80205e-05" />
-                      <joint name="joint7_right" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorfrcrange="-10 10" />
-                      <site name="EE_right" pos="0.0 0 0.15" euler="0 3.1415926 1.57079" size="0.0001" />
+                      <joint name="joint7_1" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorfrcrange="-10 10" />
+                      <site name="EE_1" pos="0.0 0 0.15" euler="0 3.1415926 1.57079" size="0.0001" />
                     </body>
                   </body>
                 </body>
@@ -74,23 +74,23 @@
   </worldbody>
 
   <actuator>
-    <!-- Left Arm Actuators -->
-    <position name="lj1_left" joint="joint1_left" kp="200" dampratio="1" />
-    <position name="lj2_left" joint="joint2_left" kp="200" dampratio="1" />
-    <position name="lj3_left" joint="joint3_left" kp="200" dampratio="1" />
-    <position name="lj4_left" joint="joint4_left" kp="200" dampratio="1" />
-    <position name="lj5_left" joint="joint5_left" kp="20" dampratio="1" />
-    <position name="lj6_left" joint="joint6_left" kp="20" dampratio="1" />
-    <position name="lj7_left" joint="joint7_left" kp="40" dampratio="1" />
+    <!-- Arm 0 Actuators -->
+    <position name="lj1_0" joint="joint1_0" kp="200" dampratio="1" />
+    <position name="lj2_0" joint="joint2_0" kp="200" dampratio="1" />
+    <position name="lj3_0" joint="joint3_0" kp="200" dampratio="1" />
+    <position name="lj4_0" joint="joint4_0" kp="200" dampratio="1" />
+    <position name="lj5_0" joint="joint5_0" kp="20" dampratio="1" />
+    <position name="lj6_0" joint="joint6_0" kp="20" dampratio="1" />
+    <position name="lj7_0" joint="joint7_0" kp="40" dampratio="1" />
 
-    <!-- Right Arm Actuators -->
-    <position name="lj1_right" joint="joint1_right" kp="200" dampratio="1" />
-    <position name="lj2_right" joint="joint2_right" kp="200" dampratio="1" />
-    <position name="lj3_right" joint="joint3_right" kp="200" dampratio="1" />
-    <position name="lj4_right" joint="joint4_right" kp="200" dampratio="1" />
-    <position name="lj5_right" joint="joint5_right" kp="20" dampratio="1" />
-    <position name="lj6_right" joint="joint6_right" kp="20" dampratio="1" />
-    <position name="lj7_right" joint="joint7_right" kp="40" dampratio="1" />
+    <!-- Arm 1 Actuators -->
+    <position name="lj1_1" joint="joint1_1" kp="200" dampratio="1" />
+    <position name="lj2_1" joint="joint2_1" kp="200" dampratio="1" />
+    <position name="lj3_1" joint="joint3_1" kp="200" dampratio="1" />
+    <position name="lj4_1" joint="joint4_1" kp="200" dampratio="1" />
+    <position name="lj5_1" joint="joint5_1" kp="20" dampratio="1" />
+    <position name="lj6_1" joint="joint6_1" kp="20" dampratio="1" />
+    <position name="lj7_1" joint="joint7_1" kp="40" dampratio="1" />
   </actuator>
 
   <keyframe>

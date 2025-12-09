@@ -114,7 +114,7 @@ The `setup_dependencies.sh` script installs:
 - **nlohmann/json** - JSON library
 
 **Physics & Kinematics:**
-- **MuJoCo** (3.3.5) - Physics simulation engine
+- **MuJoCo** (3.4.0) - Physics simulation engine
 - **Pinocchio** (3.7.0) - Rigid body dynamics library
 - **FCL** (Flexible Collision Library) - Collision detection
 
@@ -182,6 +182,34 @@ make -j$(nproc)
 cmake -DCMAKE_INSTALL_PREFIX=/custom/path ..
 make -j$(nproc)
 sudo make install
+```
+
+#### Build Optimization (Faster Builds)
+
+Use **ccache** and **Ninja** for faster rebuild times:
+
+```bash
+# Use Ninja generator (faster than Make)
+cmake -G Ninja ..
+ninja -j$(nproc)
+
+# Enable ccache (automatic if installed)
+cmake -DRYNN_USE_CCACHE=ON ..
+make -j$(nproc)
+
+# Subsequent builds will be much faster due to caching
+```
+
+**Recommended workflow for development:**
+
+```bash
+# First time setup
+mkdir build && cd build
+cmake -G Ninja ..
+ninja -j$(nproc)
+
+# After code changes (uses ccache)
+ninja -j$(nproc)  # Only recompiles changed files
 ```
 
 ---
@@ -485,7 +513,7 @@ pkg-config --modversion eigen3      # Should show ≥3.3.0
 pkg-config --modversion pinocchio   # Should show 3.7.0
 
 # Check MuJoCo
-ls /usr/local/mujoco-3.3.5/  # Linux
+ls /usr/local/mujoco-3.4.0/  # Linux
 ls /opt/homebrew/Cellar/mujoco/  # macOS (Homebrew)
 
 # Check Python packages
@@ -542,11 +570,11 @@ ls /usr/local/include/mujoco/
 
 # If missing, reinstall MuJoCo
 cd /tmp
-wget https://github.com/google-deepmind/mujoco/releases/download/3.3.5/mujoco-3.3.5-linux-x86_64.tar.gz
-tar -xzf mujoco-3.3.5-linux-x86_64.tar.gz
-sudo mv mujoco-3.3.5 /usr/local/
-sudo ln -sf /usr/local/mujoco-3.3.5/include/mujoco /usr/local/include/
-sudo ln -sf /usr/local/mujoco-3.3.5/lib/libmujoco.so.3.3.5 /usr/local/lib/
+wget https://github.com/google-deepmind/mujoco/releases/download/3.3.5/mujoco-3.4.0-linux-x86_64.tar.gz
+tar -xzf mujoco-3.4.0-linux-x86_64.tar.gz
+sudo mv mujoco-3.4.0 /usr/local/
+sudo ln -sf /usr/local/mujoco-3.4.0/include/mujoco /usr/local/include/
+sudo ln -sf /usr/local/mujoco-3.4.0/lib/libmujoco.so.3.3.5 /usr/local/lib/
 
 # macOS:
 brew install mujoco
@@ -706,7 +734,7 @@ rm -rf RynnMotion/
 
 ```bash
 # Linux: Remove installed libraries
-sudo rm -rf /usr/local/mujoco-3.3.5
+sudo rm -rf /usr/local/mujoco-3.4.0
 sudo rm -rf /usr/local/include/pinocchio
 sudo rm -rf /usr/local/lib/libpinocchio*
 # ... (repeat for other libraries)

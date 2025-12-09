@@ -1,23 +1,28 @@
 #pragma once
 
-#ifdef RYNN_USE_HDF5
+#ifdef RYNN_USE_PARQUET
 
 #include "mj_data_writer.hpp"
 
-#include <H5Cpp.h>
+#include <arrow/api.h>
+#include <arrow/io/api.h>
+#include <parquet/arrow/writer.h>
+
+#include <map>
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace mujoco {
 
-class HDF5Writer : public IDataWriter {
+class ParquetWriter : public IDataWriter {
 public:
-  HDF5Writer();
-  ~HDF5Writer() override;
+  ParquetWriter();
+  ~ParquetWriter() override;
 
-  HDF5Writer(const HDF5Writer &) = delete;
-  HDF5Writer &operator=(const HDF5Writer &) = delete;
+  ParquetWriter(const ParquetWriter &) = delete;
+  ParquetWriter &operator=(const ParquetWriter &) = delete;
 
   void create(const std::filesystem::path &filePath) override;
   void close() override;
@@ -48,11 +53,20 @@ public:
   void createGroup(const std::string &groupPath) override;
 
 private:
-  void ensureParentGroupExists(const std::string &path);
+  struct ColumnData {
+    std::string name;
+    std::shared_ptr<arrow::Array> array;
+    std::shared_ptr<arrow::Field> field;
+  };
 
-  std::unique_ptr<H5::H5File> file_;
+  void flushToFile();
+
+  std::filesystem::path filePath_;
+  bool isOpen_{false};
+  std::vector<ColumnData> columns_;
+  std::map<std::string, std::string> metadata_;
 };
 
 } // namespace mujoco
 
-#endif // RYNN_USE_HDF5
+#endif // RYNN_USE_PARQUET

@@ -2,6 +2,17 @@
 
 Record robot manipulation datasets from MuJoCo simulation, compatible with Python `RynnDataset`.
 
+## Data Format Configuration
+
+By default, datasets are recorded in **Parquet** format. Configure in `config/mujoco.yaml`:
+
+```yaml
+recorder:
+  data_format: "parquet"  # Options: "parquet" (default), "hdf5", "none"
+  record_video: true
+  video_codec: "h264"
+```
+
 ---
 
 ## Launch Simulation
@@ -30,7 +41,7 @@ RynnMotion/record/mj_<date_time>/
 │   ├── info.json
 │   └── episodes.jsonl
 ├── data/chunk-000/
-│   └── episode_000000.hdf5
+│   └── episode_000000.parquet  # or .hdf5 if using HDF5 format
 └── videos/chunk-000/
     └── observation.images.{camera}/
         └── episode_000000.mp4

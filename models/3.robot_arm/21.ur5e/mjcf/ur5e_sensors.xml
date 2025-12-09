@@ -8,6 +8,27 @@
     <gyro name="eeGyro" site="EE"/>
     <accelerometer name="eeAcc" site="EE"/>
     <force name="eeForce" site="EE"/>
+
+    <jointpos name="shoulder_pan_joint_pos" joint="shoulder_pan_joint"/>
+    <jointpos name="shoulder_lift_joint_pos" joint="shoulder_lift_joint"/>
+    <jointpos name="elbow_joint_pos" joint="elbow_joint"/>
+    <jointpos name="wrist_1_joint_pos" joint="wrist_1_joint"/>
+    <jointpos name="wrist_2_joint_pos" joint="wrist_2_joint"/>
+    <jointpos name="wrist_3_joint_pos" joint="wrist_3_joint"/>
+
+    <jointvel name="shoulder_pan_joint_vel" joint="shoulder_pan_joint"/>
+    <jointvel name="shoulder_lift_joint_vel" joint="shoulder_lift_joint"/>
+    <jointvel name="elbow_joint_vel" joint="elbow_joint"/>
+    <jointvel name="wrist_1_joint_vel" joint="wrist_1_joint"/>
+    <jointvel name="wrist_2_joint_vel" joint="wrist_2_joint"/>
+    <jointvel name="wrist_3_joint_vel" joint="wrist_3_joint"/>
+
+    <actuatorfrc name="shoulder_pan_frc" actuator="shoulder_pan"/>
+    <actuatorfrc name="shoulder_lift_frc" actuator="shoulder_lift"/>
+    <actuatorfrc name="elbow_frc" actuator="elbow"/>
+    <actuatorfrc name="wrist_1_frc" actuator="wrist_1"/>
+    <actuatorfrc name="wrist_2_frc" actuator="wrist_2"/>
+    <actuatorfrc name="wrist_3_frc" actuator="wrist_3"/>
   </sensor>
 
 </mujoco>

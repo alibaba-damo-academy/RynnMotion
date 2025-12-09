@@ -268,6 +268,7 @@ private:
   bool _vsync_enabled{false};
   bool _enable_busy_wait{false};
   int _busy_wait_threshold_us{100};
+  bool _use_sensor_feedback{false};
 
   void initRecorder();
 };

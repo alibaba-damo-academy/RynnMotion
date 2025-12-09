@@ -62,8 +62,7 @@ function(copy_to_deployment_dirs TARGET_NAME)
   endif()
 
   set(DEPLOYMENT_DIRS
-    ${CMAKE_SOURCE_DIR}/robots/damiao/lib
-    ${CMAKE_SOURCE_DIR}/robots/piper/src/xiaoda/lib
+    ${CMAKE_SOURCE_DIR}/robots/RynnDamiao/lib
     ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib
     ${CMAKE_SOURCE_DIR}/robots/realman/src/telemotion/lib
   )

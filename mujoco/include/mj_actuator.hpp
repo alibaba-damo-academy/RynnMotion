@@ -124,6 +124,18 @@ private:
    */
   void setEECommand();
 
+  /**
+   * @brief Initialize joint sensors for sensor-based feedback
+   * Finds jointpos, jointvel, and actuatorfrc sensors and caches their addresses
+   */
+  void initJointSensors();
+
+  /**
+   * @brief Update joint feedback from MuJoCo sensor data
+   * Uses cached sensor addresses to read from mjData->sensordata
+   */
+  void updateJointsFeedbackFromSensors();
+
   std::vector<rynn::ActuatorMode> actuatorModes_; // Loaded from RobotManager during init
 
   // Cached index mappings (populated in initActuatorSystem)
@@ -132,6 +144,18 @@ private:
   int mdof_;                      // Motion DOF (controllable joints)
   int numEE_;                     // Number of end-effectors
   int adof_;                      // Action DOF per end-effector
+
+  // Sensor indices for joint feedback (address in sensordata array)
+  std::vector<int> jointPosSensorAdr_;  // jointpos sensor addresses
+  std::vector<int> jointVelSensorAdr_;  // jointvel sensor addresses
+  std::vector<int> jointFrcSensorAdr_;  // actuatorfrc sensor addresses
+
+  // Flag to use sensor data vs direct state
+  bool useSensorFeedback_{false};
+
+public:
+  void setUseSensorFeedback(bool enable) { useSensorFeedback_ = enable; }
+  bool getUseSensorFeedback() const { return useSensorFeedback_; }
 };
 
 } // namespace mujoco

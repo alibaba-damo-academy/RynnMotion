@@ -9,6 +9,30 @@
     <accelerometer name="eeAcc" site="EE"/>
     <force name="eeForce" site="EE"/>
     <torque name="eeTorque" site="EE"/>
+
+    <jointpos name="fr3_joint1_pos" joint="fr3_joint1" noise="0.001"/>
+    <jointpos name="fr3_joint2_pos" joint="fr3_joint2" noise="0.001"/>
+    <jointpos name="fr3_joint3_pos" joint="fr3_joint3" noise="0.001"/>
+    <jointpos name="fr3_joint4_pos" joint="fr3_joint4" noise="0.001"/>
+    <jointpos name="fr3_joint5_pos" joint="fr3_joint5" noise="0.001"/>
+    <jointpos name="fr3_joint6_pos" joint="fr3_joint6" noise="0.001"/>
+    <jointpos name="fr3_joint7_pos" joint="fr3_joint7" noise="0.001"/>
+
+    <jointvel name="fr3_joint1_vel" joint="fr3_joint1" noise="0.001"/>
+    <jointvel name="fr3_joint2_vel" joint="fr3_joint2" noise="0.001"/>
+    <jointvel name="fr3_joint3_vel" joint="fr3_joint3" noise="0.001"/>
+    <jointvel name="fr3_joint4_vel" joint="fr3_joint4" noise="0.001"/>
+    <jointvel name="fr3_joint5_vel" joint="fr3_joint5" noise="0.001"/>
+    <jointvel name="fr3_joint6_vel" joint="fr3_joint6" noise="0.001"/>
+    <jointvel name="fr3_joint7_vel" joint="fr3_joint7" noise="0.001"/>
+
+    <actuatorfrc name="lj1_frc" actuator="lj1"/>
+    <actuatorfrc name="lj2_frc" actuator="lj2"/>
+    <actuatorfrc name="lj3_frc" actuator="lj3"/>
+    <actuatorfrc name="lj4_frc" actuator="lj4"/>
+    <actuatorfrc name="lj5_frc" actuator="lj5"/>
+    <actuatorfrc name="lj6_frc" actuator="lj6"/>
+    <actuatorfrc name="lj7_frc" actuator="lj7"/>
   </sensor>
 
 </mujoco>

@@ -48,7 +48,7 @@
     <camera name="overhead_cam" focal="1.93e-3 1.93e-3" resolution="1280 720" sensorsize="3896e-6 2140e-6" pos="-1.5 0 2" euler="0 -1 -1.57079" />
 
     <!-- Dual FR3 robots positioned for dual-arm teleoperation -->
-    <body name="tf1" pos="-0.25 0.4 0.75">
+    <body name="tf2" pos="-0.25 0.4 0.75">
       <replicate count="2" offset="0 -0.8 0" sep="_">
         <include file="../../../3.robot_arm/20.fr3/mjcf/fr3_links.xml" />
       </replicate>

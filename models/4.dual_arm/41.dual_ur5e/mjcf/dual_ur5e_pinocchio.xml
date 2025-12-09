@@ -39,29 +39,29 @@
     <body name="dual_base">
       <inertial pos="0 0 0" mass="0.001" diaginertia="0.001 0.001 0.001" />
 
-      <!-- Left Arm -->
-      <light name="spotlight_left" mode="targetbodycom" target="wrist_2_link_left" pos="0 -1 2" />
-      <body name="base_left" pos="0 0.4 0" childclass="ur5e">
+      <!-- Arm 0 -->
+      <light name="spotlight_0" mode="targetbodycom" target="wrist_2_link_0" pos="0 -1 2" />
+      <body name="base_0" pos="0 0.4 0" childclass="ur5e">
         <inertial mass="4.0" pos="0 0 0" diaginertia="0.00443333156 0.00443333156 0.0072" />
-        <body name="shoulder_link_left" pos="0 0 0.163">
+        <body name="shoulder_link_0" pos="0 0 0.163">
           <inertial mass="3.7" pos="0 0 0" diaginertia="0.0102675 0.0102675 0.00666" />
-          <joint name="shoulder_pan_joint_left" class="size3" axis="0 0 1" />
-          <body name="upper_arm_link_left" pos="0 0.138 0" quat="1 0 1 0">
+          <joint name="shoulder_pan_joint_0" class="size3" axis="0 0 1" />
+          <body name="upper_arm_link_0" pos="0 0.138 0" quat="1 0 1 0">
             <inertial mass="8.393" pos="0 0 0.2125" diaginertia="0.133886 0.133886 0.0151074" />
-            <joint name="shoulder_lift_joint_left" class="size3" />
-            <body name="forearm_link_left" pos="0 -0.131 0.425">
+            <joint name="shoulder_lift_joint_0" class="size3" />
+            <body name="forearm_link_0" pos="0 -0.131 0.425">
               <inertial mass="2.275" pos="0 0 0.196" diaginertia="0.0311796 0.0311796 0.004095" />
-              <joint name="elbow_joint_left" class="size3_limited" />
-              <body name="wrist_1_link_left" pos="0 0 0.392" quat="1 0 1 0">
+              <joint name="elbow_joint_0" class="size3_limited" />
+              <body name="wrist_1_link_0" pos="0 0 0.392" quat="1 0 1 0">
                 <inertial mass="1.219" pos="0 0.127 0" diaginertia="0.0025599 0.0025599 0.0021942" />
-                <joint name="wrist_1_joint_left" class="size1" />
-                <body name="wrist_2_link_left" pos="0 0.127 0">
+                <joint name="wrist_1_joint_0" class="size1" />
+                <body name="wrist_2_link_0" pos="0 0.127 0">
                   <inertial mass="1.219" pos="0 0 0.1" diaginertia="0.0025599 0.0025599 0.0021942" />
-                  <joint name="wrist_2_joint_left" axis="0 0 1" class="size1" />
-                  <body name="wrist_3_link_left" pos="0 0 0.1">
+                  <joint name="wrist_2_joint_0" axis="0 0 1" class="size1" />
+                  <body name="wrist_3_link_0" pos="0 0 0.1">
                     <inertial mass="0.1889" pos="0 0.0771683 0" quat="1 0 0 1" diaginertia="0.000132134 9.90863e-05 9.90863e-05" />
-                    <joint name="wrist_3_joint_left" class="size1" />
-                    <site name="EE_left" pos="0 0.25 0" euler="1.57079 0 -1.57079" size="0.01" />
+                    <joint name="wrist_3_joint_0" class="size1" />
+                    <site name="EE_0" pos="0 0.25 0" euler="1.57079 0 -1.57079" size="0.01" />
                   </body>
                 </body>
               </body>
@@ -70,29 +70,29 @@
         </body>
       </body>
 
-      <!-- Right Arm -->
-      <light name="spotlight_right" mode="targetbodycom" target="wrist_2_link_right" pos="0 -1 2" />
-      <body name="base_right" pos="0 -0.4 0" childclass="ur5e">
+      <!-- Arm 1 -->
+      <light name="spotlight_1" mode="targetbodycom" target="wrist_2_link_1" pos="0 -1 2" />
+      <body name="base_1" pos="0 -0.4 0" childclass="ur5e">
         <inertial mass="4.0" pos="0 0 0" diaginertia="0.00443333156 0.00443333156 0.0072" />
-        <body name="shoulder_link_right" pos="0 0 0.163">
+        <body name="shoulder_link_1" pos="0 0 0.163">
           <inertial mass="3.7" pos="0 0 0" diaginertia="0.0102675 0.0102675 0.00666" />
-          <joint name="shoulder_pan_joint_right" class="size3" axis="0 0 1" />
-          <body name="upper_arm_link_right" pos="0 0.138 0" quat="1 0 1 0">
+          <joint name="shoulder_pan_joint_1" class="size3" axis="0 0 1" />
+          <body name="upper_arm_link_1" pos="0 0.138 0" quat="1 0 1 0">
             <inertial mass="8.393" pos="0 0 0.2125" diaginertia="0.133886 0.133886 0.0151074" />
-            <joint name="shoulder_lift_joint_right" class="size3" />
-            <body name="forearm_link_right" pos="0 -0.131 0.425">
+            <joint name="shoulder_lift_joint_1" class="size3" />
+            <body name="forearm_link_1" pos="0 -0.131 0.425">
               <inertial mass="2.275" pos="0 0 0.196" diaginertia="0.0311796 0.0311796 0.004095" />
-              <joint name="elbow_joint_right" class="size3_limited" />
-              <body name="wrist_1_link_right" pos="0 0 0.392" quat="1 0 1 0">
+              <joint name="elbow_joint_1" class="size3_limited" />
+              <body name="wrist_1_link_1" pos="0 0 0.392" quat="1 0 1 0">
                 <inertial mass="1.219" pos="0 0.127 0" diaginertia="0.0025599 0.0025599 0.0021942" />
-                <joint name="wrist_1_joint_right" class="size1" />
-                <body name="wrist_2_link_right" pos="0 0.127 0">
+                <joint name="wrist_1_joint_1" class="size1" />
+                <body name="wrist_2_link_1" pos="0 0.127 0">
                   <inertial mass="1.219" pos="0 0 0.1" diaginertia="0.0025599 0.0025599 0.0021942" />
-                  <joint name="wrist_2_joint_right" axis="0 0 1" class="size1" />
-                  <body name="wrist_3_link_right" pos="0 0 0.1">
+                  <joint name="wrist_2_joint_1" axis="0 0 1" class="size1" />
+                  <body name="wrist_3_link_1" pos="0 0 0.1">
                     <inertial mass="0.1889" pos="0 0.0771683 0" quat="1 0 0 1" diaginertia="0.000132134 9.90863e-05 9.90863e-05" />
-                    <joint name="wrist_3_joint_right" class="size1" />
-                    <site name="EE_right" pos="0 0.25 0" euler="1.57079 0 -1.57079" size="0.01" />
+                    <joint name="wrist_3_joint_1" class="size1" />
+                    <site name="EE_1" pos="0 0.25 0" euler="1.57079 0 -1.57079" size="0.01" />
                   </body>
                 </body>
               </body>
@@ -104,21 +104,21 @@
   </worldbody>
 
   <actuator>
-    <!-- Left Arm Actuators -->
-    <general class="size3" name="shoulder_pan_left" joint="shoulder_pan_joint_left" />
-    <general class="size3" name="shoulder_lift_left" joint="shoulder_lift_joint_left" />
-    <general class="size3_limited" name="elbow_left" joint="elbow_joint_left" />
-    <general class="size1" name="wrist_1_left" joint="wrist_1_joint_left" />
-    <general class="size1" name="wrist_2_left" joint="wrist_2_joint_left" />
-    <general class="size1" name="wrist_3_left" joint="wrist_3_joint_left" />
+    <!-- Arm 0 Actuators -->
+    <general class="size3" name="shoulder_pan_0" joint="shoulder_pan_joint_0" />
+    <general class="size3" name="shoulder_lift_0" joint="shoulder_lift_joint_0" />
+    <general class="size3_limited" name="elbow_0" joint="elbow_joint_0" />
+    <general class="size1" name="wrist_1_0" joint="wrist_1_joint_0" />
+    <general class="size1" name="wrist_2_0" joint="wrist_2_joint_0" />
+    <general class="size1" name="wrist_3_0" joint="wrist_3_joint_0" />
 
-    <!-- Right Arm Actuators -->
-    <general class="size3" name="shoulder_pan_right" joint="shoulder_pan_joint_right" />
-    <general class="size3" name="shoulder_lift_right" joint="shoulder_lift_joint_right" />
-    <general class="size3_limited" name="elbow_right" joint="elbow_joint_right" />
-    <general class="size1" name="wrist_1_right" joint="wrist_1_joint_right" />
-    <general class="size1" name="wrist_2_right" joint="wrist_2_joint_right" />
-    <general class="size1" name="wrist_3_right" joint="wrist_3_joint_right" />
+    <!-- Arm 1 Actuators -->
+    <general class="size3" name="shoulder_pan_1" joint="shoulder_pan_joint_1" />
+    <general class="size3" name="shoulder_lift_1" joint="shoulder_lift_joint_1" />
+    <general class="size3_limited" name="elbow_1" joint="elbow_joint_1" />
+    <general class="size1" name="wrist_1_1" joint="wrist_1_joint_1" />
+    <general class="size1" name="wrist_2_1" joint="wrist_2_joint_1" />
+    <general class="size1" name="wrist_3_1" joint="wrist_3_joint_1" />
   </actuator>
 
   <keyframe>
