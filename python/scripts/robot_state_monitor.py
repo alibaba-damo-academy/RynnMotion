@@ -3,11 +3,9 @@ import sys
 import argparse
 
 import cv2
-import numpy as np
 import time
 import yaml
-from collections import deque
-from threading import Thread, Lock
+from threading import Thread
 import lcm
 from RynnMotion.manager.robot_manager import RobotManager
 from RynnMotion.common.lcm.lcmMotion.robot_observation import robot_observation
@@ -47,13 +45,7 @@ class RobotStateMonitor:
                 config = yaml.safe_load(f)
             return config
         except FileNotFoundError:
-            (
-                print(f"Config file {config_path} not found, using defaults")
-                if hasattr(self, "logger")
-                else print(
-                    f"Warning: Config file {config_path} not found, using defaults"
-                )
-            )
+            (print(f"Config file {config_path} not found, using defaults") if hasattr(self, "logger") else print(f"Warning: Config file {config_path} not found, using defaults"))
             return {}
 
     def init_robotmodel(self):
@@ -81,12 +73,8 @@ class RobotStateMonitor:
         """Initialize LCM connection and subscribe to channels."""
         try:
             self.lcm_instance = lcm.LCM()
-            self.lcm_instance.subscribe(
-                "robot_state_monitor/robot_state", self.handle_lcm_robot_state
-            )
-            self.lcm_instance.subscribe(
-                "robot_state_monitor/robot_action", self.handle_lcm_robot_action
-            )
+            self.lcm_instance.subscribe("robot_state_monitor/robot_state", self.handle_lcm_robot_state)
+            self.lcm_instance.subscribe("robot_state_monitor/robot_action", self.handle_lcm_robot_action)
             print(f"robot monitor setup successful!")
         except Exception as e:
             print(f"robot monitor setup failed: {e}")

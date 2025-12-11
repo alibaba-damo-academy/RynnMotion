@@ -1,0 +1,68 @@
+<mujoco model="openarm_links">
+  <body name="base" childclass="openarm">
+    <geom type="cylinder" size="0.002 0.06" rgba="1 0 0 1" pos="0.06 0.0 0.0" euler="0 1.57079 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.06" rgba="0 1 0 1" pos="0.0 0.06 0.0" euler="1.57079 0 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.06" rgba="0 0 1 1" pos="0.0 0.0 0.06" euler="0 0 0" class="visual" />
+
+    <inertial pos="0.0030905 -0.00024462 0.029293" mass="1.3011" fullinertia="0.002694 0.002574 0.002166 0 0 0" />
+    <geom type="mesh" name="link0_visual" class="visual" mesh="link0_visual" material="link0_material" />
+
+    <body name="link1" pos="0 0 0.0625">
+      <inertial pos="0.00114677 -3.31999e-05 0.0539528" quat="0.999653 0.00178277 0.0262159 -0.0018256" mass="1.14167" diaginertia="0.00156853 0.001273 0.00101447"/>
+      <joint name="joint1" pos="0 0 0" axis="0 0 1" type="hinge" range="-3.49066 1.39626" class="dm8009"/>
+      <geom type="mesh" name="link1_visual" class="visual" mesh="link1_visual" pos="0 0 -0.0625" material="link1_material" />
+
+      <body name="link2" pos="-0.0301 0 0.06">
+        <inertial pos="0.00839629 2.01451e-08 0.0325665" quat="0.966167 0.00423301 0.257864 0.00305037" mass="0.277509" diaginertia="0.000421651 0.000376006 0.000169343"/>
+        <joint name="joint2" pos="0 0 0" axis="-1 0 0" type="hinge" range="-1.74533 1.74533" class="dm8009"/>
+        <geom type="mesh" name="link2_visual" class="visual" mesh="link2_visual" pos="0.0301 0 -0.1225" material="link2_material" />
+        
+        <body name="link3" pos="0.0301 0 0.06625">
+          <inertial pos="-0.00210475 -0.000554909 0.0904747" quat="0.999951 -0.00493243 -0.00144148 0.00846755" mass="1.07386" diaginertia="0.00437205 0.00431934 0.000660613"/>
+          <joint name="joint3" pos="0 0 0" axis="0 0 1" type="hinge" range="-1.5708 1.5708" class="dm4340"/>
+          <geom type="mesh" name="link3_visual" class="visual" mesh="link3_visual" pos="0 0 -0.18875" quat="1 0 0 0" material="link3_material" />
+
+          <body name="link4" pos="0 0.0315 0.15375">
+            <inertial pos="-0.00290068 -0.0303058 0.0633964" quat="0.994282 0.0996876 0.0329726 -0.0194356" mass="0.634853" diaginertia="0.000624355 0.000518596 0.000325049"/>
+            <joint name="joint4" pos="0 0 0" axis="0 1 0" type="hinge" range="0 2.44346" class="dm4340" />
+            <geom type="mesh" name="link4_visual" class="visual" mesh="link4_visual" pos="0 -0.0315 -0.3425" material="link4_material" />
+
+            <body name="link5" pos="0 -0.0315 0.0955">
+              <inertial pos="-0.00304967 -0.00088669 0.0430798" quat="0.583368 -0.0362076 0.0020034 0.811398" mass="0.615659" diaginertia="0.000448064 0.000420549 0.000323387"/>
+              <joint name="joint5" pos="0 0 0" axis="0 0 1" type="hinge" range="-1.5708 1.5708" class="dm4310" />
+              <geom type="mesh" name="link5_visual" class="visual" mesh="link5_visual" pos="0 0 -0.438" quat="1 0 0 0" material="link5_material" />
+
+              <body name="link6" pos="0.0375 0 0.1205">
+                <inertial pos="-0.0371366 -0.000332305 -9.49837e-05" quat="0.162305 0.716462 0.124543 0.666955" mass="0.475203" diaginertia="0.000159518 0.000156606 0.000142875"/>
+                <joint name="joint6" pos="0 0 0" axis="1 0 0" type="hinge" range="-0.785398 0.785398" class="dm4310" />
+                <geom type="mesh" name="link6_visual" class="visual" mesh="link6_visual" pos="-0.0375 0 -0.5585" quat="1 0 0 0" material="link6_material" />
+
+                <body name="link7" pos="-0.0375 0 0">
+                  <site name="EE" size="0.005" pos="0.0 0.0 0.19" rgba="0.9 0 0 1" />
+                  <inertial pos="0.000225407 -0.0493083 0.0527505" quat="0.562309 0.826922 -0.00037379 0.00302762" mass="0.815977" diaginertia="0.00265078 0.00228138 0.000591786"/>
+                  <joint name="joint7" pos="0 0 0" axis="0 -1 0" type="hinge" range="-1.5708 1.5708" class="dm4310" />
+                  <geom type="mesh" name="link7_visual" class="visual" mesh="link7_visual" pos="0 0 -0.5585" material="link7_material" />
+                  <geom type="mesh" name="hand_visual" class="visual" mesh="hand" pos="0 0 -0.5584" quat="1 0 0 0" material="hand_material" />
+                  <geom type="mesh" name="hand_collision" class="collision" mesh="hand" pos="0 0 -0.5584" quat="1 0 0 0" material="hand_material" />
+
+                  <body name="left_finger" pos="0 0.006 0.1151">
+                    <inertial pos="0.0064528 0.01702 0.0219685" quat="0.923117 0.0155444 -0.0375274 0.382368" mass="0.0360255" diaginertia="2.48652e-06 2.275e-06 7.38483e-07"/>
+                    <joint name="left_finger_joint" pos="0 0 0" axis="0 1 0" type="slide" range="0 0.044" actuatorfrcrange="-100 100" class="finger_slide" />
+                    <geom type="mesh" pos="0 -0.05 -0.673001" quat="1 0 0 0" mesh="finger" class="visual" material="finger_material" />
+                    <geom type="mesh" pos="0 -0.05 -0.673001" quat="1 0 0 0" mesh="finger" class="collision" />
+                  </body>
+                  <body name="right_finger" pos="0 -0.006 0.1151">
+                    <inertial pos="0.0064528 -0.01702 0.0219685" quat="0.923117 0.0155444 -0.0375274 0.382368" mass="0.0360255" diaginertia="2.48652e-06 2.275e-06 7.38483e-07"/>
+                    <joint name="right_finger_joint" pos="0 0 0" axis="0 -1 0" type="slide" range="0 0.044" actuatorfrcrange="-100 100" class="finger_slide" />
+                    <geom type="mesh" pos="0 0.05 -0.673001" quat="1 0 0 0" mesh="finger1" class="visual" material="finger_material" />
+                    <geom type="mesh" pos="0 0.05 -0.673001" quat="1 0 0 0" mesh="finger1" class="collision" />
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </body>
+</mujoco>

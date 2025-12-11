@@ -17,7 +17,9 @@ from RynnMotion.common.data.robot_state import RobotState
 
 
 @register_generator_factory_func("tg_ruckig")
-def generator_config_to_class(generator_config: dict, robot_model, communicator=None, logger=None):
+def generator_config_to_class(
+    generator_config: dict, robot_model, communicator=None, logger=None
+):
     """
     Maps algo config to the CQL algo class to instantiate, along with additional algo kwargs.
 
@@ -102,21 +104,29 @@ class RTInterpolateGenerator(TrajectoryGeneratorBase):
         if self.signal_trajectory.workmode == 0:
             num_joint = self.signal_trajectory.trajectory[self.traj_index].num_joint
             if num_joint != self.act_dofs:
-                self.current_joint_command = self.signal_trajectory.trajectory[self.traj_index].joint_pos
+                self.current_joint_command = self.signal_trajectory.trajectory[
+                    self.traj_index
+                ].joint_pos
             else:
-                raise ValueError(f"rt trajgen joint number is {num_joint}, not equal to model act dofs {self.act_dofs}")
+                raise ValueError(
+                    f"rt trajgen joint number is {num_joint}, not equal to model act dofs {self.act_dofs}"
+                )
         elif self.signal_trajectory.workmode == 1:
             num_ee = self.signal_trajectory.trajectory[self.traj_index].num_ee
             if num_ee != self.ee_num:
-                cartesian_pose = self.signal_trajectory.trajectory[self.traj_index].ee_pose
+                cartesian_pose = self.signal_trajectory.trajectory[
+                    self.traj_index
+                ].ee_pose
 
             else:
-                raise ValueError(f"rt trajgen end-effector number is {num_ee}, not equal to model ee_num {self.ee_num}")
+                raise ValueError(
+                    f"rt trajgen end-effector number is {num_ee}, not equal to model ee_num {self.ee_num}"
+                )
 
-    def process_input_command(self, path_point=None):
+    def process_input_command(self, latest_command, new_command_flag):
         """Get signal command."""
-        latest_command, new_command = self.communicator.process_subscribe_command()
-        if not new_command:
+        # latest_command, new_command = self.communicator.process_subscribe_command()
+        if not new_command_flag:
             return
 
         """reset input command state to reflesh new input command."""
@@ -143,7 +153,9 @@ class RTInterpolateGenerator(TrajectoryGeneratorBase):
         )
         self.robot_command.joint_pos = robot_state.joint_pos
         self.robot_connected = True
-        self.logger.info(f"trajectory module get init joint position: {self.current_joint_command}")
+        self.logger.info(
+            f"trajectory module get init joint position: {self.current_joint_command}"
+        )
 
     def update_trajectory(self):
         """
@@ -158,11 +170,16 @@ class RTInterpolateGenerator(TrajectoryGeneratorBase):
         if not self.communicator_connected:
             return self.robot_command, True
 
-        lowloop_count = self.current_action_count * self.command_traj_freq / self.controller_freq
+        lowloop_count = (
+            self.current_action_count * self.command_traj_freq / self.controller_freq
+        )
         traj_index = min(self.signal_chunk_size - 1, max(0, math.floor(lowloop_count)))
         if traj_index != self.traj_index:
             self.traj_index = traj_index
-            self.current_joint_command = self.signal_trajectory.trajectory[self.traj_index].joint_pos
+
+            self.current_joint_command = self.signal_trajectory.trajectory[
+                self.traj_index
+            ].joint_pos
             self.rt_trajgen.set_input_target(np.array(self.current_joint_command))
 
             if traj_index == self.signal_chunk_size - 1:

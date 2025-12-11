@@ -1,0 +1,124 @@
+<mujoco model="openarm">
+  <compiler angle="radian" />
+
+  <default>
+    <default class="openarm">
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" />
+      </default>
+      <default class="collision">
+        <geom group="3" />
+        <default class="finger_collision">
+          <geom type="box" solimp="0 1 0.001 0.02 3" solref="0.001 1" friction="2 0.05 0.05" />
+        </default>
+      </default>
+    </default>
+    <default class="dm8009">
+      <geom contype="0" conaffinity="0"/>
+      <joint damping="0.60" frictionloss="0.052" armature="0.028"/>
+      <position kp="50" dampratio="1"/>
+    </default>
+    <default class="dm4340">
+      <geom contype="0" conaffinity="0"/>
+      <joint damping="0.60" frictionloss="0.052" armature="0.028"/>
+      <position kp="50" dampratio="1"/>
+    </default>
+    <default class="dm4310">
+      <geom contype="0" conaffinity="0"/>
+      <joint damping="0.60" frictionloss="0.052" armature="0.028"/>
+      <position kp="50" dampratio="1"/>
+    </default>
+    <default class="finger_actuator">
+      <position ctrlrange="0 0.05" />
+    </default>
+    <default class="finger_slide">
+      <joint type="slide" stiffness="100" damping="10.1" range="0 0.05" />
+    </default>
+  </default>
+
+  <worldbody>
+  <body name="base" childclass="openarm">
+    <geom type="cylinder" size="0.002 0.06" rgba="1 0 0 1" pos="0.06 0.0 0.0" euler="0 1.57079 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.06" rgba="0 1 0 1" pos="0.0 0.06 0.0" euler="1.57079 0 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.06" rgba="0 0 1 1" pos="0.0 0.0 0.06" euler="0 0 0" class="visual" />
+
+    <inertial pos="0.0030905 -0.00024462 0.029293" mass="1.3011" fullinertia="0.002694 0.002574 0.002166 0 0 0" />
+
+    <body name="link1" pos="0 0 0.0625">
+      <inertial pos="0.00114677 -3.31999e-05 0.0539528" quat="0.999653 0.00178277 0.0262159 -0.0018256" mass="1.14167" diaginertia="0.00156853 0.001273 0.00101447"/>
+      <joint name="joint1" pos="0 0 0" axis="0 0 1" type="hinge" range="-3.49066 1.39626" class="dm8009"/>
+
+      <body name="link2" pos="-0.0301 0 0.06">
+        <inertial pos="0.00839629 2.01451e-08 0.0325665" quat="0.966167 0.00423301 0.257864 0.00305037" mass="0.277509" diaginertia="0.000421651 0.000376006 0.000169343"/>
+        <joint name="joint2" pos="0 0 0" axis="-1 0 0" type="hinge" range="-1.74533 1.74533" class="dm8009"/>
+        
+        <body name="link3" pos="0.0301 0 0.06625">
+          <inertial pos="-0.00210475 -0.000554909 0.0904747" quat="0.999951 -0.00493243 -0.00144148 0.00846755" mass="1.07386" diaginertia="0.00437205 0.00431934 0.000660613"/>
+          <joint name="joint3" pos="0 0 0" axis="0 0 1" type="hinge" range="-1.5708 1.5708" class="dm4340"/>
+
+          <body name="link4" pos="0 0.0315 0.15375">
+            <inertial pos="-0.00290068 -0.0303058 0.0633964" quat="0.994282 0.0996876 0.0329726 -0.0194356" mass="0.634853" diaginertia="0.000624355 0.000518596 0.000325049"/>
+            <joint name="joint4" pos="0 0 0" axis="0 1 0" type="hinge" range="0 2.44346" class="dm4340" />
+
+            <body name="link5" pos="0 -0.0315 0.0955">
+              <inertial pos="-0.00304967 -0.00088669 0.0430798" quat="0.583368 -0.0362076 0.0020034 0.811398" mass="0.615659" diaginertia="0.000448064 0.000420549 0.000323387"/>
+              <joint name="joint5" pos="0 0 0" axis="0 0 1" type="hinge" range="-1.5708 1.5708" class="dm4310" />
+
+              <body name="link6" pos="0.0375 0 0.1205">
+                <inertial pos="-0.0371366 -0.000332305 -9.49837e-05" quat="0.162305 0.716462 0.124543 0.666955" mass="0.475203" diaginertia="0.000159518 0.000156606 0.000142875"/>
+                <joint name="joint6" pos="0 0 0" axis="1 0 0" type="hinge" range="-0.785398 0.785398" class="dm4310" />
+
+                <body name="link7" pos="-0.0375 0 0">
+                  <site name="EE" size="0.005" pos="0.0 0.0 0.19" rgba="0.9 0 0 1" />
+                  <geom type="cylinder" size="0.002 0.05" rgba="1 0 0 1" pos="0.05 -0.0 -0.1" euler="0 1.57079 0" class="visual" />
+                  <geom type="cylinder" size="0.002 0.05" rgba="0 1 0 1" pos="0 0.05 -0.1" euler="1.57079 0 0" class="visual" />
+                  <geom type="cylinder" size="0.002 0.05" rgba="0 0 1 1" pos="0 -0.0 -0.05" euler="0 0 0" class="visual" />
+                  <inertial pos="0.000225407 -0.0493083 0.0527505" quat="0.562309 0.826922 -0.00037379 0.00302762" mass="0.815977" diaginertia="0.00265078 0.00228138 0.000591786"/>
+                  <joint name="joint7" pos="0 0 0" axis="0 -1 0" type="hinge" range="-1.5708 1.5708" class="dm4310" />
+
+                  <body name="left_finger" pos="0 0.006 0.1151">
+                    <inertial pos="0.0064528 0.01702 0.0219685" quat="0.923117 0.0155444 -0.0375274 0.382368" mass="0.0360255" diaginertia="2.48652e-06 2.275e-06 7.38483e-07"/>
+                    <joint name="left_finger_joint" pos="0 0 0" axis="0 1 0" type="slide" range="0 0.044" actuatorfrcrange="-100 100" class="finger_slide" />
+
+                  </body>
+                  <body name="right_finger" pos="0 -0.006 0.1151">
+                    <inertial pos="0.0064528 -0.01702 0.0219685" quat="0.923117 0.0155444 -0.0375274 0.382368" mass="0.0360255" diaginertia="2.48652e-06 2.275e-06 7.38483e-07"/>
+                    <joint name="right_finger_joint" pos="0 0 0" axis="0 -1 0" type="slide" range="0 0.044" actuatorfrcrange="-100 100" class="finger_slide" />
+
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </body>
+  </worldbody>
+  
+  <tendon>
+    <fixed name="split">
+      <joint joint="right_finger_joint" coef="0.5" />
+      <joint joint="left_finger_joint" coef="0.5" />
+    </fixed>
+  </tendon>
+
+  <actuator>
+    <position name="joint1" joint="joint1" class="dm8009" kp="500" kv="30" forcerange="-40 40" ctrlrange="-3.49066 1.39626" />
+    <position name="joint2" joint="joint2" class="dm8009" kp="500" kv="30" forcerange="-40 40" ctrlrange="-1.74533 1.74533" />
+    <position name="joint3" joint="joint3" class="dm4340" kp="260" kv="20" forcerange="-27 27" ctrlrange="-1.5708 1.5708" />
+    <position name="joint4" joint="joint4" class="dm4340" kp="260" kv="20" forcerange="-27 27" ctrlrange="0 2.44346" />
+    <position name="joint5" joint="joint5" class="dm4310" kp="50" kv="1.5" forcerange="-7 7" ctrlrange="-1.5708 1.5708" />
+    <position name="joint6" joint="joint6" class="dm4310" kp="50" kv="1.5" forcerange="-7 7" ctrlrange="-0.785398 0.785398" />
+    <position name="joint7" joint="joint7" class="dm4310" kp="50" kv="1.5" forcerange="-7 7" ctrlrange="-1.5708 1.5708" />
+    <position name="gripper" tendon="split" class="finger_actuator" kp="2000" kv="50" ctrlrange="0 0.05" />
+  </actuator>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0 0 0" />
+    <key name="standby1" qpos="-3.4 1.57 1.57 0 1.57 0.78 1.57 0.05 0.05" ctrl="-3.4 1.57 1.57 0 1.57 0.78 1.57 0.05 0.05" />
+    <key name="standby2" qpos="0 1.57 -1.57 2.4 0 0 0 0 0" ctrl="0 1.57 -1.57 2.4 0 0 0 0 0" />
+    <key name="standby3" qpos="1.3 -1.57 -1.57 0 -1.57 -0.78 -1.57 0 0" ctrl="1.3 -1.57 -1.57 0 -1.57 -0.78 -1.57 0 0" />
+  </keyframe>
+
+</mujoco>

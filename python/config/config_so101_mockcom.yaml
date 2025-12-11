@@ -1,0 +1,33 @@
+logging:
+  log_dir: ~/RynnRcplog/robotMotion
+  log_file: robotMotion.log
+robotmodel:
+  robot_name: so101
+  robot_control_freq: 100
+  robot_mjcf: "../models/3.robot_arm/24.so101/scene/scene.xml"
+  pino_mjcf: "../models/3.robot_arm/24.so101/mjcf/so101_pinocchio.xml"
+  gripper_independent: true
+fsm:
+  fsm_type: "basic_fsm"
+communicator: 
+  type: "mock"
+  default_chunk: 20
+  command_traj_freq: 10
+  mock_config: 
+    mock_home_position: [0.0, 0, 0, 0, 0, 0.5]
+    mock_amplitude: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
+    mock_frequency: 0.1
+    block_time: 0.0
+trajgen:
+  trajmodule: "tg_ruckig"
+  generator: 
+    joint_limit_lower: [ -2.7437, -1.5837, -1.58, -1.57, -2.8065, -1.0]
+    joint_limit_upper: [ 2.7437 ,  1.5837,  1.58, 1.57,  2.8065, 1.0]
+    joint_vel_limit: [ 6.28, 6.28, 6.28, 6.28, 6.28, 10.0 ]
+    joint_acc_limit: [ 62.8, 62.8, 62.8, 62.8, 62.8, 100.0 ]
+    joint_jerk_limit: [ 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 10000.0 ]
+    vel_limit_ratio: 0.5
+robotinterface:
+  robot_type: "mujoco"
+  controller:
+    mode: "pd"

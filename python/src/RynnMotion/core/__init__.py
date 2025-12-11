@@ -31,17 +31,19 @@ Example:
 
 __version__ = "1.0.0"
 
-from RynnMotion.core.robotinterface_base import (
+from RynnMotion.core.interface_base import (
     register_robotinterface_factory_func,
     robotinterface_factory,
     RobotInterfaceBase,
 )
 
-from RynnMotion.core.mjrobot_interface import MujocoRobotInterface
+from RynnMotion.core.mj_interface import MujocoRobotInterface
+from RynnMotion.core.base_controller import ControllerBase
 
 __all__ = [
     "RobotInterfaceBase",
     "MujocoRobotInterface",
+    "ControllerBase",
     "register_robotinterface_factory_func",
     "robotinterface_factory",
 ]

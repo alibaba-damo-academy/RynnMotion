@@ -122,7 +122,7 @@ class SimMotionGenerator(TrajectoryGeneratorBase):
                 self.durtime,
             )
 
-    def process_input_command(self, path_point=None):
+    def process_input_command(self, latest_command, new_command_flag):
         """
         input command is from simulation motion, communicator is always connected
         """
@@ -153,11 +153,13 @@ class SimMotionGenerator(TrajectoryGeneratorBase):
         Returns:
             traj_point
         """
+        complete = False
         if not self.robot_connected:
             return None, True
         if self.signal_time < self.durtime:
             self.move_to_home_position(self.signal_time)
         else:
+            complete = True
             t_s = self.signal_time - self.durtime
             if self.signal_type == "sine":
                 self.generate_sine_trajectory_point(t_s)
@@ -166,4 +168,4 @@ class SimMotionGenerator(TrajectoryGeneratorBase):
             elif self.signal_type == "triangle":
                 self.generate_triangle_trajectory_point(t_s)
         self.signal_time = self.signal_time + self.update_dt
-        return self.robot_command, True
+        return self.robot_command, complete

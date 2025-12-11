@@ -77,11 +77,9 @@ class LCMCommunicator(CommunicatorBase):
         self.lcm_timeout = 0  # milliseconds
 
         self.last_command_time = time.time()
-        self.has_received_command = False
         self.act_status_index = 0
         self.stateID_index = 0
         self.substateID_index = 0
-        self.connected = False
 
         self.act_status_cycle = [
             state_feedback.kIdle,
@@ -139,13 +137,15 @@ class LCMCommunicator(CommunicatorBase):
             self.logger.info("First LCM message received!")
 
         lcm_time = float(msg.utime - self.first_timestamp) * 1e-6
-        self.logger.info(f"ACT #{msg.seq}, chunks: {msg.chunkSize}, " f"joints: {msg.numJoint}, time: {lcm_time:.3f}s")
+        self.logger.info(
+            f"ACT #{msg.seq}, chunks: {msg.chunkSize}, "
+            f"joints: {msg.numJoint}, time: {lcm_time:.3f}s"
+        )
 
         with self.command_lock:
             self.current_ACT_command = msg
             self.ACT_command_received = True
             self.last_command_time = time.time()
-            self.has_received_command = True
 
     def handle_requests(self, channel, data):
         """Handle feedback request messages."""
@@ -172,7 +172,9 @@ class LCMCommunicator(CommunicatorBase):
 
         msg.act_status_type = self.act_status_cycle[self.act_status_index]
         msg.stateID = self.stateID_cycle[self.stateID_index % len(self.stateID_cycle)]
-        msg.substateID = self.substateID_cycle[self.substateID_index % len(self.substateID_cycle)]
+        msg.substateID = self.substateID_cycle[
+            self.substateID_index % len(self.substateID_cycle)
+        ]
 
         self.stateID_index += 1
         self.substateID_index += 1
@@ -197,7 +199,7 @@ class LCMCommunicator(CommunicatorBase):
         msg.state_msg = state_messages.get(msg.stateID, "Current state unknown")
 
         self.lcm_instance.publish("state_feedback", msg.encode())
-        self.logger.info(f"Sent state feedback #{msg.seq}")
+        # self.logger.info(f"Sent state feedback #{msg.seq}")
 
     def publish_robot_feedback(self, robot_state):
         """
@@ -294,8 +296,16 @@ class LCMCommunicator(CommunicatorBase):
                     pend = pstart + 3
                     qstart = i * (num_ee * 4) + k * 4
                     qend = qstart + 4
-                    pos_slice = new_chunk.eePos[pstart:pend] if len(new_chunk.eePos) >= pend else []
-                    quat_slice = new_chunk.eeQuat[qstart:qend] if len(new_chunk.eeQuat) >= qend else []
+                    pos_slice = (
+                        new_chunk.eePos[pstart:pend]
+                        if len(new_chunk.eePos) >= pend
+                        else []
+                    )
+                    quat_slice = (
+                        new_chunk.eeQuat[qstart:qend]
+                        if len(new_chunk.eeQuat) >= qend
+                        else []
+                    )
                     # fallback to zeros/default if missing
                     if len(pos_slice) != 3:
                         pos_slice = [0.0, 0.0, 0.0]
@@ -310,9 +320,12 @@ class LCMCommunicator(CommunicatorBase):
         new_command = False
         if self.lcm_instance:
             self.lcm_instance.handle_timeout(self.lcm_timeout)
+            if not self.ACT_command_received:
+                return None, new_command
             if self.seq != self.current_ACT_command.seq:
                 self._process_trajectory()
                 new_command = True
+                self.ACT_command_received = False
         return self.robot_command, new_command
 
     def process_publish_robot_state(self, robot_state):
@@ -333,3 +346,9 @@ class LCMCommunicator(CommunicatorBase):
         if trajgen_state:
             self.act_status_index = state_feedback.kSuccess
             self.publish_state_feedback()
+
+    def process_task_command(self):
+        """Process task command from LCM."""
+        if self.gohome_requested:
+            return "go_standby"
+        return "run"

@@ -63,6 +63,8 @@ class CommunicatorBase(ABC):
     def __init__(self, robot_model: RobotManager, communicator_config, logger):
         self.logger = logger or logging.getLogger(__name__)
 
+        self.connected = False
+
         self.robot_model = robot_model
         self.robot_control_freq = robot_model.get_robot_control_freq()
         self.control_dt = 1.0 / self.robot_control_freq
@@ -118,5 +120,14 @@ class CommunicatorBase(ABC):
         pass
 
     @abstractmethod
+    def process_task_command(self):
+        """Process task command."""
+        pass
+
+    @abstractmethod
     def disconnect(self) -> None:
         pass
+
+    def is_connected(self) -> bool:
+        """Check if communicator is connected."""
+        return self.connected

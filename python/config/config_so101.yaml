@@ -2,13 +2,16 @@ logging:
   log_dir: ~/RynnRcplog/robotMotion
   log_file: robotMotion.log
 robot_monitor:
-  enable_joint_pos: false
-  enable_ee_pose: false
+  enable_joint_pos: true
+  enable_ee_pose: true
 robotmodel:
   robot_name: so101
   robot_control_freq: 100
   robot_mjcf: "../models/3.robot_arm/24.so101/scene/scene.xml"
   pino_mjcf: "../models/3.robot_arm/24.so101/mjcf/so101_pinocchio.xml"
+  gripper_independent: true
+fsm:
+  fsm_type: "basic_fsm"
 communicator: 
   type: "lcm"
 trajgen:

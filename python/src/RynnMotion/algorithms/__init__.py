@@ -6,16 +6,36 @@ Contains:
 - OSCtrl: Operational Space controller for SE3 pose tracking
 - DiffIKQP: Differential IK solver using quadratic programming
 - PinKine: Forward kinematics and Jacobian computation
+- Transform: SE3 rigid body transformation
+- FrameTransformer: Multi-frame coordinate transform manager
 """
 
 from .pose_mapper import PoseMapper
 from .osc import OSCtrl
 from .diff_ik import DiffIKQP
 from .pin_kine import PinKine
+from .orient import (
+    Transform,
+    FrameTransformer,
+    pos_quat_to_matrix,
+    matrix_to_pos_quat,
+    quat_xyzw_to_wxyz,
+    quat_wxyz_to_xyzw,
+    invert_transform,
+    compose_transforms,
+)
 
 __all__ = [
     'PoseMapper',
     'OSCtrl',
     'DiffIKQP',
     'PinKine',
+    'Transform',
+    'FrameTransformer',
+    'pos_quat_to_matrix',
+    'matrix_to_pos_quat',
+    'quat_xyzw_to_wxyz',
+    'quat_wxyz_to_xyzw',
+    'invert_transform',
+    'compose_transforms',
 ]

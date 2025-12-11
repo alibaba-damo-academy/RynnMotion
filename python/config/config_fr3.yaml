@@ -9,6 +9,9 @@ robotmodel:
   robot_control_freq: 100
   robot_mjcf: "../models/3.robot_arm/20.fr3/scene/scene.xml"
   pino_mjcf: "../models/3.robot_arm/20.fr3/mjcf/fr3_pinocchio.xml"
+  gripper_independent: true
+fsm:
+  fsm_type: "basic_fsm"
 communicator: 
   type: "lcm"
 trajgen:

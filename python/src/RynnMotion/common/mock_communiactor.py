@@ -67,6 +67,7 @@ class MockCommunicator(CommunicatorBase):
         self.signal_amplitude = self.mock_config.get("mock_amplitude", None)
         self.signal_frequency = self.mock_config.get("mock_frequency", 0)
         self.block_time = self.mock_config.get("block_time", 0.1)
+        self.durtime = self.mock_config.get("durtime", 3.0)
 
         self.logger.info(f"mock signal home position: {self.home_position}")
         self.logger.info(f"amplitude: {self.signal_amplitude}")
@@ -80,6 +81,7 @@ class MockCommunicator(CommunicatorBase):
         self.gen_command_time = (
             self.command_step_dt * self.default_chunk + self.block_time
         )
+        self.mock_run_time = 0.0
 
     def generate_commands(self):
         """generate simulation trajectory."""
@@ -114,6 +116,8 @@ class MockCommunicator(CommunicatorBase):
     def process_subscribe_command(self):
         """update signal, update every loop and it will count in inner loop."""
         new_command = False
+        if self.mock_run_time <= self.durtime:
+            return None, new_command
 
         if self.control_loop_time >= self.gen_command_time:
             self.control_loop_time = 0
@@ -128,3 +132,10 @@ class MockCommunicator(CommunicatorBase):
     def process_publish_robot_state(self, robot_state):
         """Handle communicator feedback publishing."""
         pass
+
+    def process_task_command(self):
+        self.mock_run_time = self.mock_run_time + self.control_dt
+        if self.mock_run_time <= self.durtime:
+            return "go_standby"
+        else:
+            return "run"

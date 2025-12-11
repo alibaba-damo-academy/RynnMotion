@@ -81,6 +81,8 @@ class TrajectoryGeneratorBase(object):
         self.ee_num = self.robot_model.get_ee_num()
         self.robot_command.num_end_effectors = self.ee_num
 
+        self.robot_feedback = RobotState()
+
         self.logger.info("trajectory generator build successful")
         self.logger.info(f"act dofs: {self.act_dofs}")
 
@@ -104,13 +106,23 @@ class TrajectoryGeneratorBase(object):
         self.robot_model = robot_model
 
     @abstractmethod
-    def process_input_command(self, path_point=None):
+    def process_input_command(self, latest_command, new_command_flag):
         """
         process communicator input command
 
-        path_point: path point to set if use thid module in one process.
+        latest_command: path point to set if use thid module in one process.
+        new_command_flag: True if command is newest.
         """
         pass
+
+    def process_robot_state(self, robot_state: RobotState):
+        """
+        process robot state feedback.
+
+        set robot state.
+        use this function to get robot state feedback if trajectory generator is based on periodic feedback.
+        """
+        self.robot_feedback = robot_state.copy()
 
     @abstractmethod
     def reset_trajectory_state(self, robot_state: RobotState):
@@ -118,6 +130,7 @@ class TrajectoryGeneratorBase(object):
         process robot state feedback.
 
         prepare trajectory: set robot state.
+        reset once if trajectory generator need initial feedback.
         """
         pass
 
@@ -131,3 +144,10 @@ class TrajectoryGeneratorBase(object):
         """
         self.complete = True
         return self.robot_command, self.complete
+
+    @abstractmethod
+    def get_trajectory_command_without_update(self):
+        """
+        get trajectory input command.
+        """
+        return self.robot_command.copy()

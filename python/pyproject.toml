@@ -49,6 +49,7 @@ full = ["draccus>=0.10.0"]
 dev = ["build>=0.10.0", "wheel>=0.38.0", "twine>=4.0.0", "pytest>=7.0.0"]
 
 [project.urls]
+# Homepage = "https://github.com/your-org/rynnmotion"
 Repository = "https://github.com/alibaba-damo-academy/RynnMotion"
 
 [tool.setuptools.packages.find]

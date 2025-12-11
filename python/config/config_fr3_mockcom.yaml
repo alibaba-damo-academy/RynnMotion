@@ -1,0 +1,33 @@
+logging:
+  log_dir: ~/RynnRcplog/robotMotion
+  log_file: robotMotion.log
+robotmodel:
+  robot_name: fr3
+  robot_control_freq: 100
+  robot_mjcf: "../models/3.robot_arm/20.fr3/scene/scene.xml"
+  pino_mjcf: "../models/3.robot_arm/20.fr3/mjcf/fr3_pinocchio.xml"
+  gripper_independent: true
+fsm:
+  fsm_type: "basic_fsm"
+communicator: 
+  type: "mock"
+  default_chunk: 20
+  command_traj_freq: 20
+  mock_config: 
+    mock_home_position: [0.0, 0.0, 0.0, -1.57, 0.0, 1.57, 0.0, 100]
+    mock_amplitude: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 100]
+    mock_frequency: 0.1
+    block_time: 0.1
+trajgen:
+  trajmodule: "tg_ruckig"
+  generator: 
+    joint_limit_lower: [ -2.7437, -1.5837, -2.9007, -2.8421, -2.8065, 0.8445, -3.0159, 0.0 ]
+    joint_limit_upper: [ 2.7437 ,  1.5837,  2.9007, -0.5518,  2.8065, 4.2169,  3.0159, 255.0 ]
+    joint_vel_limit: [ 6.28, 6.28, 6.28, 6.28, 6.28, 6.28, 6.28, 1000.0 ]
+    joint_acc_limit: [ 62.8, 62.8, 62.8, 62.8, 62.8, 62.8, 62.8, 10000.0 ]
+    joint_jerk_limit: [ 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 1000000.0 ]
+    vel_limit_ratio: 0.1
+robotinterface:
+  robot_type: "mujoco"
+  controller:
+    mode: "pd"
