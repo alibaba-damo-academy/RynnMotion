@@ -26,7 +26,7 @@ set(SOURCE_FILES
 
 add_library(${LIBRARY_NAME} SHARED ${SOURCE_FILES})
 
-if(BUILD_STATIC)
+if(BUILD_DEPLOY)
   add_library(${LIBRARY_NAME}_static STATIC ${SOURCE_FILES})
   set_target_properties(${LIBRARY_NAME}_static PROPERTIES OUTPUT_NAME ${LIBRARY_NAME})
 endif()
@@ -71,7 +71,7 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/motion/manager
 )
 
-if(BUILD_STATIC)
+if(BUILD_DEPLOY)
   target_include_directories(${LIBRARY_NAME}_static PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/models

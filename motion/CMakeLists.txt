@@ -29,40 +29,27 @@ set(SOURCE_FILES
     runtime/timing_manager.cpp
 )
 
-# Find packages before creating targets
 find_package(Eigen3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
-
-# Find Boost with required components for Pinocchio
 find_package(Boost REQUIRED COMPONENTS filesystem)
-
-# Find Pinocchio using pkg-config
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PINOCCHIO REQUIRED pinocchio)
 
-# Extract library paths for linker (must be called before add_library)
 string(REPLACE "-L" "" PINOCCHIO_LIB_PATHS "${PINOCCHIO_LDFLAGS}")
 separate_arguments(PINOCCHIO_LIB_PATHS)
 list(FILTER PINOCCHIO_LIB_PATHS INCLUDE REGEX "^/")
 link_directories(${PINOCCHIO_LIB_PATHS})
 
-# Handle cross-compilation settings
-if(CMAKE_TOOLCHAIN_FILE)
-    message(STATUS "Cross-compiling for aarch64 - Using static linking")
+if(CROSS_COMPILE)
+    message(STATUS "Cross-compiling for ${CROSS_TARGET} - Using static linking")
     set(BUILD_SHARED_LIBS OFF)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
-
-    # For cross-compilation, only build static library
     add_library(${LIBRARY_NAME} STATIC ${SOURCE_FILES})
 else()
     message(STATUS "libmotion, Native compilation")
-
-    # For native compilation, build dynamic library
     add_library(${LIBRARY_NAME} SHARED ${SOURCE_FILES})
 
-    # Only build static library if needed for deployment
-    if(BUILD_STATIC)
-        # Static library
+    if(BUILD_DEPLOY)
         add_library(${LIBRARY_NAME}_static STATIC ${SOURCE_FILES})
         set_target_properties(${LIBRARY_NAME}_static PROPERTIES OUTPUT_NAME ${LIBRARY_NAME})
     endif()
@@ -89,20 +76,18 @@ set(COMMON_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/trajectory/
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/logger/
     ${CMAKE_CURRENT_SOURCE_DIR}/module/teleopfollow/
-    ${CMAKE_SOURCE_DIR}/mujoco/include/ # For robot_manager.hpp
+    ${CMAKE_SOURCE_DIR}/mujoco/include/
 )
 
 if(APPLE)
     list(APPEND COMMON_INCLUDE_DIRS /opt/homebrew/opt/yaml-cpp/include)
 endif()
 
-# Add compile definitions (include MuJoCo lib for mjcf_parser)
 target_compile_definitions(${LIBRARY_NAME} PUBLIC
     MODEL_DIR="${MODEL_DIR}"
     MOTION_DIR="${MOTION_DIR}"
 )
 
-# operation
 option(READ_HDF5_FILE "Enable hdf5 library to replay trajectory" OFF)
 
 if(READ_HDF5_FILE)
@@ -112,8 +97,7 @@ if(READ_HDF5_FILE)
     target_compile_definitions(${LIBRARY_NAME} PRIVATE READ_HDF5_FILE)
 endif()
 
-# For native build, also set up the static library if needed
-if(NOT CMAKE_TOOLCHAIN_FILE AND BUILD_STATIC)
+if(NOT CROSS_COMPILE AND BUILD_DEPLOY)
     target_compile_definitions(${LIBRARY_NAME}_static PUBLIC
         MODEL_DIR="${MODEL_DIR}"
         MOTION_DIR="${MOTION_DIR}"
@@ -129,8 +113,6 @@ if(NOT CMAKE_TOOLCHAIN_FILE AND BUILD_STATIC)
         ${QPOASES_LIBRARY}
         utility_static
     )
-
-    # Add Pinocchio includes and definitions to static target
     target_include_directories(${LIBRARY_NAME}_static SYSTEM BEFORE PUBLIC
         ${EIGEN3_INCLUDE_DIR}
         ${PINOCCHIO_INCLUDE_DIRS}
@@ -144,7 +126,6 @@ if(NOT CMAKE_TOOLCHAIN_FILE AND BUILD_STATIC)
     )
 endif()
 
-# Set YAML library based on platform
 if(APPLE)
     set(YAML_LIB yaml-cpp::yaml-cpp)
     set(NATIVE_HINTS /opt/homebrew/lib)
@@ -157,43 +138,23 @@ endif()
 
 target_include_directories(${LIBRARY_NAME} PUBLIC ${COMMON_INCLUDE_DIRS})
 
-# Find libraries
-if(CMAKE_TOOLCHAIN_FILE)
-    # Find static libraries for cross-compilation
+if(CROSS_COMPILE)
     find_library(LCM_LIBRARY NAMES liblcm.a HINTS /usr/aarch64-linux-gnu/lib)
     find_library(QPOASES_LIBRARY NAMES libqpOASES.a HINTS /usr/aarch64-linux-gnu/lib)
 else()
-    # Find dynamic libraries for native build
     find_library(LCM_LIBRARY NAMES lcm HINTS ${NATIVE_HINTS})
     find_library(QPOASES_LIBRARY NAMES qpOASES HINTS ${NATIVE_HINTS})
 endif()
 
-# Common libraries to link against
-# Note: Pinocchio libraries are linked via utility, no need to link them here again
-# Note: NO MuJoCo library - libmotion is MuJoCo-independent!
-if(CMAKE_TOOLCHAIN_FILE)
-    # For cross-compilation
-    set(COMMON_LIBRARIES
-        ${LCM_LIBRARY}
-        ${QPOASES_LIBRARY}
-        utility
-    )
-else()
-    # For native build
-    set(COMMON_LIBRARIES
-        ${LCM_LIBRARY}
-        ${QPOASES_LIBRARY}
-        utility
-    )
-endif()
+set(COMMON_LIBRARIES
+    ${LCM_LIBRARY}
+    ${QPOASES_LIBRARY}
+    utility
+)
 
 target_link_libraries(${LIBRARY_NAME} PUBLIC Eigen3::Eigen ${YAML_LIB} ${COMMON_LIBRARIES})
-
-# Link against manager library
 target_link_libraries(${LIBRARY_NAME} PUBLIC manager)
 
-# Add Pinocchio includes and definitions to target
-# Add Eigen3 include dir before Pinocchio to ensure correct header resolution
 target_include_directories(${LIBRARY_NAME} SYSTEM BEFORE PUBLIC
     ${EIGEN3_INCLUDE_DIR}
     ${PINOCCHIO_INCLUDE_DIRS}
@@ -202,8 +163,7 @@ target_compile_definitions(${LIBRARY_NAME} PUBLIC
     PINOCCHIO_WITH_URDFDOM
     PINOCCHIO_ENABLE_TEMPLATE_INSTANTIATION
 )
-
-# Suppress deprecation warnings from Pinocchio headers
 target_compile_options(${LIBRARY_NAME} PRIVATE
     $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-declarations>
 )
+

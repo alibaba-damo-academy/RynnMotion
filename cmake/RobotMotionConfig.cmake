@@ -56,26 +56,6 @@ function(configure_motion_target TARGET_NAME)
   )
 endfunction()
 
-function(copy_to_deployment_dirs TARGET_NAME)
-  if(NOT BUILD_STATIC)
-    return()
-  endif()
-
-  set(DEPLOYMENT_DIRS
-    ${CMAKE_SOURCE_DIR}/robots/RynnDamiao/lib
-    ${CMAKE_SOURCE_DIR}/robots/franka/src/libmotion/lib
-    ${CMAKE_SOURCE_DIR}/robots/realman/src/telemotion/lib
-  )
-
-  foreach(DIR ${DEPLOYMENT_DIRS})
-    add_custom_command(
-      TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${TARGET_NAME}> ${DIR}/
-      COMMENT "Copying ${TARGET_NAME} to ${DIR}"
-    )
-  endforeach()
-endfunction()
-
 set(COMMON_INCLUDE_DIRS
   ${CMAKE_SOURCE_DIR}/common/lcm/lcmMotion/
   ${CMAKE_SOURCE_DIR}/motion/manager

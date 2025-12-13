@@ -14,11 +14,11 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "USING_GDB": "ON",
+        "ENABLE_DEBUG_SYMBOLS": "ON",
         "BUILD_MUJOCO": "ON",
         "BUILD_TESTS": "OFF",
         "BUILD_ROS_MUJOCO": "OFF",
-        "BUILD_STATIC": "OFF"
+        "BUILD_DEPLOY": "OFF"
       }
     },
     {
@@ -29,11 +29,11 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "USING_GDB": "ON",
+        "ENABLE_DEBUG_SYMBOLS": "ON",
         "BUILD_MUJOCO": "ON",
         "BUILD_TESTS": "OFF",
         "BUILD_ROS_MUJOCO": "OFF",
-        "BUILD_STATIC": "ON"
+        "BUILD_DEPLOY": "ON"
       }
     },
     {
@@ -44,11 +44,11 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "USING_GDB": "OFF",
+        "ENABLE_DEBUG_SYMBOLS": "OFF",
         "BUILD_MUJOCO": "ON",
         "BUILD_TESTS": "OFF",
         "BUILD_ROS_MUJOCO": "OFF",
-        "BUILD_STATIC": "ON"
+        "BUILD_DEPLOY": "ON"
       }
     },
     {
@@ -59,11 +59,11 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "USING_GDB": "ON",
+        "ENABLE_DEBUG_SYMBOLS": "ON",
         "BUILD_MUJOCO": "ON",
         "BUILD_TESTS": "OFF",
         "BUILD_ROS_MUJOCO": "ON",
-        "BUILD_STATIC": "OFF"
+        "BUILD_DEPLOY": "OFF"
       }
     },
     {
@@ -74,30 +74,28 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "USING_GDB": "OFF",
+        "ENABLE_DEBUG_SYMBOLS": "OFF",
         "BUILD_MUJOCO": "ON",
         "BUILD_TESTS": "ON",
         "BUILD_ROS_MUJOCO": "OFF",
-        "BUILD_STATIC": "OFF"
+        "BUILD_DEPLOY": "OFF"
       }
     },
     {
-      "name": "cross-aarch64",
-      "displayName": "Cross-compilation for ARM64",
-      "description": "Cross-compile for aarch64 architecture",
+      "name": "orin",
+      "displayName": "Cross-compilation for Jetson Orin",
+      "description": "Cross-compile for Jetson Orin (aarch64)",
       "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build-aarch64",
+      "binaryDir": "${sourceDir}/build-orin",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_SYSTEM_NAME": "Linux",
-        "CMAKE_SYSTEM_PROCESSOR": "aarch64",
-        "CMAKE_C_COMPILER": "/usr/bin/aarch64-linux-gnu-gcc",
-        "CMAKE_CXX_COMPILER": "/usr/bin/aarch64-linux-gnu-g++",
-        "USING_GDB": "OFF",
+        "CROSS_COMPILE": "ON",
+        "CROSS_TARGET": "orin",
+        "ENABLE_DEBUG_SYMBOLS": "OFF",
         "BUILD_MUJOCO": "OFF",
         "BUILD_TESTS": "OFF",
         "BUILD_ROS_MUJOCO": "OFF",
-        "BUILD_STATIC": "ON"
+        "BUILD_DEPLOY": "ON"
       }
     }
   ],
@@ -123,8 +121,8 @@
       "configurePreset": "tests"
     },
     {
-      "name": "cross-aarch64",
-      "configurePreset": "cross-aarch64"
+      "name": "orin",
+      "configurePreset": "orin"
     }
   ]
 }

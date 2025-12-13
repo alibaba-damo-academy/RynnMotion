@@ -1,5 +1,24 @@
 cmake_minimum_required(VERSION 3.16)
-project(mujocoProject_cpp)
+project(mujoco_simulation)
+
+option(RYNN_USE_PARQUET "Enable Parquet recording support" ON)
+option(RYNN_USE_HDF5 "Enable HDF5 recording support" OFF)
+
+if(APPLE)
+    set(PLATFORM_LIB_DIR /opt/homebrew/lib)
+    set(PLATFORM_INCLUDE_DIR /opt/homebrew/include)
+    set(YAML_LIB yaml-cpp::yaml-cpp)
+    set(GLFW_LIB "${PLATFORM_LIB_DIR}/libglfw.dylib")
+    include_directories(/opt/homebrew/opt/yaml-cpp/include)
+else()
+    set(PLATFORM_LIB_DIR /usr/local/lib)
+    set(PLATFORM_INCLUDE_DIR /usr/local/include)
+    find_library(YAML_CPP_LIBRARY NAMES yaml-cpp HINTS ${PLATFORM_LIB_DIR})
+    set(YAML_LIB ${YAML_CPP_LIBRARY})
+    find_package(glfw3 REQUIRED)
+    set(GLFW_LIB glfw)
+    include_directories(/usr/local/include)
+endif()
 
 find_package(yaml-cpp REQUIRED)
 find_package(fcl REQUIRED)
@@ -12,16 +31,26 @@ pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
     libswscale
 )
 
-option(RYNN_USE_PARQUET "Enable Parquet recording support" ON)
-option(RYNN_USE_HDF5 "Enable HDF5 recording support" OFF)
+find_library(LCM_LIBRARY NAMES lcm HINTS ${PLATFORM_LIB_DIR})
+
+if(APPLE)
+    if(NOT EXISTS "${PLATFORM_LIB_DIR}/libglfw.dylib")
+        message(FATAL_ERROR "GLFW library not found at ${PLATFORM_LIB_DIR}")
+    endif()
+    include_directories(${PLATFORM_INCLUDE_DIR}/GLFW)
+else()
+    include_directories(/usr/include/GLFW)
+endif()
+
+message(STATUS "Using MuJoCo library: ${MUJOCO_LIBRARY}")
 
 set(PARQUET_AVAILABLE FALSE)
 if(RYNN_USE_PARQUET)
-    set(_OLD_CMAKE_MESSAGE_LOG_LEVEL ${CMAKE_MESSAGE_LOG_LEVEL})
+    set(_OLD_LOG_LEVEL ${CMAKE_MESSAGE_LOG_LEVEL})
     set(CMAKE_MESSAGE_LOG_LEVEL WARNING)
     find_package(Arrow QUIET)
     find_package(Parquet QUIET)
-    set(CMAKE_MESSAGE_LOG_LEVEL ${_OLD_CMAKE_MESSAGE_LOG_LEVEL})
+    set(CMAKE_MESSAGE_LOG_LEVEL ${_OLD_LOG_LEVEL})
 
     if(Arrow_FOUND AND Parquet_FOUND)
         add_compile_definitions(RYNN_USE_PARQUET)
@@ -48,72 +77,42 @@ if(APPLE)
     function(clean_target_interface_libs target_name)
         if(TARGET ${target_name})
             get_target_property(INTERFACE_LIBS ${target_name} INTERFACE_LINK_LIBRARIES)
-
             if(INTERFACE_LIBS)
                 set(CLEANED_LIBS "")
-
                 foreach(lib ${INTERFACE_LIBS})
                     if(NOT lib MATCHES ".*MacOSX[0-9]+\\.sdk.*" AND NOT lib MATCHES ".*/libm\\..*")
                         list(APPEND CLEANED_LIBS ${lib})
-                    else()
-                        message(STATUS "Filtering out old SDK reference: ${lib}")
                     endif()
                 endforeach()
-
                 set_target_properties(${target_name} PROPERTIES INTERFACE_LINK_LIBRARIES "${CLEANED_LIBS}")
             endif()
         endif()
     endfunction()
 
     clean_target_interface_libs(fcl)
-
-    foreach(opencv_target opencv_core opencv_imgproc opencv_highgui opencv_imgcodecs opencv_videoio opencv_calib3d opencv_features2d opencv_objdetect opencv_dnn opencv_ml opencv_flann opencv_photo opencv_stitching opencv_video)
+    foreach(opencv_target opencv_core opencv_imgproc opencv_highgui opencv_imgcodecs
+            opencv_videoio opencv_calib3d opencv_features2d opencv_objdetect
+            opencv_dnn opencv_ml opencv_flann opencv_photo opencv_stitching opencv_video)
         clean_target_interface_libs(${opencv_target})
     endforeach()
 
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-search_paths_first")
 endif()
 
-if(APPLE)
-    set(BASE_INCLUDE_DIR /opt/homebrew/include)
-    set(BASE_LIB_DIR /opt/homebrew/lib)
+set(MUJOCO_SOURCES
+    src/mj_interface.cpp
+    src/mj_actuator.cpp
+    src/mj_sensor.cpp
+    src/mj_ui.cpp
+    src/mj_scene.cpp
+    src/mj_data_writer.cpp
+    src/mj_hdf5_writer.cpp
+    src/mj_parquet_writer.cpp
+    src/mj_video_encoder.cpp
+    src/mj_recorder.cpp
+)
 
-    set(YAML_LIB yaml-cpp::yaml-cpp)
-    set(YAML_CPP_INCLUDE_DIR /opt/homebrew/opt/yaml-cpp/include)
-    include_directories(/opt/homebrew/opt/yaml-cpp/include)
-
-    set(GLFW_INCLUDE_DIR "${BASE_INCLUDE_DIR}/GLFW")
-    set(GLFW_LIB "${BASE_LIB_DIR}/libglfw.dylib")
-
-    set(LCM_INCLUDE_DIRS "${BASE_INCLUDE_DIR}")
-    find_library(LCM_LIBRARY NAMES lcm HINTS ${BASE_LIB_DIR})
-
-    if(EXISTS "${GLFW_INCLUDE_DIR}/glfw3.h" AND EXISTS "${GLFW_LIB}")
-        message(STATUS "GLFW library found: ${GLFW_LIB}")
-        include_directories(${GLFW_INCLUDE_DIR})
-    else()
-        message(FATAL_ERROR "GLFW library not found at expected location.")
-    endif()
-else()
-    set(BASE_INCLUDE_DIR /usr/local/include)
-    set(BASE_LIB_DIR /usr/local/lib)
-
-    find_library(YAML_CPP_LIBRARY NAMES yaml-cpp HINTS ${BASE_LIB_DIR})
-    set(YAML_LIB ${YAML_CPP_LIBRARY})
-    set(YAML_CPP_INCLUDE_DIR /usr/local/include)
-
-    include_directories(/usr/local/include)
-
-    find_package(glfw3 REQUIRED)
-    set(GLFW_INCLUDE_DIRS /usr/include/GLFW)
-
-    set(LCM_INCLUDE_DIRS "${BASE_INCLUDE_DIR}")
-    find_library(LCM_LIBRARY NAMES lcm HINTS ${BASE_LIB_DIR})
-endif()
-
-message(STATUS "Using MuJoCo library: ${MUJOCO_LIBRARY}")
-
-set(COMMON_INCLUDE_DIRS
+set(MUJOCO_INCLUDE_DIRS
     include/
     ${COMMON_DIR}/data/
     ${COMMON_DIR}/lcm/piperlcm/
@@ -136,75 +135,54 @@ set(COMMON_INCLUDE_DIRS
     ${MOTION_DIR}/utils/trajectory/
     ${MOTION_DIR}/utils/logger/
     ${MUJOCO_INCLUDE_DIRS}
-    ${GLFW_INCLUDE_DIRS}
-    ${UTILS_BUILD_INCLUDE_DIR}
-    ${YAML_CPP_INCLUDE_DIR}
-    ${LCM_INCLUDE_DIRS}
+    ${PLATFORM_INCLUDE_DIR}
     ${OpenCV_INCLUDE_DIRS}
     ${LIBAV_INCLUDE_DIRS}
 )
 
 if(HDF5_AVAILABLE)
-    list(APPEND COMMON_INCLUDE_DIRS ${HDF5_INCLUDE_DIRS})
+    list(APPEND MUJOCO_INCLUDE_DIRS ${HDF5_INCLUDE_DIRS})
 endif()
 
 if(PARQUET_AVAILABLE)
-    list(APPEND COMMON_INCLUDE_DIRS ${Arrow_INCLUDE_DIRS} ${Parquet_INCLUDE_DIRS})
+    list(APPEND MUJOCO_INCLUDE_DIRS ${Arrow_INCLUDE_DIRS} ${Parquet_INCLUDE_DIRS})
 endif()
 
-if(APPLE)
-    set(COMMON_LIBRARIES
-        ${MUJOCO_LIBRARY}
-        ${GLFW_LIB}
-        ${YAML_LIB}
-        ${LCM_LIBRARY}
-    )
-else()
-    set(COMMON_LIBRARIES
-        ${MUJOCO_LIBRARY}
-        glfw
-        ${YAML_LIB}
-        ${LCM_LIBRARY}
-    )
-endif()
-
-set(COMMON_LINK_DIRS
+set(MUJOCO_LINK_DIRS
     ${MUJOCO_LIB_DIR}
     ${CMAKE_BINARY_DIR}/motion
     ${CMAKE_BINARY_DIR}/motion/utils
 )
 
-set(UTILS_BUILD_INCLUDE_DIR ${CMAKE_BINARY_DIR}/utility/include/)
+set(MUJOCO_COMMON_LIBS
+    ${MUJOCO_LIBRARY}
+    ${GLFW_LIB}
+    ${YAML_LIB}
+    ${LCM_LIBRARY}
+)
 
 add_executable(mujocoExe
     src/main_mj.cpp
-    src/mj_interface.cpp
-    src/mj_actuator.cpp
-    src/mj_sensor.cpp
-    src/mj_ui.cpp
-    src/mj_scene.cpp
-    src/mj_data_writer.cpp
-    src/mj_hdf5_writer.cpp
-    src/mj_parquet_writer.cpp
-    src/mj_video_encoder.cpp
-    src/mj_recorder.cpp
+    ${MUJOCO_SOURCES}
 )
 
-target_include_directories(mujocoExe PUBLIC ${COMMON_INCLUDE_DIRS})
-target_link_directories(mujocoExe PRIVATE ${COMMON_LINK_DIRS})
+target_include_directories(mujocoExe PUBLIC ${MUJOCO_INCLUDE_DIRS})
+target_link_directories(mujocoExe PRIVATE ${MUJOCO_LINK_DIRS})
 
 if(APPLE)
     set_target_properties(mujocoExe PROPERTIES
-        BUILD_RPATH "${CMAKE_BINARY_DIR}/motion;${CMAKE_BINARY_DIR}/motion/utils;${BASE_LIB_DIR}"
-        INSTALL_RPATH "@executable_path/../lib;@loader_path/../lib;${BASE_LIB_DIR}"
+        BUILD_RPATH "${CMAKE_BINARY_DIR}/motion;${CMAKE_BINARY_DIR}/motion/utils;${PLATFORM_LIB_DIR}"
+        INSTALL_RPATH "@executable_path/../lib;@loader_path/../lib;${PLATFORM_LIB_DIR}"
+        LINK_DEPENDS ""
     )
+    target_link_options(mujocoExe PRIVATE "LINKER:-w")
 endif()
 
 target_link_libraries(mujocoExe
     manager
     ${MOTION_LIBRARY}
     ${UTILITY_LIBRARY}
-    ${COMMON_LIBRARIES}
+    ${MUJOCO_COMMON_LIBS}
     ${FCL_LIBRARIES}
     ${OpenCV_LIBS}
     PkgConfig::LIBAV
@@ -218,16 +196,6 @@ if(PARQUET_AVAILABLE)
     target_link_libraries(mujocoExe Arrow::arrow_shared Parquet::parquet_shared)
 endif()
 
-if(APPLE)
-    set_target_properties(mujocoExe PROPERTIES
-        LINK_DEPENDS ""
-    )
-
-    target_link_options(mujocoExe PRIVATE
-        "LINKER:-w"
-    )
-endif()
-
 add_dependencies(mujocoExe motion utility)
 
 add_custom_command(TARGET mujocoExe POST_BUILD
@@ -236,102 +204,14 @@ add_custom_command(TARGET mujocoExe POST_BUILD
 
 if(APPLE)
     get_filename_component(MUJOCO_LIB_NAME ${MUJOCO_LIBRARY} NAME)
-
     add_custom_command(TARGET mujocoExe POST_BUILD
         COMMAND install_name_tool -change @rpath/mujoco.framework/Versions/A/${MUJOCO_LIB_NAME} ${MUJOCO_LIBRARY} $<TARGET_FILE:mujocoExe> || true
         COMMAND install_name_tool -change @rpath/mujoco.framework/Versions/A/${MUJOCO_LIB_NAME} ${MUJOCO_LIBRARY} ${CMAKE_SOURCE_DIR}/build/mujocoExe || true
-        COMMAND install_name_tool -change liblcm.1.dylib ${BASE_LIB_DIR}/liblcm.1.dylib $<TARGET_FILE:mujocoExe> || true
-        COMMAND install_name_tool -change liblcm.1.dylib ${BASE_LIB_DIR}/liblcm.1.dylib ${CMAKE_SOURCE_DIR}/build/mujocoExe || true
+        COMMAND install_name_tool -change liblcm.1.dylib ${PLATFORM_LIB_DIR}/liblcm.1.dylib $<TARGET_FILE:mujocoExe> || true
+        COMMAND install_name_tool -change liblcm.1.dylib ${PLATFORM_LIB_DIR}/liblcm.1.dylib ${CMAKE_SOURCE_DIR}/build/mujocoExe || true
     )
 endif()
 
 if(BUILD_ROS_MUJOCO)
-    find_package(ament_cmake REQUIRED)
-    find_package(rclcpp REQUIRED)
-    find_package(sensor_msgs REQUIRED)
-    find_package(nav_msgs REQUIRED)
-    find_package(rosgraph_msgs REQUIRED)
-
-    find_package(rm_ros_interfaces QUIET)
-
-    if(rm_ros_interfaces_FOUND)
-        add_compile_definitions(USE_RM_INTERFACES)
-        message(STATUS "Found rm_ros_interfaces - Building with RM robot support")
-    else()
-        message(STATUS "rm_ros_interfaces not found - Building without RM robot support (simulation only)")
-    endif()
-
-    find_library(CCD_LIBRARY NAMES ccd REQUIRED)
-
-    if(NOT CCD_LIBRARY)
-        message(FATAL_ERROR "libccd library not found")
-    else()
-        message(STATUS "Found libccd: ${CCD_LIBRARY}")
-    endif()
-
-    add_executable(rosMujocoExe
-        src/ros_main_mj.cpp
-        src/ros_mj_interface.cpp
-        src/mj_interface.cpp
-        src/mj_actuator.cpp
-        src/mj_sensor.cpp
-        src/mj_ui.cpp
-        src/mj_scene.cpp
-        src/mj_data_writer.cpp
-        src/mj_hdf5_writer.cpp
-        src/mj_parquet_writer.cpp
-        src/mj_video_encoder.cpp
-        src/mj_recorder.cpp
-    )
-
-    ament_target_dependencies(rosMujocoExe
-        rclcpp
-        sensor_msgs
-        nav_msgs
-        rosgraph_msgs
-        yaml-cpp
-    )
-
-    if(rm_ros_interfaces_FOUND)
-        ament_target_dependencies(rosMujocoExe rm_ros_interfaces)
-    endif()
-
-    target_include_directories(rosMujocoExe PUBLIC ${COMMON_INCLUDE_DIRS})
-    target_link_directories(rosMujocoExe PRIVATE ${COMMON_LINK_DIRS})
-
-    if(APPLE)
-        set_target_properties(rosMujocoExe PROPERTIES
-            BUILD_RPATH "${CMAKE_BINARY_DIR}/motion;${CMAKE_BINARY_DIR}/motion/utils;${BASE_LIB_DIR}"
-            INSTALL_RPATH "@executable_path/../lib;@loader_path/../lib;${BASE_LIB_DIR}"
-        )
-    endif()
-
-    target_link_libraries(rosMujocoExe
-        manager
-        motion
-        utility
-        ${COMMON_LIBRARIES}
-        ${FCL_LIBRARIES}
-        ${CCD_LIBRARY}
-        ${OpenCV_LIBS}
-        PkgConfig::LIBAV
-    )
-
-    if(HDF5_AVAILABLE)
-        target_link_libraries(rosMujocoExe ${HDF5_CXX_LIBRARIES})
-    endif()
-
-    if(PARQUET_AVAILABLE)
-        target_link_libraries(rosMujocoExe Arrow::arrow_shared Parquet::parquet_shared)
-    endif()
-
-    add_dependencies(rosMujocoExe utility motion)
-
-    add_custom_command(TARGET rosMujocoExe POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:rosMujocoExe> ${CMAKE_SOURCE_DIR}/build/rosMujocoExe
-    )
-
-    install(TARGETS rosMujocoExe
-        DESTINATION lib/${PROJECT_NAME}
-    )
+    include(${CMAKE_SOURCE_DIR}/cmake/RosMujoco.cmake)
 endif()
