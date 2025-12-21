@@ -90,6 +90,19 @@ class PolicyInterpolator:
         self._optimized_curves = None
         self._velocity_constrained_curves = None
         self._adjusted_curves = None
+        self._current_index = 0.0
+        self._last_position: list[float] | None = None
+        self._last_velocity: list[float] | None = None
+
+    def get_current_reference(self) -> list[float] | None:
+        """Return current interpolated reference position."""
+        if self._piecewise_curves is None:
+            return self._last_position
+        return [cs(self._current_index) for cs in self._piecewise_curves]
+
+    def get_current_velocity(self) -> list[float] | None:
+        """Reserved for future velocity continuity support."""
+        return self._last_velocity
 
     def prepare_trajectory(
         self,
@@ -125,23 +138,75 @@ class PolicyInterpolator:
             )
             self._piecewise_curves.append(cs)
 
-    def update(self, _index):
-        """
-        Evaluate all spline curves at a specific trajectory index.
-
-        Used for real-time trajectory execution to get joint positions
-        at any index point within the trajectory.
+    def update(self, _index: float) -> list[float]:
+        """Evaluate all spline curves at trajectory index.
 
         Args:
-            _index: Trajectory index to evaluate (0 to chunk_size-1)
+            _index: Trajectory index (0 to chunk_size-1).
 
         Returns:
-            list: Joint positions at index _index, one value per joint
+            Joint positions at index, one value per joint.
         """
         if self._piecewise_curves is None:
             raise ValueError("No trajectory prepared. Call prepare_trajectory() first.")
 
-        return [cs(_index) for cs in self._piecewise_curves]
+        self._current_index = _index
+        result = [cs(_index) for cs in self._piecewise_curves]
+        self._last_position = result
+        return result
+
+    def prepare_trajectory_async(
+        self,
+        joint_positions: np.ndarray | list[float],
+        ndof: int,
+        chunk_size: int,
+    ) -> bool:
+        """Prepare trajectory for async action chunk receiving.
+
+        Replaces first waypoint with current reference position,
+        dropping unexecuted portion of previous trajectory.
+
+        Args:
+            joint_positions: Flattened trajectory [j0_t0, j1_t0, ...].
+            ndof: Number of joints.
+            chunk_size: Number of waypoints.
+
+        Returns:
+            True if blending occurred, False if fresh start.
+        """
+        joint_positions = np.array(joint_positions)
+        current_ref = self.get_current_reference()
+
+        rearranged = np.zeros((ndof, chunk_size))
+        for i in range(ndof):
+            rearranged[i] = joint_positions[i::ndof]
+
+        blended = False
+        if current_ref is not None:
+            rearranged[:, 0] = np.array(current_ref)
+            blended = True
+
+        self._piecewise_curves = []
+        self._ndof = ndof
+        self._chunk_size = chunk_size
+        self._current_index = 0.0
+
+        for i in range(ndof):
+            x_values = np.arange(chunk_size)
+            cs = CubicSpline(x_values, rearranged[i], bc_type="clamped")
+            self._piecewise_curves.append(cs)
+
+        return blended
+
+    def prepare_trajectory_async_with_velocity(
+        self,
+        joint_positions: np.ndarray | list[float],
+        ndof: int,
+        chunk_size: int,
+        velocities: np.ndarray | list[float] | None = None,
+    ) -> bool:
+        """Reserved for async preparation with velocity continuity."""
+        pass
 
     def prepare_adjusted_trajectory(
         self, cur_joint_positions, joint_positions, ndof, chunk_size, max_velocities

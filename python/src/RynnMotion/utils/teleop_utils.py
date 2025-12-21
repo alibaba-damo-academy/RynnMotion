@@ -15,7 +15,7 @@ from typing import Tuple, Optional
 
 from RynnMotion.manager.robot_manager import RobotManager
 from RynnMotion.utils.pyFSM import PyFSM
-from RynnMotion.utils.policy_interpolator import lerp
+from RynnMotion.algorithms.policy_interpolator import lerp
 from RynnMotion.utils.path_config import get_models_root
 
 

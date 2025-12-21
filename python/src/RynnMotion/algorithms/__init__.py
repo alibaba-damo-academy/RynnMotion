@@ -8,6 +8,7 @@ Contains:
 - PinKine: Forward kinematics and Jacobian computation
 - Transform: SE3 rigid body transformation
 - FrameTransformer: Multi-frame coordinate transform manager
+- PolicyInterpolator: Trajectory interpolation for policy execution
 """
 
 from .pose_mapper import PoseMapper
@@ -24,6 +25,7 @@ from .orient import (
     invert_transform,
     compose_transforms,
 )
+from .policy_interpolator import PolicyInterpolator, lerp
 
 __all__ = [
     'PoseMapper',
@@ -38,4 +40,6 @@ __all__ = [
     'quat_wxyz_to_xyzw',
     'invert_transform',
     'compose_transforms',
+    'PolicyInterpolator',
+    'lerp',
 ]
