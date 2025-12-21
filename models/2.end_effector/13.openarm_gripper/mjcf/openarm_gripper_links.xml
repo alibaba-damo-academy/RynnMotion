@@ -13,33 +13,64 @@
     <joint name="gripper_joint_ry" axis="0 1 0" class="gripper_hinge" />
     <joint name="gripper_joint_rz" axis="0 0 1" class="gripper_hinge" />
 
-    <geom type="cylinder" size="0.002 0.05" rgba="1 0 0 1" pos="0.05 -0.0 0." euler="0 1.57079 0" class="visual"/>
-    <geom type="cylinder" size="0.002 0.05" rgba="0 1 0 1" pos="0 0.05 0." euler="1.57079 0 0" class="visual"/>
-    <geom type="cylinder" size="0.002 0.05" rgba="0 0 1 1" pos="0 -0.0 0.05" euler="0 0 0" class="visual"/>
+    <!-- 2. 独立的滑块机构 -->
+    <body name="lslider" pos="0.0186 -0.018344 0.0595">
+      <inertial pos="0 0 0" mass="0.0005" diaginertia="1e-8 1e-8 1e-8"/>
+      <joint name="lslider" axis="0 -1 0" class="finger_slide"/>
+      <site name="lslider_site" pos="0 0 0" size="0.005" class="visual"/>
+    </body>
 
+    <body name="rslider" pos="-0.0186 0.018344 0.0595">
+      <inertial pos="0 0 0" mass="0.0005" diaginertia="1e-8 1e-8 1e-8"/>
+      <joint name="rslider" axis="0 1 0" class="finger_slide"/>
+      <site name="rslider_site" pos="0 0 0" size="0.005" class="visual"/>
+    </body>
 
     <!-- Base Link -->
-    <geom mesh="link7_symp" name="openarm_link7_visual" pos="0 0 -0.5585"  class="visual" material="gray" />
-    <geom mesh="link7_symp" name="openarm_link7_collision" pos="0 0 -0.5585"  class="collision" />
-    <geom mesh="hand" name="openarm_hand_visual" pos="0 0 -0.5585"  class="visual" material="mirror" />
-    <geom mesh="hand" name="openarm_hand_collision" pos="0 0 -0.5584" quat="1 0 0 0" class="collision" />
+    <inertial pos="-9.6677E-05 1.9775E-09 0.032528" mass="0.44703" fullinertia="0.00034877 0.00013257 0.00037145 -2.8397E-10 -8.3973E-07 -3.1026E-11" />
+    <geom mesh="gripper_base" name="gripper_base_visual" pos="0 0 0" class="visual" material="gray" />
+    <geom mesh="gripper_base" name="gripper_base_collision" pos="0 0 0" class="collision" />
 
-    <!-- Left Finger -->
-    <body name="left_finger" pos="0 0.006 0.1151">
-      <inertial pos="0.0064528 0.01702 0.0219685" quat="0.923117 0.0155444 -0.0375274 0.382368" mass="0.0360255" diaginertia="2.48652e-06 2.275e-06 7.38483e-07"/>
-      <joint name="left_finger_joint" pos="0 0 0" axis="0 1 0" type="slide" range="0 0.044" actuatorfrcrange="-333 333" class="finger_slide" />
-      <geom pos="0 -0.05 -0.673001" quat="1 0 0 0" mesh="finger" class="visual" material="black" />
-      <geom pos="0 -0.05 -0.673001" quat="1 0 0 0" mesh="finger" class="collision" />
+    <body name="link1" pos="0 0 0.05">
+
+      <inertial pos="-3.5053e-09 -2.1485e-08 0.0038423" quat="-0.0922935 0.701057 0.0922959 0.701058" mass="0.042956" diaginertia="1.8252e-05 1.77163e-05 1.6337e-06"/>
+      <joint name="joint1" pos="0 0 0" axis="0 0 1" type="hinge" range="-1.05 0.05" class="dm4310" />
+      <geom type="mesh" mesh="link1" class="visual" material="black" />
+      <!-- <geom type="mesh" mesh="link1" class="collision" /> -->
+      <!-- Left Finger -->
+      <body name="llink2" pos="0.038637 0.010353 0.002">
+
+        <inertial pos="-0.0058663 -0.0084016 0.0097928" quat="0.625618 0.327639 -0.628367 0.326205" mass="0.0064263" diaginertia="8.75735e-07 8.01658e-07 9.7217e-08"/>
+        <joint name="lj2" pos="0 0 0" axis="0 0 1" type="hinge" class="hinge_passive" />
+        <geom type="mesh" mesh="llink2" class="visual" material="black" />
+        <!-- <geom type="mesh" mesh="llink2" class="collision" /> -->
+        <body name="llink3" pos="-0.020037 -0.028697 0.0075">
+
+          <inertial pos="-0.01475 0.00076708 0.017141" quat="0.711571 -0.0681383 0.129684 0.687172" mass="0.081668" diaginertia="2.2198e-05 1.72462e-05 1.28177e-05"/>
+          <joint name="lj3" pos="0 0 0" axis="0 0 1" type="hinge" class="hinge_passive" />
+          <geom type="mesh" mesh="llink3" class="visual" material="black" />
+          <geom type="mesh" mesh="llink3" class="collision" />
+          <site name="end_llink3_site" pos="0 0 0" size="0.005"/>
+        </body>
+      </body>
+
+      <!-- Right Finger -->
+      <body name="rlink2" pos="-0.038637 -0.010353 0.002">
+        <inertial pos="0.0058663 0.0084016 0.0097928" quat="0.628367 0.326205 -0.625618 0.327639" mass="0.0064263" diaginertia="8.75735e-07 8.01658e-07 9.7217e-08"/>
+        <joint name="rj2" pos="0 0 0" axis="0 0 1" type="hinge" class="hinge_passive" />
+        <geom type="mesh" mesh="rlink2" class="visual" material="black" />
+        <!-- <geom type="mesh" mesh="rlink2" class="collision" /> -->
+        <body name="rlink3" pos="0.020037 0.028697 0.0075">
+
+          <inertial pos="0.015182 -0.00076709 0.017141" quat="0.706741 0.0670458 -0.13081 0.692034" mass="0.081668" diaginertia="2.215e-05 1.72497e-05 1.27704e-05"/>
+          <joint name="rj3" pos="0 0 0" axis="0 0 1" type="hinge" class="hinge_passive" />
+          <geom type="mesh" mesh="rlink3" class="visual" material="black" />
+          <geom type="mesh" mesh="rlink3" class="collision" />
+          <site name="end_rlink3_site" pos="0 0 0" size="0.005"/>
+        </body>
+      </body>
+
     </body>
-
-    <!-- Right Finger -->
-    <body name="right_finger" pos="0 -0.006 0.1151">
-      <inertial pos="0.0064528 -0.01702 0.0219685" quat="0.923117 0.0155444 -0.0375274 0.382368" mass="0.0360255" diaginertia="2.48652e-06 2.275e-06 7.38483e-07"/>
-      <joint name="right_finger_joint" pos="0 0 0" axis="0 -1 0" type="slide" range="0 0.044" actuatorfrcrange="-333 333" class="finger_slide" />
-      <geom pos="0 0.05 -0.673001" quat="1 0 0 0" mesh="finger1" class="visual" material="black" />
-      <geom pos="0 0.05 -0.673001" quat="1 0 0 0" mesh="finger1" class="collision" />
-    </body>
-
   </body>
 
 

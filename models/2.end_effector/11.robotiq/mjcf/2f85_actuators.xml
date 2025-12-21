@@ -23,12 +23,10 @@
   </equality>
 
   <!--
-    The general actuator below is a customized position actuator (with some damping) where
-    gainprm[0] != kp (see http://mujoco.org/book/modeling.html#position).
-    The reason why gainprm[0] != kp is because the control input range has to be re-scaled to
-    [0, 255]. The joint range is currently set at [0, 0.8], the control range is [0, 255] and
-    kp = 100. Tau = Kp * scale * control_input - Kp * error, max(Kp * scale * control_input) = 0.8,
-    hence scale = 0.8 * 100 / 255
+    Gripper control: 0=closed, 1=open
+    Joint range: [0, 0.8] where 0=open, 0.8=closed
+    Mapping: ctrl=0 -> joint=0.8 (closed), ctrl=1 -> joint=0 (open)
+    With kp=100: gainprm = -0.8 * 100 = -80, biasprm[0] = 0.8 * 100 = 80
   -->
 
   <actuator>
@@ -38,7 +36,8 @@
     <position name="2f85_qrx" joint="gripper_joint_rx" class="gripper_rot_actuator" />
     <position name="2f85_qry" joint="gripper_joint_ry" class="gripper_rot_actuator" />
     <position name="2f85_qrz" joint="gripper_joint_rz" class="gripper_rot_actuator" />
-    <general class="2f85" name="gripper" tendon="split" forcerange="-5 5" ctrlrange="0 255" gainprm="0.3137255 0 0" biasprm="0 -100 -10"/>
+    <!-- 0=closed (joint=0.8), 1=open (joint=0) -->
+    <general class="2f85" name="gripper" tendon="split" forcerange="-5 5" ctrlrange="0 1" gainprm="-80 0 0" biasprm="80 -100 -10"/>
   </actuator>
 
 </mujoco>

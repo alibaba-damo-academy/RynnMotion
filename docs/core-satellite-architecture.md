@@ -1,498 +1,674 @@
-# Core-Satellite Python Architecture Pattern for RynnMotion
+# Core-Satellite Architecture Pattern for RynnMotion
 
 ## Overview
 
-RynnMotion uses a **Core-Satellite Pattern** (Hub-and-Spoke) for managing a shared algorithmic core with multiple robot-specific implementations. This document outlines the current architecture, best practices, and refactoring recommendations.
+RynnMotion uses a **Core-Satellite Pattern** (Hub-and-Spoke) for managing a shared algorithmic core with multiple robot-specific implementations. This architecture enables:
 
-## Current Architecture
+- **Hardware SDK Isolation**: Each robot's proprietary SDK lives in its own environment
+- **Dependency Management**: Avoid conflicts between different robot frameworks
+- **Unified Interface**: Same API for simulation and real hardware
+- **Sim-to-Real Transfer**: Develop in simulation, deploy to hardware without code changes
 
-### Structure Overview
+### Dependency Flow
 
 ```
-RynnMotion/
-├── python/                    # CORE: Main RynnMotion package
-│   └── src/RynnMotion/       # Algorithms, simulation, datasets
-│       ├── base/             # Base interfaces
-│       ├── teleop/           # Teleoperation framework
-│       ├── RynnDatasets/     # Dataset management
-│       └── utils/            # Shared utilities
-│
-└── robots/                   # SATELLITES: Robot-specific submodules
-    ├── RynnLeRobot/         # LeRobot implementation (own venv)
-    ├── franka/              # Franka robots (own venv)
-    ├── piper/               # Piper robots (own venv)
-    └── realman/             # RealMan robots (own venv)
+┌─────────────────────────────────────────────────────────────────┐
+│                         CORE PACKAGE                            │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  python/src/RynnMotion/     motion/                     │   │
+│  │  ├── core/                  ├── interface/              │   │
+│  │  │   ├── interface_base.py  │   └── interface_base.hpp  │   │
+│  │  │   └── mj_interface.py    ├── robot_manager/          │   │
+│  │  ├── manager/               └── module_manager/         │   │
+│  │  ├── utils/                                             │   │
+│  │  └── algorithms/                                        │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              ↑                                  │
+│                    (unidirectional)                             │
+│                              │                                  │
+└──────────────────────────────┼──────────────────────────────────┘
+                               │
+       ┌───────────────────────┼───────────────────────┐
+       │                       │                       │
+       ▼                       ▼                       ▼
+┌─────────────┐        ┌─────────────┐        ┌─────────────┐
+│ Satellite A │        │ Satellite B │        │ Satellite C │
+│  (Python)   │        │   (C++)     │        │  (Hybrid)   │
+│             │        │             │        │             │
+│ pip install │        │ #include    │        │ Both Python │
+│ -e core/    │        │ interface_  │        │ and C++     │
+│             │        │ base.hpp    │        │             │
+│ Hardware    │        │             │        │             │
+│ SDK A       │        │ Hardware    │        │ Hardware    │
+│             │        │ SDK B       │        │ SDK C       │
+└─────────────┘        └─────────────┘        └─────────────┘
 ```
 
-### Key Characteristics
+**Key Principle**: Satellites depend on Core. Core NEVER depends on satellites.
 
-1. **Core Package** (`python/`):
+---
 
-   - Contains shared algorithms, simulation, and dataset tools
-   - Minimal dependencies
-   - Hardware-agnostic
+## Core Package Structure
 
-2. **Satellite Submodules** (`robots/*`):
-
-   - Git submodules for specific robot implementations
-   - Own virtual environments with hardware SDKs
-   - Install core package via editable install: `pip install -e ../../python/`
-
-3. **Dependency Flow**:
-   - Satellites → Core (unidirectional)
-   - Core never depends on satellites
-   - Each satellite manages its own hardware SDKs
-
-## Technical Implementation Details
-
-### Current Setup Method
-
-From `robots/RynnLeRobot/setup_env.sh`:
-
-```bash
-# Install core package as editable without dependencies
-uv pip install -e ../../python/ --no-deps
-
-# Set PYTHONPATH for common modules
-export PYTHONPATH="$(pwd)/../../../:$PYTHONPATH"
-
-# Install remaining dependencies
-uv pip install numpy scipy PyYAML matplotlib opencv-python ...
-```
-
-### Dependency Isolation Strategy
-
-- Each robot submodule has isolated venv
-- Core installed with `--no-deps` to avoid conflicts
-- Hardware SDKs only in respective submodules
-- PyTorch version flexibility (CPU vs CUDA)
-
-## Refactoring Plan
-
-### Phase 1: Improve Package Structure
-
-#### 1.1 Convert to Namespace Packages
-
-**Current:**
+### Python Core (`python/src/RynnMotion/`)
 
 ```
 python/src/RynnMotion/
+├── core/                    # Base interfaces and factories
+│   ├── interface_base.py    # RobotInterfaceBase (ABC)
+│   ├── mj_interface.py      # MuJoCo simulation interface
+│   └── base_controller.py   # ControllerBase for applications
+├── manager/                 # Robot & scene management
+│   ├── robot_manager.py     # Robot model configuration
+│   └── scene_manager.py     # MuJoCo scene setup
+├── common/                  # Shared data structures
+│   └── data/
+│       └── robot_state.py   # RobotState dataclass
+├── utils/                   # Utilities
+│   ├── path_config.py       # Path resolution
+│   └── pin_kine.py          # Pinocchio kinematics
+└── algorithms/              # Shared algorithms
+    └── ...
 ```
 
-**Proposed:**
+### C++ Core (`motion/`)
 
-```python
-python/src/
-├── rynn_motion/           # Core namespace
-│   ├── core/             # Core algorithms
-│   ├── sim/              # Simulation
-│   ├── datasets/         # Dataset management
-│   └── __init__.py
-└── rynn_robots/          # Robot implementations namespace
-    └── __init__.py       # Namespace package marker
+```
+motion/
+├── interface/
+│   └── interface_base.hpp   # InterfaceBase (abstract class)
+├── robot_manager/
+│   └── robot_manager.hpp    # Robot configuration
+├── module_manager/
+│   └── module_manager.hpp   # Controller modules
+├── fsm_manager/
+│   └── fsm_manager.hpp      # State machine
+└── runtime_data/
+    └── runtime_data.hpp     # Shared runtime data
 ```
 
-#### 1.2 Define Clear Interface Contracts
+---
 
-Create `python/src/rynn_motion/core/interfaces.py`:
+## Interface Contracts
+
+### Python Interface (`RobotInterfaceBase`)
+
+The base class that all Python robot interfaces must implement:
 
 ```python
 from abc import ABC, abstractmethod
-from typing import Protocol, Dict, Any, Optional
+from collections import OrderedDict
+from RynnMotion.common.data.robot_state import RobotState
 
-class RobotInterface(Protocol):
-    """Contract that all robot implementations must follow"""
+REGISTERED_ROBOT_INTERFACE_FACTORY_FUNCS = OrderedDict()
+
+def register_robotinterface_factory_func(robot_type):
+    """Decorator to register interface factories for runtime selection."""
+    def decorator(factory_func):
+        REGISTERED_ROBOT_INTERFACE_FACTORY_FUNCS[robot_type] = factory_func
+    return decorator
+
+def robotinterface_factory(robot_type, robot_model, robot_config, logger=None):
+    """Create interface instance by type string."""
+    factory_func = REGISTERED_ROBOT_INTERFACE_FACTORY_FUNCS[robot_type]
+    return factory_func(robot_model=robot_model, robot_config=robot_config, logger=logger)
+
+
+class RobotInterfaceBase(ABC):
+    """Abstract base class for all robot interfaces (simulation and hardware)."""
+
+    def __init__(self, robot_model, robot_config, logger):
+        self.logger = logger
+        self.robot_model = robot_model
+        self.connected = False
+        self._load_robot_config(robot_config)
+
+    def _load_robot_config(self, robot_config):
+        """Initialize robot dimensions from model."""
+        self.mdof = self.robot_model.get_actuator_num()
+        self.ee_num = self.robot_model.get_ee_num()
+        self.gripper_num = self.robot_model.get_gripper_num()
+        # ... additional configuration
 
     @abstractmethod
-    def initialize(self, config: Dict[str, Any]) -> None:
-        """Initialize robot with configuration"""
-        ...
+    def connect(self) -> None:
+        """Connect to robot hardware or initialize simulation."""
+        pass
 
     @abstractmethod
-    def get_state(self) -> Dict[str, Any]:
-        """Get current robot state"""
-        ...
+    def get_robot_state_feedbacks(self) -> RobotState:
+        """Read current robot state from sensors or simulation."""
+        pass
 
     @abstractmethod
-    def execute_command(self, command: Dict[str, Any]) -> bool:
-        """Execute control command"""
-        ...
+    def set_robot_command(self, command: RobotState) -> None:
+        """Send control commands to robot."""
+        pass
 
     @abstractmethod
-    def shutdown(self) -> None:
-        """Clean shutdown of robot"""
-        ...
-
-class DatasetInterface(Protocol):
-    """Contract for dataset implementations"""
+    def step(self) -> None:
+        """Advance one timestep (simulation) or sync (hardware)."""
+        pass
 
     @abstractmethod
-    def load(self, path: str) -> None:
-        ...
+    def disconnect(self) -> None:
+        """Clean shutdown of robot connection."""
+        pass
 
-    @abstractmethod
-    def save(self, path: str) -> None:
-        ...
+    def is_connected(self) -> bool:
+        """Check connection status."""
+        return self.connected
 ```
 
-### Phase 2: Dependency Management
+### C++ Interface (`InterfaceBase`)
 
-#### 2.1 Core Package Dependencies
+The base class that all C++ robot interfaces must implement:
 
-Update `python/pyproject.toml`:
+```cpp
+#pragma once
 
-```toml
-[project]
-name = "rynn-motion"
-version = "1.0.0"
-dependencies = [
-    # Minimal core dependencies
-    "numpy>=1.20.0,<2.0.0",
-    "scipy>=1.7.0",
-    "pyyaml>=5.4",
-]
+#include <yaml-cpp/yaml.h>
+#include <memory>
+#include "robot_manager.hpp"
+#include "module_manager.hpp"
+#include "runtime_data.hpp"
 
-[project.optional-dependencies]
-simulation = [
-    "mujoco>=3.0.0",
-    "opencv-python>=4.5.0",
-]
-datasets = [
-    "datasets>=2.0.0",
-    "huggingface-hub>=0.20.0",
-]
-visualization = [
-    "matplotlib>=3.5.0",
-]
+class InterfaceBase {
+public:
+    /**
+     * @brief Constructor for InterfaceBase
+     * @param motionYaml Motion configuration YAML node
+     * @param robotNumber Robot number to initialize
+     * @param sceneNumber Scene configuration number
+     */
+    InterfaceBase(const YAML::Node &motionYaml,
+                  int robotNumber,
+                  int sceneNumber = 1);
+
+    virtual ~InterfaceBase() = default;
+
+    /**
+     * @brief Run the main control application loop
+     */
+    virtual void runApplication() = 0;
+
+protected:
+    /**
+     * @brief Load parameters from YAML configuration
+     */
+    virtual void loadYaml() = 0;
+
+    /**
+     * @brief Get feedback from sensors or simulation
+     */
+    virtual void getFeedbacks();
+    virtual void getJointFeedbacks() = 0;
+    virtual void getEEFeedbacks();  // Optional, default empty
+
+    /**
+     * @brief Send commands to actuators or simulation
+     */
+    virtual void setActuatorCommands();
+    virtual void setJointCommands() = 0;
+    virtual void setEECommands();  // Optional, default empty
+
+    /**
+     * @brief Advance physics simulation by one step
+     */
+    virtual void step() = 0;
+
+    /**
+     * @brief Controller management
+     */
+    virtual void callController();
+    virtual void resetController();
+
+    // Core managers (initialized by base class)
+    std::unique_ptr<rynn::RobotManager> robotManager;
+    std::unique_ptr<rynn::ModuleManager> moduleManager;
+    data::RuntimeData runtimeData_;
+
+    YAML::Node _motionYaml;
+    int _robotNumber;
+    double _controlFreq{1000.0};
+};
 ```
 
-#### 2.2 Satellite Package Dependencies
+### Method Mapping (Python ↔ C++)
 
-Template for `robots/*/pyproject.toml`:
+| Python Method | C++ Method | Purpose |
+|---------------|------------|---------|
+| `connect()` | Constructor + `initInterface()` | Initialize robot connection |
+| `get_robot_state_feedbacks()` | `getFeedbacks()` → `getJointFeedbacks()` | Read sensor data |
+| `set_robot_command()` | `setActuatorCommands()` → `setJointCommands()` | Send control commands |
+| `step()` | `step()` | Advance simulation / sync hardware |
+| `disconnect()` | Destructor | Clean shutdown |
+| `is_connected()` | N/A (managed internally) | Check connection status |
 
-```toml
-[project]
-name = "rynn-robot-{name}"
-version = "0.1.0"
-dependencies = [
-    # Core package with version constraint
-    "rynn-motion>=1.0.0,<2.0.0",
-    # Robot-specific SDKs
-    "{robot_sdk}>=x.y.z",
-]
+---
 
-[tool.rynn]
-compatible_core = ">=1.0.0,<2.0.0"
-hardware_requirements = ["usb", "serial", "camera"]
-```
+## Satellite Implementation Guide
 
-### Phase 3: Build and Test Infrastructure
+### Python Satellite Example
 
-#### 3.1 Root Makefile
-
-Create `Makefile` at project root:
-
-```makefile
-.PHONY: install-core install-all test-core test-all clean
-
-ROBOTS := $(wildcard robots/*)
-PYTHON := python3.13
-
-install-core:
-	@echo "Installing core RynnMotion package..."
-	cd python && pip install -e .[all]
-
-install-all: install-core
-	@echo "Installing all robot submodules..."
-	@for robot in $(ROBOTS); do \
-		if [ -f "$$robot/setup.sh" ]; then \
-			echo "Setting up $$robot..."; \
-			cd "$$robot" && ./setup.sh; \
-		fi; \
-	done
-
-test-core:
-	@echo "Testing core package..."
-	cd python && pytest tests/ -v
-
-test-all: test-core
-	@echo "Testing all robot implementations..."
-	@for robot in $(ROBOTS); do \
-		if [ -d "$$robot/tests" ]; then \
-			echo "Testing $$robot..."; \
-			cd "$$robot" && pytest tests/ -v; \
-		fi; \
-	done
-
-test-integration:
-	@echo "Running integration tests..."
-	pytest integration_tests/ -v
-
-clean:
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	find . -type d -name "*.egg-info" -exec rm -rf {} +
-	find . -type d -name ".pytest_cache" -exec rm -rf {} +
-```
-
-#### 3.2 CI/CD Configuration
-
-Create `.github/workflows/test.yml`:
-
-```yaml
-name: Test Core and Satellites
-
-on: [push, pull_request]
-
-jobs:
-  test-core:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.13"]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install core dependencies
-        run: |
-          cd python
-          pip install -e .[all,dev]
-
-      - name: Run core tests
-        run: |
-          cd python
-          pytest tests/ --cov=rynn_motion
-
-  test-satellites:
-    runs-on: ubuntu-latest
-    needs: test-core
-    strategy:
-      matrix:
-        robot: [RynnLeRobot, franka, piper]
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - name: Test ${{ matrix.robot }}
-        run: |
-          cd robots/${{ matrix.robot }}
-          if [ -f "tests/run_tests.sh" ]; then
-            ./tests/run_tests.sh
-          fi
-```
-
-### Phase 4: Version Management
-
-#### 4.1 Compatibility Matrix
-
-Create `config/compatibility.yaml`:
-
-```yaml
-# Version compatibility matrix
-compatibility_matrix:
-  core_version: "1.0.0"
-
-  satellites:
-    RynnLeRobot:
-      min_version: "0.5.0"
-      max_version: "1.0.0"
-      tested_versions: ["0.5.0", "0.6.0", "0.7.0"]
-
-    franka:
-      min_version: "1.2.0"
-      max_version: "2.0.0"
-      tested_versions: ["1.2.0", "1.3.0"]
-
-    piper:
-      min_version: "0.3.0"
-      max_version: "1.0.0"
-      tested_versions: ["0.3.0", "0.4.0"]
-
-# Breaking changes log
-breaking_changes:
-  "1.0.0":
-    - "Changed RobotInterface.get_state() return type"
-    - "Removed deprecated teleop.legacy module"
-
-  "0.9.0":
-    - "Restructured dataset formats"
-```
-
-#### 4.2 Version Check Script
-
-Create `scripts/check_compatibility.py`:
+A complete example of implementing a robot interface in Python:
 
 ```python
 #!/usr/bin/env python3
-"""Check version compatibility between core and satellites"""
+"""Example robot interface implementation."""
 
-import yaml
-import sys
-from pathlib import Path
-from packaging import version
+from RynnMotion.core.interface_base import (
+    RobotInterfaceBase,
+    register_robotinterface_factory_func,
+)
+from RynnMotion.common.data.robot_state import RobotState
 
-def check_compatibility():
-    # Load compatibility matrix
-    with open('config/compatibility.yaml', 'r') as f:
-        compat = yaml.safe_load(f)
+# Import your hardware SDK
+# from my_robot_sdk import RobotDriver
 
-    core_version = compat['compatibility_matrix']['core_version']
 
-    # Check each satellite
-    robots_dir = Path('robots')
-    for robot_dir in robots_dir.iterdir():
-        if robot_dir.is_dir():
-            # Check if version is compatible
-            robot_name = robot_dir.name
-            if robot_name in compat['compatibility_matrix']['satellites']:
-                sat_info = compat['compatibility_matrix']['satellites'][robot_name]
-                print(f"✓ {robot_name}: Compatible versions {sat_info['min_version']} - {sat_info['max_version']}")
-            else:
-                print(f"⚠ {robot_name}: No compatibility info found")
+@register_robotinterface_factory_func("my_robot_real")
+def my_robot_factory(robot_model, robot_config, logger=None):
+    """Factory function registered for runtime selection."""
+    return MyRobotInterface(robot_model, robot_config, logger)
 
-    return 0
 
-if __name__ == "__main__":
-    sys.exit(check_compatibility())
+class MyRobotInterface(RobotInterfaceBase):
+    """Hardware interface for MyRobot."""
+
+    def __init__(self, robot_model, robot_config, logger):
+        super().__init__(robot_model, robot_config, logger)
+        self.driver = None
+        self.ip_address = robot_config.get("ip_address", "192.168.1.100")
+        self.port = robot_config.get("port", 8080)
+
+    def connect(self) -> None:
+        """Connect to robot hardware."""
+        self.logger.info(f"Connecting to robot at {self.ip_address}:{self.port}")
+        # self.driver = RobotDriver(self.ip_address, self.port)
+        # self.driver.connect()
+        self.connected = True
+        self.logger.info("Robot connected successfully")
+
+    def get_robot_state_feedbacks(self) -> RobotState:
+        """Read current joint positions and velocities from hardware."""
+        # positions = self.driver.get_joint_positions()
+        # velocities = self.driver.get_joint_velocities()
+
+        self.robot_feedback.joint_pos[:] = [0.0] * self.mdof  # Replace with actual
+        self.robot_feedback.joint_vel[:] = [0.0] * self.mdof
+        return self.robot_feedback.copy()
+
+    def set_robot_command(self, command: RobotState) -> None:
+        """Send joint position commands to hardware."""
+        positions = command.joint_pos[:self.mdof]
+        # self.driver.set_joint_positions(positions)
+        self.robot_command = command
+
+    def step(self) -> None:
+        """For real hardware, this is typically a no-op or sync point."""
+        pass
+
+    def disconnect(self) -> None:
+        """Disconnect from robot hardware."""
+        if self.connected:
+            # self.driver.disconnect()
+            self.connected = False
+            self.logger.info("Robot disconnected")
 ```
 
-### Phase 5: Documentation
+### C++ Satellite Example
 
-#### 5.1 Architecture Documentation
+A complete example of implementing a robot interface in C++:
 
-Create `docs/architecture/README.md`:
+```cpp
+// my_robot_interface.hpp
+#pragma once
 
-```markdown
-# RynnMotion Architecture
+#include "interface_base.hpp"
+#include <memory>
+#include <vector>
 
-## Package Structure
+// #include "my_robot_sdk/driver.hpp"  // Your hardware SDK
 
-- **Core Package**: Shared algorithms and simulation (`python/`)
-- **Satellite Packages**: Robot-specific implementations (`robots/*/`)
-- **Dependency Flow**: Satellites depend on Core (unidirectional)
+class MyRobotInterface : public InterfaceBase {
+public:
+    MyRobotInterface(const YAML::Node &robotYaml,
+                     const YAML::Node &motionYaml,
+                     int robotNumber,
+                     int sceneNumber = 1);
 
-## Development Guidelines
+    ~MyRobotInterface() override;
 
-### Adding a New Robot
+    void runApplication() override;
 
-1. Create submodule in `robots/`
-2. Implement `RobotInterface` from core
-3. Create setup script with core installation
-4. Add to compatibility matrix
-5. Write integration tests
+protected:
+    void loadYaml() override;
+    void getJointFeedbacks() override;
+    void setJointCommands() override;
+    void step() override;
 
-### Modifying Core Package
+private:
+    YAML::Node _robotYaml;
+    std::string _ipAddress;
+    int _port;
+    // std::unique_ptr<MyRobotDriver> _driver;
 
-1. Check impact on all satellites
-2. Update compatibility matrix
-3. Use deprecation warnings for breaking changes
-4. Run full integration test suite
-
-## API Stability
-
-- Core APIs follow semantic versioning
-- Breaking changes require major version bump
-- Deprecation period of 2 minor versions
+    std::vector<double> _jointPositions;
+    std::vector<double> _jointVelocities;
+};
 ```
 
-#### 5.2 Migration Guide Template
+```cpp
+// my_robot_interface.cpp
+#include "my_robot_interface.hpp"
+#include <chrono>
+#include <thread>
+#include <iostream>
 
-Create `docs/migration/template.md`:
+MyRobotInterface::MyRobotInterface(const YAML::Node &robotYaml,
+                                   const YAML::Node &motionYaml,
+                                   int robotNumber,
+                                   int sceneNumber)
+    : InterfaceBase(motionYaml, robotNumber, sceneNumber),
+      _robotYaml(robotYaml) {
+    loadYaml();
+    initHardware();
+}
 
-```markdown
-# Migration Guide: vX.Y.Z to vA.B.C
+MyRobotInterface::~MyRobotInterface() {
+    // Clean shutdown
+    // _driver->disconnect();
+}
 
-## Breaking Changes
+void MyRobotInterface::loadYaml() {
+    auto config = _robotYaml["my_robot"];
+    _ipAddress = config["ip_address"].as<std::string>("192.168.1.100");
+    _port = config["port"].as<int>(8080);
+    _controlFreq = config["control_freq"].as<double>(1000.0);
 
-- List all breaking changes
-- Provide before/after examples
+    // Initialize storage
+    int numJoints = robotManager->getNumJoints();
+    _jointPositions.resize(numJoints, 0.0);
+    _jointVelocities.resize(numJoints, 0.0);
+}
 
-## Deprecations
+void MyRobotInterface::getJointFeedbacks() {
+    // Read from hardware
+    // _jointPositions = _driver->getJointPositions();
+    // _jointVelocities = _driver->getJointVelocities();
 
-- List deprecated features
-- Show migration path
+    for (size_t i = 0; i < _jointPositions.size(); ++i) {
+        runtimeData_.qFb(i) = _jointPositions[i];
+        runtimeData_.qdFb(i) = _jointVelocities[i];
+    }
+}
 
-## New Features
+void MyRobotInterface::setJointCommands() {
+    std::vector<double> commands(_jointPositions.size());
+    for (size_t i = 0; i < commands.size(); ++i) {
+        commands[i] = runtimeData_.qCmd(i);
+    }
+    // _driver->setJointPositions(commands);
+}
 
-- List new features
-- Provide usage examples
+void MyRobotInterface::step() {
+    // For real hardware: sync point or no-op
+    // For simulation: would call physics step
+}
 
-## Update Instructions
+void MyRobotInterface::runApplication() {
+    std::cout << "Starting control loop at " << _controlFreq << " Hz" << std::endl;
 
-1. Update core package
-2. Check compatibility matrix
-3. Update satellite packages
-4. Run integration tests
+    const auto loopDuration = std::chrono::microseconds(
+        static_cast<int>(1000000.0 / _controlFreq));
+    auto nextTime = std::chrono::steady_clock::now();
+
+    while (true) {
+        nextTime += loopDuration;
+
+        getFeedbacks();      // Read sensors
+        callController();    // Update control
+        setActuatorCommands(); // Send commands
+
+        std::this_thread::sleep_until(nextTime);
+    }
+}
 ```
+
+### Setup Script Template
+
+Each satellite should have a setup script that installs the core package:
+
+```bash
+#!/bin/bash
+# setup_env.sh - Satellite environment setup
+
+set -e
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install core package WITHOUT its dependencies (to avoid conflicts)
+pip install -e ../../python/ --no-deps
+
+# Install core dependencies manually (allows version flexibility)
+pip install numpy scipy PyYAML matplotlib mujoco pinocchio
+
+# Install robot-specific SDK
+pip install my-robot-sdk>=1.0.0
+
+# Set PYTHONPATH if needed for development
+export PYTHONPATH="$(pwd)/../../:$PYTHONPATH"
+
+echo "Environment setup complete"
+```
+
+---
+
+## Controller Layer (Application)
+
+For higher-level applications, RynnMotion provides `ControllerBase` which abstracts mode switching:
+
+### ControllerBase
+
+```python
+from abc import ABC, abstractmethod
+from RynnMotion.core.interface_base import robotinterface_factory
+from RynnMotion.manager.robot_manager import RobotManager
+
+class ControllerBase(ABC):
+    """Application-level controller with sim/real mode switching."""
+
+    def __init__(self, mode="sim", frequency=100, config_path="config.yaml"):
+        self.mode = mode
+        self.frequency = frequency
+        self.robot_model = RobotManager(self.get_robot_name())
+
+        # Factory selects interface based on mode
+        interface_type = "mujoco_sim_robot" if mode == "sim" else f"{self.get_robot_name()}_real"
+        self.interface = robotinterface_factory(
+            robot_type=interface_type,
+            robot_model=self.robot_model,
+            robot_config=self.load_config(config_path)
+        )
+
+    @abstractmethod
+    def get_robot_name(self) -> str:
+        """Return robot identifier (e.g., 'so101', 'fr3')."""
+        pass
+
+    @abstractmethod
+    def motion_planner(self, current_time: float) -> np.ndarray:
+        """Compute target joint positions for current timestep."""
+        pass
+
+    def run(self):
+        """Main control loop."""
+        self.interface.connect()
+        current_time = 0.0
+        dt = 1.0 / self.frequency
+
+        try:
+            while self.is_running():
+                # Get current state
+                state = self.interface.get_robot_state_feedbacks()
+
+                # Compute commands
+                target_positions = self.motion_planner(current_time)
+
+                # Send commands
+                command = RobotState()
+                command.joint_pos[:] = target_positions
+                self.interface.set_robot_command(command)
+
+                # Step
+                self.interface.step()
+                current_time += dt
+        finally:
+            self.interface.disconnect()
+```
+
+### Controller Example
+
+```python
+class MyMotionController(ControllerBase):
+    """Example controller for predefined motion patterns."""
+
+    def __init__(self, mode="sim", motion_type=1):
+        self.motion_type = motion_type
+        super().__init__(mode=mode, frequency=100, config_path="configs/my_robot.yaml")
+
+    def get_robot_name(self) -> str:
+        return "my_robot"
+
+    def motion_planner(self, current_time: float) -> np.ndarray:
+        """Generate sinusoidal motion pattern."""
+        amplitude = 0.5
+        freq = 0.2
+        num_joints = self.robot_model.get_actuator_num()
+
+        target = np.zeros(num_joints)
+        target[0] = amplitude * np.sin(2 * np.pi * freq * current_time)
+        return target
+
+
+# Usage:
+# Simulation mode
+controller = MyMotionController(mode="sim", motion_type=1)
+controller.run()
+
+# Real hardware mode
+controller = MyMotionController(mode="real", motion_type=1)
+controller.run()
+```
+
+---
 
 ## Best Practices
 
-### Do's ✅
+### Do's
 
-1. **Keep core dependencies minimal** - Only essential packages
-2. **Use editable installs for development** - `-e` flag for real-time updates
-3. **Version everything** - Core, satellites, and compatibility matrix
-4. **Test integration regularly** - Automated CI/CD for all combinations
-5. **Document interfaces clearly** - Type hints and docstrings
-6. **Use semantic versioning** - Major.Minor.Patch
-7. **Isolate hardware SDKs** - Keep in satellite venvs only
+1. **Keep core dependencies minimal** - Only essential packages (numpy, scipy, yaml)
+2. **Use editable installs for development** - `pip install -e` for real-time updates
+3. **Document interfaces clearly** - Type hints and docstrings
+4. **Isolate hardware SDKs** - Keep in satellite venvs only
+5. **Use the factory pattern** - Enables runtime mode switching
+6. **Test in simulation first** - Use `MujocoRobotInterface` before hardware
 
-### Don'ts ❌
+### Don'ts
 
-1. **Don't create circular dependencies** - Core should never import satellites
-2. **Don't hardcode paths** - Use relative imports and config files
-3. **Don't skip compatibility testing** - Test before merging
-4. **Don't break interfaces without deprecation** - Use warnings first
-5. **Don't mix hardware SDKs** - Keep them isolated
-6. **Don't use global Python packages** - Always use venvs
-7. **Don't ignore version constraints** - Pin compatible versions
+1. **Don't create circular dependencies** - Core should NEVER import satellites
+2. **Don't hardcode paths** - Use `path_config.py` utilities
+3. **Don't mix hardware SDKs** - Keep them isolated per satellite
+4. **Don't skip the interface contract** - Implement all abstract methods
+5. **Don't use global Python packages** - Always use virtual environments
 
-## Monitoring and Maintenance
+### Dependency Isolation Strategy
 
-### Health Checks
+```
+Core Package (minimal deps)
+├── numpy>=1.20.0
+├── scipy>=1.7.0
+├── pyyaml>=5.4
+└── [optional] mujoco, pinocchio
 
-- Weekly compatibility tests
-- Monthly dependency updates
-- Quarterly architecture review
+Satellite A (servo motors)
+├── Core (via pip install -e --no-deps)
+├── servo-sdk>=2.0.0
+└── pyserial>=3.5
 
-### Metrics to Track
+Satellite B (industrial arm)
+├── Core (via pip install -e --no-deps)
+├── industrial-robot-sdk>=1.5.0
+└── protobuf>=3.20.0
+```
 
-- Import time of core package
-- Test coverage percentage
-- Number of cross-dependencies
-- Time to set up new robot
+---
 
-### Warning Signs
+## Adding a New Robot
 
-- Increasing setup complexity
-- Circular import attempts
-- Version conflict reports
-- Slow import times
+### Step-by-Step Guide
 
-## Future Considerations
+1. **Create satellite repository**
+   ```
+   my-robot-satellite/
+   ├── src/
+   │   └── my_robot_interface.py  # or .cpp
+   ├── configs/
+   │   └── my_robot.yaml
+   ├── setup.py  # or CMakeLists.txt
+   └── setup_env.sh
+   ```
 
-### Potential Improvements
+2. **Implement the interface**
+   - Inherit from `RobotInterfaceBase` (Python) or `InterfaceBase` (C++)
+   - Implement all abstract methods
+   - Add hardware SDK integration
 
-1. **Plugin System**: Dynamic robot loading
-2. **Docker Containers**: Isolated environments
-3. **Microservices**: Separate services for each robot
-4. **gRPC/REST APIs**: Network-based interfaces
-5. **Conda Environments**: Better binary dependency management
+3. **Register with factory** (Python only)
+   ```python
+   @register_robotinterface_factory_func("my_robot_real")
+   def factory(robot_model, robot_config, logger=None):
+       return MyRobotInterface(robot_model, robot_config, logger)
+   ```
 
-### Scalability Path
+4. **Create setup script**
+   - Install core with `--no-deps`
+   - Install hardware SDK
+   - Configure PYTHONPATH if needed
 
-- Current: 5-10 robot types
-- Medium-term: 20-30 robot types
-- Long-term: 50+ robot types → Consider microservices
+5. **Test in simulation**
+   - Use `MujocoRobotInterface` with your robot model
+   - Verify control logic before hardware
+
+6. **Deploy to hardware**
+   - Switch mode from "sim" to "real"
+   - Same controller code, different interface
+
+### Checklist
+
+- [ ] Interface inherits from base class
+- [ ] All abstract methods implemented
+- [ ] Factory function registered (Python)
+- [ ] Setup script creates isolated environment
+- [ ] Core installed with `--no-deps`
+- [ ] Hardware SDK installed
+- [ ] YAML configuration created
+- [ ] Tested in simulation
+- [ ] Tested on hardware
+
+---
 
 ## Conclusion
 
-The Core-Satellite pattern provides good separation of concerns for RynnMotion's multi-robot architecture. Following these guidelines will ensure maintainable and scalable growth of the codebase.
+The Core-Satellite pattern provides clean separation between shared algorithms and robot-specific implementations. This enables:
 
-Last Updated: 2024-10-18
+- **Rapid prototyping** in simulation
+- **Safe deployment** to hardware
+- **Easy addition** of new robots
+- **Isolated dependencies** per robot
+- **Consistent API** across all robots
+
+The unidirectional dependency flow ensures the core remains stable while satellites can evolve independently with their respective hardware SDKs.

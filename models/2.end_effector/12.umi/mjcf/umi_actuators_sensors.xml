@@ -14,7 +14,7 @@
     <position name="umi_qrx" joint="gripper_joint_rx" class="gripper_rot_actuator" />
     <position name="umi_qry" joint="gripper_joint_ry" class="gripper_rot_actuator" />
     <position name="umi_qrz" joint="gripper_joint_rz" class="gripper_rot_actuator" />
-    <position name="gripper" tendon="split" class="finger_actuator"/>
+    <general name="gripper" tendon="split" class="finger_actuator"/>
   </actuator>
 
 </mujoco>

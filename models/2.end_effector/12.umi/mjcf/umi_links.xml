@@ -16,10 +16,6 @@
     <joint name="gripper_joint_ry" axis="0 1 0" class="gripper_hinge" />
     <joint name="gripper_joint_rz" axis="0 0 1" class="gripper_hinge" />
 
-    <geom type="cylinder" size="0.002 0.05" rgba="1 0 0 1" pos="0.05 -0.0 0." euler="0 1.57079 0" class="visual"/>
-    <geom type="cylinder" size="0.002 0.05" rgba="0 1 0 1" pos="0 0.05 0." euler="1.57079 0 0" class="visual"/>
-    <geom type="cylinder" size="0.002 0.05" rgba="0 0 1 1" pos="0 -0.0 0.05" euler="0 0 0" class="visual"/>
-
     <!-- Linear Rail -->
     <geom name="linear_guide_rail" type="box" pos="0 -0.002 0.062" size="0.08 0.003 0.004" material="light_gray" class="visual" />
 

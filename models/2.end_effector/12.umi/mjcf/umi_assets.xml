@@ -22,7 +22,8 @@
       </default>
 
       <default class="finger_actuator">
-        <position ctrlrange="0 0.05" />
+        <!-- 0=closed (joint=0.05), 1=open (joint=0) -->
+        <general biastype="affine" gainprm="-50 0 0" biasprm="50 -1000 -100" ctrlrange="0 1" />
       </default>
       <default class="gripper_actuator">
         <position kp="100" dampratio="1" ctrlrange="-1.2 1.2" />

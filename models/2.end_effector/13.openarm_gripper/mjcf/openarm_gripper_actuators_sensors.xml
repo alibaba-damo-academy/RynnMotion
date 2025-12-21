@@ -1,12 +1,5 @@
 <mujoco model="openarm_gripper_actuators_sensors">
 
-  <tendon>
-    <fixed name="split">
-      <joint joint="right_finger_joint" coef="0.5" />
-      <joint joint="left_finger_joint" coef="0.5" />
-    </fixed>
-  </tendon>
-
   <actuator>
     <position name="gripper_qx" joint="gripper_joint_x" class="gripper_actuator" />
     <position name="gripper_qy" joint="gripper_joint_y" class="gripper_actuator" />
@@ -14,7 +7,12 @@
     <position name="gripper_qrx" joint="gripper_joint_rx" class="gripper_rot_actuator" />
     <position name="gripper_qry" joint="gripper_joint_ry" class="gripper_rot_actuator" />
     <position name="gripper_qrz" joint="gripper_joint_rz" class="gripper_rot_actuator" />
-    <position name="gripper" tendon="split" class="finger_actuator"/>
+    <general name="gripper" joint="joint1" class="dm4310" biastype="affine" gainprm="-550 0 0" biasprm="25 -500 -15" forcerange="-7 7" ctrlrange="0 1"/>
   </actuator>
+
+  <equality>
+    <weld site1="lslider_site" site2="end_llink3_site" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+    <weld site1="rslider_site" site2="end_rlink3_site" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+  </equality>
 
 </mujoco>
