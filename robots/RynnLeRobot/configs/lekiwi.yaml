@@ -1,0 +1,21 @@
+logging:
+  log_dir: ~/RynnRcplog/RynnMotion
+  log_file: RynnMotion.log
+robot:
+  port: /dev/ttyACM0
+  inference_rate: 30.0
+  timeout_seconds: 30.0
+  baudrate: 1000000
+  model: "sts3215"
+simulation:
+  random_init_joints: false
+  cube_grabber_mode: lerp # "lerp", "Pcontrol"
+  camera_saving_mode: none # "image", "video", "none"
+  camera_frequency: 30 # hz
+  camera_name: Wrist_camera
+spline:
+  boundary_condition: natural # "natural", "periodic", "clamped", "not-a-knot"
+plot:
+  enable_joint_plotting: false
+  enable_interpolator_plotting: false
+  show_plots: false

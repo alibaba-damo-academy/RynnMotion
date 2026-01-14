@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "RynnLeRobot"
+version = "0.1.0"
+description = "RynnMotion LeRobot Motion Control and Communication"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.21.0,<=1.24.4; python_version < '3.13'",
+    "numpy>=1.26.0; python_version >= '3.13'",
+    "scipy>=1.10.0",
+    "PyYAML>=6.0.0",
+    "matplotlib>=3.5.0; python_version < '3.13'",
+    "matplotlib>=3.5.0; python_version >= '3.13'",
+    "pyserial>=3.5",
+    "lcm>=1.5.0",
+    "tqdm>=4.60.0",
+    "feetech-servo-sdk>=1.0.0",
+    "draccus>=0.8.0,<=0.9.3; python_version < '3.13'",
+    "draccus>=0.8.0; python_version >= '3.13'",
+    "mujoco>=3.3.0",
+    "fsspec>=2023.0.0",
+    "spatialmath-python>=1.0.0",
+    "opencv-python>=4.5.5.64",
+    "pytest==7.0.0",
+    "ipykernel==6.30.0",
+    "deepdiff==8.6.0",
+    "huggingface_hub==0.34.4",
+    "ruckig>=0.10.0",
+    "rerun-sdk>=0.21.0,<0.23.0",
+    "jsonlines>=4.0.0",
+    "av>=12.0.0",
+    "pillow>=9.0.0",
+    "pynput>=1.7.6",
+    "termcolor>=2.3.0",
+    "datasets>=4.0.0",
+    "pyarrow>=15.0.0",
+    "h5py>=3.7.0",
+    "pandas>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["black>=22.0.0", "flake8>=4.0.0", "mypy>=0.950", "pytest>=7.0.0"]
+
+[project.scripts]
+# Regular scripts (no MuJoCo viewer dependency)
+feetech-tool = "RynnLeRobot.scripts.feetech_tool:main"
+so101-motion = "RynnLeRobot.utils.mjpython_wrapper:so101_motion"
+lekiwi-motion = "RynnLeRobot.utils.mjpython_wrapper:lekiwi_motion"
+calibrate = "RynnLeRobot.scripts.calibrate:main"
+find-camera-port = "RynnLeRobot.scripts.find_camera_port:main"
+find-motor-port = "RynnLeRobot.scripts.find_motor_port:main"
+follower-jointsine = "RynnLeRobot.scripts.follower_jointsine:main"
+show-joint-angles = "RynnLeRobot.scripts.show_joint_angles:main"
+check-calibrate = "RynnLeRobot.scripts.so101_check_calibrate:main"
+lekiwi-gamepad-control = "RynnLeRobot.scripts.lekiwi_gamepad_control:main"
+record = "RynnLeRobot.scripts.record:main"
+multi-teleop-mac = "RynnLeRobot.utils.mjpython_wrapper:multi_teleop_mac"
+
+# MuJoCo viewer scripts (mjpython on macOS)
+joint-teleop = "RynnLeRobot.utils.mjpython_wrapper:joint_teleop"
+lerobot-ui = "RynnLeRobot.utils.mjpython_wrapper:lerobot_ui"
+lekiwi-ui = "RynnLeRobot.utils.mjpython_wrapper:lekiwi_ui"
+multi-teleop = "RynnLeRobot.utils.mjpython_wrapper:multi_teleop"
+so101-teleop = "RynnLeRobot.utils.mjpython_wrapper:so101_teleop"
+so101-pickplace = "RynnLeRobot.utils.mjpython_wrapper:so101_pickplace"
+so101-floating-ee = "RynnLeRobot.utils.mjpython_wrapper:so101_floating_ee"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["RynnLeRobot*"]
+
+[tool.setuptools.package-data]
+"common.lcm" = ["*.lcm"]
+"common.lcm.lcm_types" = ["*.lcm"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[dependency-groups]
+dev = ["black>=22.0.0", "flake8>=4.0.0", "mypy>=0.950", "pytest>=7.0.0"]
