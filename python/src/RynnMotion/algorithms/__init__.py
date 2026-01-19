@@ -9,6 +9,7 @@ Contains:
 - Transform: SE3 rigid body transformation
 - FrameTransformer: Multi-frame coordinate transform manager
 - PolicyInterpolator: Trajectory interpolation for policy execution
+- mink_bridge: Bridge utilities for mink IK integration
 """
 
 from .pose_mapper import PoseMapper
@@ -26,6 +27,19 @@ from .orient import (
     compose_transforms,
 )
 from .policy_interpolator import PolicyInterpolator, lerp
+from .mink_bridge import (
+    configuration_from_model,
+    configuration_from_interface,
+    sync_interface_to_config,
+    sync_mj_data_to_config,
+    apply_config_to_interface,
+    apply_config_to_mj_data,
+    get_joint_positions_from_config,
+    create_frame_task,
+    create_posture_task,
+    create_standard_limits,
+    solve_ik_step,
+)
 
 __all__ = [
     'PoseMapper',
@@ -42,4 +56,16 @@ __all__ = [
     'compose_transforms',
     'PolicyInterpolator',
     'lerp',
+    # mink bridge utilities
+    'configuration_from_model',
+    'configuration_from_interface',
+    'sync_interface_to_config',
+    'sync_mj_data_to_config',
+    'apply_config_to_interface',
+    'apply_config_to_mj_data',
+    'get_joint_positions_from_config',
+    'create_frame_task',
+    'create_posture_task',
+    'create_standard_limits',
+    'solve_ik_step',
 ]

@@ -37,6 +37,9 @@ dependencies = [
     "torch>=1.13.0",
     "packaging>=21.0",
     "ruckig>=0.15.0",
+    "mink>=1.0.0",
+    "loop-rate-limiters>=0.1.0",
+    "robot_descriptions>=1.14.0",
 ]
 
 [tool.rynnmotion.paths]
@@ -49,7 +52,6 @@ full = ["draccus>=0.10.0"]
 dev = ["build>=0.10.0", "wheel>=0.38.0", "twine>=4.0.0", "pytest>=7.0.0"]
 
 [project.urls]
-# Homepage = "https://github.com/your-org/rynnmotion"
 Repository = "https://github.com/alibaba-damo-academy/RynnMotion"
 
 [tool.setuptools.packages.find]
