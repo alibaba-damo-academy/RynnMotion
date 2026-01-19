@@ -1,0 +1,13 @@
+<mujoco model="openarm_gripper_fixed_actuators">
+
+  <actuator>
+    <!-- Only finger actuator, no floating joint actuators -->
+    <general name="gripper" joint="joint1" class="dm4310" biastype="affine" gainprm="-550 0 0" biasprm="25 -500 -15" forcerange="-7 7" ctrlrange="0 1"/>
+  </actuator>
+
+  <equality>
+    <weld site1="lslider_site" site2="end_llink3_site" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+    <weld site1="rslider_site" site2="end_rlink3_site" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+  </equality>
+
+</mujoco>

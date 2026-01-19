@@ -1,0 +1,20 @@
+<mujoco model="openarm_gripper_fixed_robot">
+  <compiler angle="radian" meshdir="../assets" texturedir="../assets" />
+
+  <option integrator="implicitfast" impratio="10" cone="elliptic" noslip_iterations="2">
+    <flag multiccd="enable" />
+  </option>
+
+  <include file="openarm_gripper_assets.xml" />
+
+  <worldbody>
+    <include file="openarm_gripper_fixed_links.xml" />
+  </worldbody>
+
+  <include file="openarm_gripper_fixed_actuators.xml" />
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0" ctrl="0"/>
+  </keyframe>
+
+</mujoco>

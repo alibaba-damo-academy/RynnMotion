@@ -1,7 +1,7 @@
 <mujoco model="rizon4s_assets">
 
   <asset>
-    <!-- Mesh files -->
+    <!-- Visual mesh files -->
     <mesh name="link0" file="visual_link0.obj"/>
     <mesh name="link1" file="visual_link1.obj"/>
     <mesh name="link2" file="visual_link2.obj"/>
@@ -10,6 +10,16 @@
     <mesh name="link5" file="visual_link5.obj"/>
     <mesh name="link6" file="visual_link6.obj"/>
     <mesh name="link7" file="visual_link7.obj"/>
+
+    <!-- Collision mesh files -->
+    <mesh name="collision_link0" file="collision_link0.stl"/>
+    <mesh name="collision_link1" file="collision_link1.stl"/>
+    <mesh name="collision_link2" file="collision_link2.stl"/>
+    <mesh name="collision_link3" file="collision_link3.stl"/>
+    <mesh name="collision_link4" file="collision_link4.stl"/>
+    <mesh name="collision_link5" file="collision_link5.stl"/>
+    <mesh name="collision_link6" file="collision_link6.stl"/>
+    <mesh name="collision_link7" file="collision_link7.stl"/>
 
 
     <!-- Materials -->

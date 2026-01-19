@@ -1,0 +1,79 @@
+<mujoco model="agibot_x2_ultra">
+  <compiler angle="radian" meshdir="../assets" autolimits="true"/>
+
+  <option integrator="implicitfast"/>
+
+  <include file="x2_defaults.xml"/>
+  <include file="x2_assets.xml"/>
+
+  <worldbody>
+    <light pos="1 0 3.5" dir="0 0 -1" directional="true"/>
+    <body name="pelvis_root" pos="0 0 0.68" childclass="x2">
+      <freejoint name="floating_base_joint"/>
+      <include file="x2_ultra_links.xml"/>
+    </body>
+  </worldbody>
+
+  <include file="x2_ultra_actuators.xml"/>
+  <include file="x2_sensors.xml"/>
+
+  <keyframe>
+    <key name="home"
+      qpos="
+      0 0 0.68
+      1 0 0 0
+      0 0 0 0 0 0
+      0 0 0 0 0 0
+      0 0 0
+      0 0
+      0 0 0 0 0 0 0
+      0 0 0 0 0 0 0
+      "
+      ctrl="
+      0 0 0 0 0 0
+      0 0 0 0 0 0
+      0 0 0
+      0 0
+      0 0 0 0 0 0 0
+      0 0 0 0 0 0 0
+      "/>
+    <key name="standby1"
+      qpos="
+      0 0 0.68
+      1 0 0 0
+      0 0 0 0 0 0
+      0 0 0 0 0 0
+      0 0 0
+      0 0
+      0 0.5 0 -0.8 0 0 0
+      0 -0.5 0 -0.8 0 0 0
+      "
+      ctrl="
+      0 0 0 0 0 0
+      0 0 0 0 0 0
+      0 0 0
+      0 0
+      0 0.5 0 -0.8 0 0 0
+      0 -0.5 0 -0.8 0 0 0
+      "/>
+    <key name="standby2"
+      qpos="
+      0 0 0.68
+      1 0 0 0
+      0 0 0 0 0 0
+      0 0 0 0 0 0
+      0 0 0
+      0 0
+      0 1.0 0 -1.5 0 0 0
+      0 -1.0 0 -1.5 0 0 0
+      "
+      ctrl="
+      0 0 0 0 0 0
+      0 0 0 0 0 0
+      0 0 0
+      0 0
+      0 1.0 0 -1.5 0 0 0
+      0 -1.0 0 -1.5 0 0 0
+      "/>
+  </keyframe>
+</mujoco>

@@ -1,4 +1,4 @@
-<mujoco model="scene">
+<mujoco model="scene_float">
   <compiler angle="radian" meshdir="../assets" texturedir="../assets" />
 
   <option integrator="implicitfast" impratio="10" cone="elliptic" noslip_iterations="2">
@@ -40,9 +40,8 @@
   <include file="../mjcf/openarm_gripper_actuators_sensors.xml" />
 
   <!-- Exclude contact between floor and internal mechanism links -->
-  <!-- NOTE: Comment out gripper sections below to match replicate count -->
   <contact>
-    <!-- Gripper 0 (for replicate count >= 1) -->
+    <!-- Gripper 0 -->
     <exclude body1="world" body2="link1_0"/>
     <exclude body1="world" body2="llink2_0"/>
     <exclude body1="world" body2="rlink2_0"/>
@@ -50,7 +49,7 @@
     <exclude body1="world" body2="rslider_0"/>
     <exclude body1="gripper_base_0" body2="llink3_0"/>
     <exclude body1="gripper_base_0" body2="rlink3_0"/>
-    <!-- Gripper 1 (for replicate count >= 2, comment out if count = 1) -->
+    <!-- Gripper 1 -->
     <exclude body1="world" body2="link1_1"/>
     <exclude body1="world" body2="llink2_1"/>
     <exclude body1="world" body2="rlink2_1"/>

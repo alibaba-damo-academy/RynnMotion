@@ -1,0 +1,5 @@
+# Robot Package to RynnMotion MJCF Converter
+# Install: pip install -r requirements.txt
+
+mujoco>=3.0.0
+xacrodoc>=0.1.0  # For xacro to URDF conversion (optional, only needed for .xacro files)

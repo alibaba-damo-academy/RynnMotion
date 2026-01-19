@@ -1,0 +1,15 @@
+<mujoco model="openarm_gripper_fixed_pinocchio">
+  <compiler angle="radian" />
+
+  <worldbody>
+    <body name="gripper_base" pos="0 0 0.11">
+      <inertial pos="0 0 0.03" mass="0.5" diaginertia="0.001 0.001 0.001" />
+      <site name="EE" pos="0 0 0" size="0.001" />
+    </body>
+  </worldbody>
+
+  <keyframe>
+    <key name="home" qpos="" ctrl="" />
+  </keyframe>
+
+</mujoco>

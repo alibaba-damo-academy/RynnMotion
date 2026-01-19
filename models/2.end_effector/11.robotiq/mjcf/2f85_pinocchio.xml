@@ -1,0 +1,43 @@
+<mujoco model="2f85_pinocchio">
+  <compiler angle="radian" />
+
+  <default>
+    <default class="gripper_slide">
+      <joint type="slide" damping="0.1" range="-1.2 1.2" />
+      <position kp="100" dampratio="1" ctrlrange="-1.2 1.2" />
+    </default>
+    <default class="gripper_hinge">
+      <joint type="hinge" damping="10.1" range="-3.1415 3.1415" />
+      <position kp="10" dampratio="0.1" ctrlrange="-3.1415 3.1415" />
+    </default>
+  </default>
+
+  <worldbody>
+    <body name="base_mount" pos="0 0 0.007">
+      <inertial pos="0 0 0.03" mass="0.8" diaginertia="0.001 0.001 0.001" />
+
+      <joint name="gripper_joint_x" axis="1 0 0" class="gripper_slide" />
+      <joint name="gripper_joint_y" axis="0 1 0" class="gripper_slide" />
+      <joint name="gripper_joint_z" axis="0 0 1" class="gripper_slide" />
+      <joint name="gripper_joint_rx" axis="1 0 0" class="gripper_hinge" />
+      <joint name="gripper_joint_ry" axis="0 1 0" class="gripper_hinge" />
+      <joint name="gripper_joint_rz" axis="0 0 1" class="gripper_hinge" />
+
+      <site name="EE" pos="0 0 0.1" size="0.001" />
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="2f85_qx" joint="gripper_joint_x" class="gripper_slide" />
+    <position name="2f85_qy" joint="gripper_joint_y" class="gripper_slide" />
+    <position name="2f85_qz" joint="gripper_joint_z" class="gripper_slide" />
+    <position name="2f85_qrx" joint="gripper_joint_rx" class="gripper_hinge" />
+    <position name="2f85_qry" joint="gripper_joint_ry" class="gripper_hinge" />
+    <position name="2f85_qrz" joint="gripper_joint_rz" class="gripper_hinge" />
+  </actuator>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0.11 0 0 0" ctrl="0 0 0.11 0 0 0" />
+  </keyframe>
+
+</mujoco>

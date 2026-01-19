@@ -47,6 +47,8 @@ const std::map<std::string, std::vector<std::string>> ROBOT_ALIASES = {
     {"diffMobile_Franka", {"mobile_fr3", "diff-mobile-franka"}},
     {"oneLink", {"onelink", "one-link", "one_link"}},
     {"twoLink", {"twolink", "two-link", "two_link"}},
+    {"unitree_g1", {"g1", "G1", "unitree-g1", "unitree_humanoid"}},
+    {"agibot_x2", {"x2", "X2", "agibot-x2", "agibot_humanoid", "x2_fist", "x2_hand", "x2_ultra"}},
 };
 
 const std::map<std::string, std::vector<std::string>> SCENE_ALIASES = {
@@ -64,7 +66,7 @@ const std::map<std::string, std::map<std::string, std::vector<int>>> LEGACY_SCEN
     {"rm75", {{"scene.xml", {1, 2, 3, 4}}, {"scene_pickplace.xml", {5}}}},
     {"so101", {{"scene.xml", {1, 2, 3, 4}}, {"scene_pickplace.xml", {5}}}},
     {"openarm", {{"scene.xml", {1, 2}}}},
-    {"rizon4s", {{"scene.xml", {1, 2, 3, 4, 5}}}},
+    {"rizon4s", {{"scene.xml", {1, 2}}}},
     {"onelink", {{"scene.xml", {1, 2}}}},
     {"twolink", {{"scene.xml", {1, 2}}}},
     {"dual_fr3", {{"dual_fr3_scene.xml", {1, 2, 3, 4}}, {"dual_fr3_pickplace.xml", {5}}}},
@@ -73,7 +75,7 @@ const std::map<std::string, std::map<std::string, std::vector<int>>> LEGACY_SCEN
     {"dual_rm75", {{"dual_rm75_scene.xml", {1, 2, 3, 4}}, {"dual_rm75_pickplace.xml", {5}}}},
     {"dual_so101", {{"dual_so101_scene.xml", {1, 2, 3, 4}}, {"dual_so101_pickplace.xml", {5}}}},
 };
-}
+} // namespace
 
 // Forward declaration
 struct DiscoveredSceneInfo;
@@ -308,7 +310,7 @@ inline std::optional<std::string> RobotDiscovery::findRobotConfig(const fs::path
 }
 
 inline std::vector<DiscoveredSceneInfo> RobotDiscovery::scanScenes(const fs::path &robotDir,
-                                                            const std::string &robotName) const {
+                                                                   const std::string &robotName) const {
   return SceneDiscovery::scanScenes(robotDir, robotName);
 }
 
@@ -406,7 +408,7 @@ inline std::string RobotDiscovery::toLower(const std::string &str) const {
 }
 
 inline std::vector<DiscoveredSceneInfo> SceneDiscovery::scanScenes(const fs::path &robotPath,
-                                                            const std::string &robotName) {
+                                                                   const std::string &robotName) {
   std::vector<DiscoveredSceneInfo> scenes;
 
   fs::path sceneDir = robotPath / "scene";
@@ -462,7 +464,7 @@ inline std::vector<DiscoveredSceneInfo> SceneDiscovery::scanScenes(const fs::pat
 }
 
 inline DiscoveredSceneInfo SceneDiscovery::getScene(const std::vector<DiscoveredSceneInfo> &scenes,
-                                             const std::string &numberOrName) {
+                                                    const std::string &numberOrName) {
   if (scenes.empty()) {
     throw std::runtime_error("No scenes available");
   }

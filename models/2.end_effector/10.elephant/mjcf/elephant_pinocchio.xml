@@ -1,0 +1,15 @@
+<mujoco model="elephant_pinocchio">
+  <compiler angle="radian" />
+
+  <worldbody>
+    <body name="handbase" pos="0 0 0">
+      <inertial pos="0 0 0.03" mass="0.1" diaginertia="0.0001 0.0001 0.0001" />
+      <site name="EE" pos="0.01 0 0.07" size="0.001" />
+    </body>
+  </worldbody>
+
+  <keyframe>
+    <key name="home" qpos="" ctrl="" />
+  </keyframe>
+
+</mujoco>

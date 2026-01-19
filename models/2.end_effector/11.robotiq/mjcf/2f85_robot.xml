@@ -1,0 +1,17 @@
+<mujoco model="2f85_robot">
+  <compiler angle="radian" meshdir="../assets" />
+
+  <include file="2f85_defaults.xml" />
+  <include file="2f85_assets.xml" />
+
+  <worldbody>
+    <include file="2f85_links.xml" />
+  </worldbody>
+
+  <include file="2f85_actuators.xml" />
+
+  <keyframe>
+    <key name="home" qpos="0 0 0.11 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" ctrl="0 0 0.11 0 0 0 0"/>
+  </keyframe>
+
+</mujoco>

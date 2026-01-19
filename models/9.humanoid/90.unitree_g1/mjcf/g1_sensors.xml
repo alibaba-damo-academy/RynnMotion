@@ -1,0 +1,16 @@
+<mujoco model="unitree_g1_sensors">
+  <sensor>
+    <gyro site="imu_in_torso" name="imu-torso-angular-velocity" cutoff="34.9" noise="0.0005"/>
+    <accelerometer site="imu_in_torso" name="imu-torso-linear-acceleration" cutoff="157" noise="0.01"/>
+    <gyro site="imu_in_pelvis" name="imu-pelvis-angular-velocity" cutoff="34.9" noise="0.0005"/>
+    <accelerometer site="imu_in_pelvis" name="imu-pelvis-linear-acceleration" cutoff="157" noise="0.01"/>
+
+    <framepos name="left_hand_pos" objtype="site" objname="left_hand"/>
+    <framequat name="left_hand_quat" objtype="site" objname="left_hand"/>
+    <framepos name="right_hand_pos" objtype="site" objname="right_hand"/>
+    <framequat name="right_hand_quat" objtype="site" objname="right_hand"/>
+
+    <framepos name="left_foot_pos" objtype="site" objname="left_foot"/>
+    <framepos name="right_foot_pos" objtype="site" objname="right_foot"/>
+  </sensor>
+</mujoco>

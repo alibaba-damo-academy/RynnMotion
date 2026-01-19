@@ -1,0 +1,36 @@
+<mujoco model="x2_fist_actuators">
+  <actuator>
+    <motor class="x2" name="motor_left_hip_pitch_joint" joint="left_hip_pitch_joint" ctrlrange="-118 118"/>
+    <motor class="x2" name="motor_left_hip_roll_joint" joint="left_hip_roll_joint" ctrlrange="-118 118"/>
+    <motor class="x2" name="motor_left_hip_yaw_joint" joint="left_hip_yaw_joint" ctrlrange="-118 118"/>
+    <motor class="x2" name="motor_left_knee_joint" joint="left_knee_joint" ctrlrange="-118 118"/>
+    <motor class="x2" name="motor_left_ankle_pitch_joint" joint="left_ankle_pitch_joint" ctrlrange="-36 36"/>
+    <motor class="x2" name="motor_left_ankle_roll_joint" joint="left_ankle_roll_joint" ctrlrange="-24 24"/>
+
+    <motor class="x2" name="motor_right_hip_pitch_joint" joint="right_hip_pitch_joint" ctrlrange="-118 118"/>
+    <motor class="x2" name="motor_right_hip_roll_joint" joint="right_hip_roll_joint" ctrlrange="-118 118"/>
+    <motor class="x2" name="motor_right_hip_yaw_joint" joint="right_hip_yaw_joint" ctrlrange="-118 118"/>
+    <motor class="x2" name="motor_right_knee_joint" joint="right_knee_joint" ctrlrange="-118 118"/>
+    <motor class="x2" name="motor_right_ankle_pitch_joint" joint="right_ankle_pitch_joint" ctrlrange="-36 36"/>
+    <motor class="x2" name="motor_right_ankle_roll_joint" joint="right_ankle_roll_joint" ctrlrange="-24 24"/>
+
+    <motor class="x2" name="motor_waist_yaw_joint" joint="waist_yaw_joint" ctrlrange="-118 118"/>
+    <motor class="x2" name="motor_waist_pitch_joint" joint="waist_pitch_joint" ctrlrange="-48 48"/>
+    <motor class="x2" name="motor_waist_roll_joint" joint="waist_roll_joint" ctrlrange="-48 48"/>
+
+    <motor class="x2" name="motor_head_yaw_joint" joint="head_yaw_joint" ctrlrange="-2.6 2.6"/>
+    <motor class="x2" name="motor_head_pitch_joint" joint="head_pitch_joint" ctrlrange="-0.6 0.6"/>
+
+    <motor class="x2" name="motor_left_shoulder_pitch_joint" joint="left_shoulder_pitch_joint" ctrlrange="-36 36"/>
+    <motor class="x2" name="motor_left_shoulder_roll_joint" joint="left_shoulder_roll_joint" ctrlrange="-36 36"/>
+    <motor class="x2" name="motor_left_shoulder_yaw_joint" joint="left_shoulder_yaw_joint" ctrlrange="-24 24"/>
+    <motor class="x2" name="motor_left_elbow_joint" joint="left_elbow_joint" ctrlrange="-24 24"/>
+    <motor class="x2" name="motor_left_wrist_yaw_joint" joint="left_wrist_yaw_joint" ctrlrange="-24 24"/>
+
+    <motor class="x2" name="motor_right_shoulder_pitch_joint" joint="right_shoulder_pitch_joint" ctrlrange="-36 36"/>
+    <motor class="x2" name="motor_right_shoulder_roll_joint" joint="right_shoulder_roll_joint" ctrlrange="-36 36"/>
+    <motor class="x2" name="motor_right_shoulder_yaw_joint" joint="right_shoulder_yaw_joint" ctrlrange="-24 24"/>
+    <motor class="x2" name="motor_right_elbow_joint" joint="right_elbow_joint" ctrlrange="-24 24"/>
+    <motor class="x2" name="motor_right_wrist_yaw_joint" joint="right_wrist_yaw_joint" ctrlrange="-24 24"/>
+  </actuator>
+</mujoco>

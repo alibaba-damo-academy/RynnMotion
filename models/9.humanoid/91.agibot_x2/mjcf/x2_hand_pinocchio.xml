@@ -1,0 +1,12 @@
+<mujoco model="agibot_x2_hand_pinocchio">
+  <compiler angle="radian" meshdir="../assets" autolimits="true"/>
+
+  <include file="x2_defaults.xml"/>
+  <include file="x2_assets.xml"/>
+
+  <worldbody>
+    <include file="x2_hand_links.xml"/>
+  </worldbody>
+
+  <include file="x2_hand_actuators.xml"/>
+</mujoco>
