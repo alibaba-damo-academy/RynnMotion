@@ -25,7 +25,7 @@ if _PLATFORM != "Darwin":
 
 from RynnMotion.utils.pyFSM import PyFSM
 from RynnMotion.utils.path_config import get_models_root
-from RynnMotion.utils.policy_interpolator import lerp
+from RynnMotion.algorithms.policy_interpolator import lerp
 from RynnMotion.manager.robot_manager import RobotManager
 from RynnMotion.algorithms import PinKine
 import logging

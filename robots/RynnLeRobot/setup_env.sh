@@ -151,7 +151,7 @@ uv pip install -e .[dev]
 
 msg "✅ Verifying critical packages are installed..." "✅ 正在验证关键包是否已安装..."
 
-python -c "import RynnMotion; print('✅ RynnMotion package installed successfully')" || {
+python -c "import importlib.util; spec = importlib.util.find_spec('RynnMotion'); print('✅ RynnMotion package installed successfully' if spec else exit(1))" || {
     msg "❌ RynnMotion package installation failed, trying again with uv..." "❌ RynnMotion 包安装失败，正在使用 uv 重试..."
     uv pip install --force-reinstall -e ../../python/
 }

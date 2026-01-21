@@ -14,7 +14,7 @@ import yaml
 from threading import Lock
 from RynnMotion.utils.pyFSM import PyFSM
 from RynnMotion.utils.path_config import get_models_root
-from RynnMotion.utils.policy_interpolator import lerp
+from RynnMotion.algorithms.policy_interpolator import lerp
 from RynnMotion.manager.robot_manager import RobotManager
 import logging
 from RynnLeRobot.interface.so101_interface import create_robot_interface

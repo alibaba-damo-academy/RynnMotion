@@ -8,10 +8,10 @@ import pinocchio as pin
 import yaml
 from enum import Enum, auto
 from abc import ABC, abstractmethod
-from RynnMotion.core.robotinterface_base import robotinterface_factory
+from RynnMotion.core.interface_base import robotinterface_factory
 from RynnMotion.manager.robot_manager import RobotManager
 from RynnMotion.utils.path_config import get_models_root
-from RynnMotion.utils.policy_interpolator import lerp
+from RynnMotion.algorithms.policy_interpolator import lerp
 from RynnLeRobot.utils.ik_solver import IKSolver
 
 

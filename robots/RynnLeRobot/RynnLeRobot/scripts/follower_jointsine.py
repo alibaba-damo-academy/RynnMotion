@@ -31,7 +31,7 @@ from typing import Dict
 from RynnLeRobot.hardware.motors.feetech import FeetechMotorsBus
 from RynnLeRobot.hardware.motors import Motor, MotorNormMode
 
-from RynnMotion.utils.policy_interpolator import lerp
+from RynnMotion.algorithms.policy_interpolator import lerp
 
 
 def create_motor_bus():

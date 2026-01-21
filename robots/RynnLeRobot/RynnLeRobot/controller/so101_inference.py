@@ -23,12 +23,12 @@ if platform.system() == "Darwin":
     matplotlib.use("Agg")
 
 # New factory pattern imports for simulation
-from RynnMotion.core.mjrobot_interface import MujocoRobotInterface
+from RynnMotion.core.mj_interface import MujocoRobotInterface
 from RynnMotion.manager.robot_manager import RobotManager
 from RynnMotion.utils.path_config import get_models_root
 
 # Utility imports
-from RynnMotion.utils.policy_interpolator import PolicyInterpolator, lerp
+from RynnMotion.algorithms.policy_interpolator import PolicyInterpolator, lerp
 from RynnMotion.utils.lcm_handler import LCMHandler
 from RynnMotion.utils.joint_plotter import JointPlotter
 from RynnMotion.utils.interpolator_plotter import InterpolatorPlotter

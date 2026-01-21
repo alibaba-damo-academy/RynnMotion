@@ -15,10 +15,10 @@ import logging
 import yaml
 import numpy as np
 
-from RynnMotion.core.robotinterface_base import robotinterface_factory
+from RynnMotion.core.interface_base import robotinterface_factory
 from RynnMotion.manager.robot_manager import RobotManager
 from RynnMotion.common.data.robot_state import RobotState
-from RynnMotion.teleop.leader_reader import LeaderDataReader
+from RynnMotion.utils.leader_reader import LeaderDataReader
 from RynnLeRobot.interface.so101_interface import create_robot_interface
 from RynnMotion.algorithms.pin_kine import PinKine
 from RynnMotion.utils.path_config import get_models_root

@@ -27,15 +27,32 @@ Example:
 
 from typing import TYPE_CHECKING, Optional
 import numpy as np
-
-import mink
 import mujoco
 
 if TYPE_CHECKING:
     from RynnMotion.core.mj_interface import MujocoRobotInterface
+    import mink as _mink_type
+
+# Lazy import for mink - only load when actually used
+_mink = None
 
 
-def configuration_from_model(model: mujoco.MjModel) -> mink.Configuration:
+def _ensure_mink():
+    """Lazily import mink, raising a clear error if not installed."""
+    global _mink
+    if _mink is None:
+        try:
+            import mink as _mink_module
+            _mink = _mink_module
+        except ImportError:
+            raise ImportError(
+                "mink is required for IK bridge functions. "
+                "Install with: pip install RynnMotion[mink]"
+            )
+    return _mink
+
+
+def configuration_from_model(model: mujoco.MjModel) -> "_mink_type.Configuration":
     """Create a mink Configuration from a MuJoCo model.
 
     Args:
@@ -44,12 +61,13 @@ def configuration_from_model(model: mujoco.MjModel) -> mink.Configuration:
     Returns:
         mink Configuration object initialized with the model
     """
+    mink = _ensure_mink()
     return mink.Configuration(model)
 
 
 def configuration_from_interface(
     interface: "MujocoRobotInterface",
-) -> mink.Configuration:
+) -> "_mink_type.Configuration":
     """Create a mink Configuration from a MujocoRobotInterface.
 
     Args:
@@ -62,12 +80,13 @@ def configuration_from_interface(
         interface = MujocoRobotInterface(robot_model, robot_config, logger)
         config = configuration_from_interface(interface)
     """
+    mink = _ensure_mink()
     return mink.Configuration(interface.mjModel)
 
 
 def sync_interface_to_config(
     interface: "MujocoRobotInterface",
-    configuration: mink.Configuration,
+    configuration: "_mink_type.Configuration",
 ) -> None:
     """Sync state from MujocoRobotInterface to mink Configuration.
 
@@ -95,7 +114,7 @@ def sync_interface_to_config(
 
 def sync_mj_data_to_config(
     data: mujoco.MjData,
-    configuration: mink.Configuration,
+    configuration: "_mink_type.Configuration",
 ) -> None:
     """Sync state from MjData to mink Configuration.
 
@@ -107,7 +126,7 @@ def sync_mj_data_to_config(
 
 
 def apply_config_to_interface(
-    configuration: mink.Configuration,
+    configuration: "_mink_type.Configuration",
     interface: "MujocoRobotInterface",
 ) -> None:
     """Apply mink Configuration solution to MujocoRobotInterface.
@@ -132,7 +151,7 @@ def apply_config_to_interface(
 
 
 def apply_config_to_mj_data(
-    configuration: mink.Configuration,
+    configuration: "_mink_type.Configuration",
     data: mujoco.MjData,
 ) -> None:
     """Apply mink Configuration solution to MjData.
@@ -145,7 +164,7 @@ def apply_config_to_mj_data(
 
 
 def get_joint_positions_from_config(
-    configuration: mink.Configuration,
+    configuration: "_mink_type.Configuration",
     ndof: Optional[int] = None,
 ) -> np.ndarray:
     """Get joint positions from mink Configuration.
@@ -168,7 +187,7 @@ def create_frame_task(
     position_cost: float = 1.0,
     orientation_cost: float = 1.0,
     lm_damping: float = 1.0,
-) -> mink.FrameTask:
+) -> "_mink_type.FrameTask":
     """Create a mink FrameTask with common defaults.
 
     Args:
@@ -181,6 +200,7 @@ def create_frame_task(
     Returns:
         Configured mink FrameTask
     """
+    mink = _ensure_mink()
     return mink.FrameTask(
         frame_name=frame_name,
         frame_type=frame_type,
@@ -193,7 +213,7 @@ def create_frame_task(
 def create_posture_task(
     model: mujoco.MjModel,
     cost: float = 1e-2,
-) -> mink.PostureTask:
+) -> "_mink_type.PostureTask":
     """Create a mink PostureTask with common defaults.
 
     Args:
@@ -203,6 +223,7 @@ def create_posture_task(
     Returns:
         Configured mink PostureTask
     """
+    mink = _ensure_mink()
     return mink.PostureTask(model=model, cost=cost)
 
 
@@ -230,6 +251,7 @@ def create_standard_limits(
             ],
         )
     """
+    mink = _ensure_mink()
     limits = [mink.ConfigurationLimit(model=model)]
 
     if velocity_limits:
@@ -249,7 +271,7 @@ def create_standard_limits(
 
 
 def solve_ik_step(
-    configuration: mink.Configuration,
+    configuration: "_mink_type.Configuration",
     tasks: list,
     dt: float,
     solver: str = "daqp",
@@ -278,6 +300,7 @@ def solve_ik_step(
         vel = solve_ik_step(config, tasks, 0.005)
         data.qpos[:] = config.q
     """
+    mink = _ensure_mink()
     vel = np.zeros(configuration.model.nv)
 
     for _ in range(max_iters):

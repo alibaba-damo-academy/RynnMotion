@@ -7,7 +7,7 @@ This module provides a single interface that can handle all robot types:
 - Teleop mode for leader robot control
 
 Inherits from RobotInterfaceBase to follow the unified interface pattern.
-For MuJoCo simulation, use MujocoRobotInterface from RynnMotion.core.mjrobot_interface.
+For MuJoCo simulation, use MujocoRobotInterface from RynnMotion.core.mj_interface.
 """
 
 import os
@@ -30,7 +30,7 @@ from RynnLeRobot.hardware.teleoperators.so101_leader.config_so101_leader import 
 )
 from RynnLeRobot.hardware.teleoperators.so101_leader.so101_leader import SO101Leader
 
-from RynnMotion.core.robotinterface_base import (
+from RynnMotion.core.interface_base import (
     RobotInterfaceBase,
     register_robotinterface_factory_func,
 )

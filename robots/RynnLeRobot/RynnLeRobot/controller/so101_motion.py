@@ -14,10 +14,10 @@ import logging
 import yaml
 import numpy as np
 
-from RynnMotion.core.robotinterface_base import robotinterface_factory
+from RynnMotion.core.interface_base import robotinterface_factory
 from RynnMotion.manager.robot_manager import RobotManager
 from RynnMotion.utils.path_config import get_models_root
-from RynnMotion.utils.policy_interpolator import lerp
+from RynnMotion.algorithms.policy_interpolator import lerp
 from RynnMotion.common.data.robot_state import RobotState
 from RynnLeRobot.interface.so101_interface import create_robot_interface
 
