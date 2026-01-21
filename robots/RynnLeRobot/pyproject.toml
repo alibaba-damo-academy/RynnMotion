@@ -30,7 +30,7 @@ dependencies = [
     "deepdiff==8.6.0",
     "huggingface_hub==0.34.4",
     "ruckig>=0.10.0",
-    "rerun-sdk>=0.21.0,<0.23.0",
+    # "rerun-sdk>=0.21.0,<0.23.0",
     "jsonlines>=4.0.0",
     "av>=12.0.0",
     "pillow>=9.0.0",
@@ -40,6 +40,9 @@ dependencies = [
     "pyarrow>=15.0.0",
     "h5py>=3.7.0",
     "pandas>=2.0.0",
+    "uvicorn>=0.35.0",
+    "fastapi>=0.100.0",
+    "sshkeyboard>=2.0.0"
 ]
 
 [project.optional-dependencies]
@@ -47,7 +50,6 @@ dev = ["black>=22.0.0", "flake8>=4.0.0", "mypy>=0.950", "pytest>=7.0.0"]
 
 [project.scripts]
 # Regular scripts (no MuJoCo viewer dependency)
-feetech-tool = "RynnLeRobot.scripts.feetech_tool:main"
 so101-motion = "RynnLeRobot.utils.mjpython_wrapper:so101_motion"
 lekiwi-motion = "RynnLeRobot.utils.mjpython_wrapper:lekiwi_motion"
 calibrate = "RynnLeRobot.scripts.calibrate:main"
@@ -55,9 +57,10 @@ find-camera-port = "RynnLeRobot.scripts.find_camera_port:main"
 find-motor-port = "RynnLeRobot.scripts.find_motor_port:main"
 follower-jointsine = "RynnLeRobot.scripts.follower_jointsine:main"
 show-joint-angles = "RynnLeRobot.scripts.show_joint_angles:main"
-check-calibrate = "RynnLeRobot.scripts.so101_check_calibrate:main"
 lekiwi-gamepad-control = "RynnLeRobot.scripts.lekiwi_gamepad_control:main"
 record = "RynnLeRobot.scripts.record:main"
+test-chassis-velocity = "RynnLeRobot.scripts.test_chassis_velocity_control:main"
+test-gamepad-input = "RynnLeRobot.scripts.test_gamepad_input:main"
 multi-teleop-mac = "RynnLeRobot.utils.mjpython_wrapper:multi_teleop_mac"
 
 # MuJoCo viewer scripts (mjpython on macOS)
@@ -67,7 +70,6 @@ lekiwi-ui = "RynnLeRobot.utils.mjpython_wrapper:lekiwi_ui"
 multi-teleop = "RynnLeRobot.utils.mjpython_wrapper:multi_teleop"
 so101-teleop = "RynnLeRobot.utils.mjpython_wrapper:so101_teleop"
 so101-pickplace = "RynnLeRobot.utils.mjpython_wrapper:so101_pickplace"
-so101-floating-ee = "RynnLeRobot.utils.mjpython_wrapper:so101_floating_ee"
 
 [tool.setuptools.packages.find]
 where = ["."]

@@ -150,17 +150,11 @@ class SO101Follower(Robot):
 
         self.calibration = {}
         for motor, m in self.bus.motors.items():
-            # 对2轴和3轴进行最最小范围修正，令其映射接近3.14rad对应2047
-            range_min_value = (
-                int(range_mins[motor] + (range_maxes[motor]-range_mins[motor])*0.2/3.34) if motor == "elbow_flex" 
-                else int(range_mins[motor] + (range_maxes[motor]-range_mins[motor])*0.07/3.21) if motor == "shoulder_lift" 
-                else range_mins[motor]
-            )
             self.calibration[motor] = MotorCalibration(
                 id=m.id,
                 drive_mode=0,
                 homing_offset=homing_offsets[motor],
-                range_min=range_min_value,
+                range_min=range_mins[motor],
                 range_max=range_maxes[motor],
             )
 

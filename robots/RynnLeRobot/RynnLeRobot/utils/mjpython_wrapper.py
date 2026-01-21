@@ -199,9 +199,9 @@ multi_teleop_main = create_mujoco_wrapper("RynnLeRobot.teleop.multi_teleop")
 multi_teleop_mac_main = create_direct_wrapper("RynnLeRobot.teleop.multi_teleop_mac")
 lerobot_ui_main = create_mujoco_wrapper("RynnLeRobot.scripts.lerobot_UI")
 lekiwi_ui_main = create_mujoco_wrapper("RynnLeRobot.scripts.lekiwi_UI")
+calibrate_main = create_mujoco_wrapper("RynnLeRobot.scripts.calibrate")
 so101_teleop_main = create_mujoco_wrapper("RynnLeRobot.teleop.so101_teleop")
 so101_pickplace_main = create_mujoco_wrapper("RynnLeRobot.controller.so101_pickplace")
-so101_floating_ee_main = create_mujoco_wrapper("RynnLeRobot.teleop.so101_floating_ee")
 
 
 # Entry point functions for pyproject.toml
@@ -239,6 +239,10 @@ def lekiwi_ui():
     """Entry point for lekiwi-ui command."""
     lekiwi_ui_main()
 
+def calibrate():
+    """Entry point for calibrate command."""
+    calibrate_main()
+
 
 def so101_teleop():
     """Entry point for unified so101-teleop command."""
@@ -248,11 +252,6 @@ def so101_teleop():
 def so101_pickplace():
     """Entry point for so101-pickplace command."""
     so101_pickplace_main()
-
-
-def so101_floating_ee():
-    """Entry point for so101-floating-ee command."""
-    so101_floating_ee_main()
 
 
 # For direct execution testing
@@ -269,6 +268,8 @@ if __name__ == "__main__":
             lerobot_ui()
         elif script_name == "lekiwi-ui":
             lekiwi_ui()
+        elif script_name == "calibrate":
+            calibrate()
         else:
             print(f"Unknown script: {script_name}")
             sys.exit(1)

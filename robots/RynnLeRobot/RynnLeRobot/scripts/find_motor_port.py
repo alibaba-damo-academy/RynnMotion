@@ -85,7 +85,7 @@ def set_port_permissions(ports):
 
             try:
                 print(t("setting_port_perms", port=port))
-                subprocess.run(['sudo', 'chmod', '666', port], check=True, timeout=10)
+                subprocess.run(['sudo', 'chmod', '666', port], check=True, timeout=30)
                 print(t("perms_set", port=port))
             except subprocess.TimeoutExpired:
                 print(t("perms_timeout", port=port))
@@ -117,18 +117,18 @@ def update_config_with_ports(detected_ports, port_type="follower", is_second_lea
             # Single port detected
             port = detected_ports[0]
             if port_type == "follower":
-                if "follower" not in config or not isinstance(config["follower"], dict):
-                    config["follower"] = {}
-                config["follower"]["port"] = port
+                if "robot" not in config or not isinstance(config["robot"], dict):
+                    config["robot"] = {}
+                config["robot"]["port"] = port
                 print(t("updated_follower_port", config_path=config_path, port=port))
             elif port_type == "leader":
-                if "leader" not in config or not isinstance(config["leader"], dict):
-                    config["leader"] = {}
+                if "teleoperate" not in config or not isinstance(config["teleoperate"], dict):
+                    config["teleoperate"] = {}
                 if is_second_leader:
-                    config["leader"]["port_2"] = port
+                    config["teleoperate"]["port_2"] = port
                     print(t("updated_second_leader_port", config_path=config_path, port=port))
                 else:
-                    config["leader"]["port"] = port
+                    config["teleoperate"]["port"] = port
                     print(t("updated_leader_port", config_path=config_path, port=port))
 
         with open(config_path, "w") as f:
@@ -141,9 +141,9 @@ def update_config_with_ports(detected_ports, port_type="follower", is_second_lea
 
 def find_port(dev_type, is_second_leader=False):
     # Map display name to config key
-    if "follower" in dev_type.lower():
+    if "follower" in dev_type.lower() or dev_type == t("dev_type_follower"):
         config_type = "follower"
-    elif "leader" in dev_type.lower():
+    elif "leader" in dev_type.lower() or dev_type == t("dev_type_leader"):
         config_type = "leader"
     else:
         config_type = dev_type
@@ -202,7 +202,7 @@ def main():
 
     leader_port = find_port(t("dev_type_leader"))
 
-    second_leader_port = find_port(t("dev_type_second_leader"), is_second_leader=True)
+    #second_leader_port = find_port(t("dev_type_second_leader"), is_second_leader=True)
 
     print(t("port_summary"))
     if follower_port:
@@ -215,10 +215,10 @@ def main():
     else:
         print(t("leader_port", port=t("not_detected")))
 
-    if second_leader_port:
-        print(t("second_leader_port", port=second_leader_port))
-    else:
-        print(t("second_leader_port", port=t("not_detected")))
+    #if second_leader_port:
+    #    print(t("second_leader_port", port=second_leader_port))
+    #else:
+    #    print(t("second_leader_port", port=t("not_detected")))
     print("=" * 60)
 
     # Force clean exit to avoid memory corruption during cleanup

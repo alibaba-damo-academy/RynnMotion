@@ -29,6 +29,7 @@ Options:
 import argparse
 import logging
 import time
+import os
 import sys
 import threading
 import json
@@ -45,8 +46,12 @@ from RynnLeRobot.scripts.find_camera_port import find_cameras, find_all_opencv_c
 from RynnLeRobot.hardware.cameras.opencv.camera_opencv import OpenCVCamera
 from RynnLeRobot.hardware.cameras.opencv.configuration_opencv import OpenCVCameraConfig
 from RynnLeRobot.hardware.cameras.configs import ColorMode
-from RynnLeRobot.utils.keyboard_listener import init_keyboard_listener, cleanup_keyboard_listener
-from RynnLeRobot.utils.visualization_utils import log_rerun_data, _init_rerun
+from RynnLeRobot.utils.keyboard_listener import (
+    init_keyboard_listener,
+    cleanup_keyboard_listener,
+)
+from RynnLeRobot.utils.visualization_utils import display_imgs, is_headless
+from RynnLeRobot.tools.web_streamer import WebServer
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +70,9 @@ class RynnLeRobotRecorder:
         root: str = "./outputs",
         config_path: str = "configs/so101.yaml",
         cameras_config: dict = None,
-        display_data: bool = False,
+        show_display: bool = False,
+        show_webcam: bool = False,
+        log_level: str = "INFO",
         godview: bool = True
     ):
         self.repo_id = repo_id
@@ -81,7 +88,11 @@ class RynnLeRobotRecorder:
         self.dataset = None
         self.recording = False
         self.teleop_thread = None
-        self.display_data = display_data
+        self.show_display = show_display
+        self.windows_created = False
+        self.show_webcam = show_webcam
+        self.webcam_server = None
+        self.log_level = log_level
 
         logger.info(f"📋 Recorder initialized with config: {config_path}")
         logger.info(f"🎥 Camera configuration: {list(self.cameras_config.keys())}")
@@ -117,9 +128,13 @@ class RynnLeRobotRecorder:
 
                 self.save_camera_config_to_yaml()
 
-                logger.info("✅ Using last two cameras (works on Ubuntu laptops - skips built-in cameras)")
+                logger.info(
+                    "✅ Using last two cameras (works on Ubuntu laptops - skips built-in cameras)"
+                )
             else:
-                logger.warning(f"⚠️ Only {len(detected_cameras)} cameras detected, expected at least 2")
+                logger.warning(
+                    f"⚠️ Only {len(detected_cameras)} cameras detected, expected at least 2"
+                )
         except Exception as e:
             logger.warning(f"⚠️ Camera auto-detection failed: {e}")
 
@@ -143,22 +158,65 @@ class RynnLeRobotRecorder:
 
         for camera_name, cam_config in self.cameras_config.items():
             try:
+                # 检查设备是否存在且可访问
+                device_path = cam_config["index_or_path"]
+                if isinstance(device_path, str) and device_path.startswith("/dev/"):
+                    import os
+
+                    if not os.path.exists(device_path):
+                        logger.warning(f"⚠️ Camera device {device_path} does not exist")
+                        self.cameras[camera_name] = None
+                        continue
+
                 opencv_config = OpenCVCameraConfig(
                     index_or_path=cam_config["index_or_path"],
                     width=cam_config.get("width", 640),
                     height=cam_config.get("height", 480),
                     fps=cam_config.get("fps", 30),
-                    color_mode=ColorMode.RGB if cam_config.get("color_mode", "rgb").lower() == "rgb" else ColorMode.BGR
+                    color_mode=(
+                        ColorMode.RGB
+                        if cam_config.get("color_mode", "rgb").lower() == "rgb"
+                        else ColorMode.BGR
+                    ),
                 )
 
                 camera = OpenCVCamera(opencv_config)
                 camera.connect(warmup=True)
                 self.cameras[camera_name] = camera
-                logger.info(f"✅ {camera_name} camera connected on port {cam_config['index_or_path']}")
+                logger.info(
+                    f"✅ {camera_name} camera connected on port {cam_config['index_or_path']}"
+                )
 
             except Exception as e:
                 logger.error(f"❌ Failed to setup {camera_name} camera: {e}")
                 self.cameras[camera_name] = None
+
+    def reset_camera_devices(self):
+        """尝试重置摄像头设备"""
+        try:
+            import cv2
+            import os
+
+            # 尝试释放可能被占用的设备
+            for camera_name, cam_config in self.cameras_config.items():
+                device_path = cam_config["index_or_path"]
+                if isinstance(device_path, int):
+                    # 对于索引设备，创建并立即释放一个capture对象
+                    cap = cv2.VideoCapture(device_path)
+                    if cap.isOpened():
+                        cap.release()
+                elif isinstance(device_path, str) and device_path.startswith("/dev/"):
+                    # 检查设备权限
+                    if os.path.exists(device_path) and not os.access(
+                        device_path, os.R_OK
+                    ):
+                        logger.warning(
+                            f"⚠️ No read access to camera device {device_path}"
+                        )
+
+            logger.info("🔄 Camera devices reset attempt completed")
+        except Exception as e:
+            logger.warning(f"⚠️ Error during camera device reset: {e}")
 
     def disconnect_cameras(self):
         """Disconnect all cameras."""
@@ -172,22 +230,34 @@ class RynnLeRobotRecorder:
 
     def get_robot_features(self):
         """Get robot features for dataset creation."""
-        joint_names = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
+        joint_names = [
+            "shoulder_pan",
+            "shoulder_lift",
+            "elbow_flex",
+            "wrist_flex",
+            "wrist_roll",
+            "gripper",
+        ]
         motor_features = {f"{joint}.pos": float for joint in joint_names}
-        camera_features = {
-            "front": (480, 640, 3),
-            "wrist": (480, 640, 3)
-        }
+        # camera_features = {
+        #     "front": (480, 640, 3),
+        #     "wrist": (480, 640, 3)
+        # }
+        camera_features = {}
+        for camera_name, cam_config in self.cameras_config.items():
+            height = cam_config.get("height", 480)  # 仅在配置缺失时使用默认值
+            width = cam_config.get("width", 640)  # 仅在配置缺失时使用默认值
+            camera_features[camera_name] = (height, width, 3)
 
         # NEW: Add end-effector pose features (list format for pose detection)
-        ee_pose_features = {
-            "end_effector_pose": [7]  # [x, y, z, qx, qy, qz, qw]
-        }
+        ee_pose_features = {"end_effector_pose": [7]}  # [x, y, z, qx, qy, qz, qw]
 
         # NEW: Add camera pose features (list format per camera)
         camera_pose_features = {}
         for camera_name in self.cameras_config.keys():
-            camera_pose_features[f"camera_poses.{camera_name}"] = [7]  # [x, y, z, qx, qy, qz, qw]
+            camera_pose_features[f"camera_poses.{camera_name}"] = [
+                7
+            ]  # [x, y, z, qx, qy, qz, qw]
 
         return {
             "action_features": {**motor_features, **ee_pose_features},
@@ -195,8 +265,8 @@ class RynnLeRobotRecorder:
                 **motor_features,
                 **camera_features,
                 **ee_pose_features,
-                **camera_pose_features
-            }
+                **camera_pose_features,
+            },
         }
 
     def setup_dataset(self):
@@ -229,7 +299,9 @@ class RynnLeRobotRecorder:
         self.teleop = TeleOperator(
             mode="real",
             frequency=30,
-            config_path=self.config_path
+            config_path=self.config_path,
+            recording=True,
+            log_level=self.log_level,
         )
 
         def run_teleop():
@@ -259,10 +331,19 @@ class RynnLeRobotRecorder:
                 joint_observation = self.teleop.get_observation()
                 # Convert numpy array to joint dictionary
                 if isinstance(joint_observation, np.ndarray):
-                    joint_names = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
+                    joint_names = [
+                        "shoulder_pan",
+                        "shoulder_lift",
+                        "elbow_flex",
+                        "wrist_flex",
+                        "wrist_roll",
+                        "gripper",
+                    ]
                     for i, joint_name in enumerate(joint_names):
                         if i < len(joint_observation):
-                            observation[f"{joint_name}.pos"] = float(joint_observation[i])
+                            observation[f"{joint_name}.pos"] = float(
+                                joint_observation[i]
+                            )
                         else:
                             observation[f"{joint_name}.pos"] = 0.0
                 else:
@@ -270,18 +351,28 @@ class RynnLeRobotRecorder:
                     observation.update(joint_observation)
 
                 ee_pose_obs = self.teleop.get_eePose_observation()
-                observation["end_effector_pose"] = ee_pose_obs.astype(np.float32)  # Convert to float32
+                observation["end_effector_pose"] = ee_pose_obs.astype(
+                    np.float32
+                )  # Convert to float32
 
             for camera_name, camera in self.cameras.items():
                 if camera and camera.is_connected:
                     try:
                         frame = camera.read(color_mode=ColorMode.RGB)
+                        # 同时添加两种键名格式以兼容display_imgs
                         observation[camera_name] = frame
+                        observation[f"{camera_name}_image"] = frame  # 关键：添加带_image后缀的键
                     except Exception as e:
                         logger.warning(f"⚠️ Error reading from {camera_name} camera: {e}")
-                        observation[camera_name] = np.zeros((480, 640, 3), dtype=np.uint8)
+                        # 两种格式都设置默认值
+                        default_frame = np.zeros((480, 640, 3), dtype=np.uint8)
+                        observation[camera_name] = default_frame
+                        observation[f"{camera_name}_image"] = default_frame
                 else:
-                    observation[camera_name] = np.zeros((480, 640, 3), dtype=np.uint8)
+                    # 两种格式都设置默认值
+                    default_frame = np.zeros((480, 640, 3), dtype=np.uint8)
+                    observation[camera_name] = default_frame
+                    observation[f"{camera_name}_image"] = default_frame
 
             # Get camera poses from TeleOperator FK (computed via Pinocchio)
             try:
@@ -303,17 +394,36 @@ class RynnLeRobotRecorder:
 
         except Exception as e:
             logger.warning(f"⚠️ Error getting observation: {e}")
-            joint_names = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
+            joint_names = [
+                "shoulder_pan",
+                "shoulder_lift",
+                "elbow_flex",
+                "wrist_flex",
+                "wrist_roll",
+                "gripper",
+            ]
             for joint in joint_names:
                 observation[f"{joint}.pos"] = 0.0
 
             # NEW: Add fallback for end-effector pose (numpy array)
-            observation["end_effector_pose"] = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0], dtype=np.float32)
+            observation["end_effector_pose"] = np.array(
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0], dtype=np.float32
+            )
 
             for camera_name in self.cameras_config.keys():
-                observation[camera_name] = np.zeros((480, 640, 3), dtype=np.uint8)
+                observation[camera_name] = np.zeros(
+                    (cam_config.get("height", 480), cam_config.get("width", 640), 3),
+                    dtype=np.uint8,
+                )
+                # 添加带'image'关键字的键以兼容display_imgs
+                observation[f"{camera_name}_image"] = np.zeros(
+                    (cam_config.get("height", 480), cam_config.get("width", 640), 3),
+                    dtype=np.uint8,
+                )
                 # NEW: Add fallback for camera poses (numpy array)
-                observation[f"camera_poses.{camera_name}"] = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0], dtype=np.float32)
+                observation[f"camera_poses.{camera_name}"] = np.array(
+                    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0], dtype=np.float32
+                )
 
         return observation
 
@@ -326,7 +436,14 @@ class RynnLeRobotRecorder:
                 joint_action = self.teleop.get_action()
                 # Convert numpy array to joint dictionary
                 if isinstance(joint_action, np.ndarray):
-                    joint_names = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
+                    joint_names = [
+                        "shoulder_pan",
+                        "shoulder_lift",
+                        "elbow_flex",
+                        "wrist_flex",
+                        "wrist_roll",
+                        "gripper",
+                    ]
                     for i, joint_name in enumerate(joint_names):
                         if i < len(joint_action):
                             action[f"{joint_name}.pos"] = float(joint_action[i])
@@ -338,7 +455,9 @@ class RynnLeRobotRecorder:
 
                 # NEW: Add end-effector pose action (numpy array)
                 ee_pose_action = self.teleop.get_eePose_action()
-                action["end_effector_pose"] = ee_pose_action.astype(np.float32)  # Convert to float32
+                action["end_effector_pose"] = ee_pose_action.astype(
+                    np.float32
+                )  # Convert to float32
 
                 # Get camera poses from TeleOperator FK (computed via Pinocchio)
                 try:
@@ -360,7 +479,14 @@ class RynnLeRobotRecorder:
 
         except Exception as e:
             logger.warning(f"⚠️ Error getting action: {e}")
-            joint_names = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]
+            joint_names = [
+                "shoulder_pan",
+                "shoulder_lift",
+                "elbow_flex",
+                "wrist_flex",
+                "wrist_roll",
+                "gripper",
+            ]
             for joint in joint_names:
                 action[f"{joint}.pos"] = 0.0
 
@@ -416,8 +542,9 @@ class RynnLeRobotRecorder:
     def record_episode(self, task: str, episode_length_s: float, events: dict = None):
         """Record a single episode following source repo pattern."""
         episode_frames = int(episode_length_s * self.fps)
-        logger.info(f"📹 Recording episode: {episode_frames} frames ({episode_length_s}s)")
-
+        logger.info(
+            f"📹 Recording episode: {episode_frames} frames ({episode_length_s}s)"
+        )
         self.recording = True
         frame_count = 0
         start_time = time.perf_counter()
@@ -426,10 +553,28 @@ class RynnLeRobotRecorder:
             while frame_count < episode_frames and self.recording:
                 frame_start = time.perf_counter()
 
-                if events and events["exit_early"]:
-                    events["exit_early"] = False
-                    logger.info("🔄 Exiting episode early due to keyboard input")
-                    break
+                # 检查键盘事件
+                if events:
+                    if events["stop_recording"]:  # ESC键 - 停止整个录制会话
+                        events["stop_recording"] = False
+                        events["exit_early"] = False
+                        logger.info("🛑 Stopping entire recording session")
+                        break
+
+                    if events["rerecord_episode"]:  # 左箭头键 - 重新录制当前回合
+                        events["rerecord_episode"] = False
+                        events["exit_early"] = False
+                        logger.info("🔄 Re-recording current episode")
+                        # 重置录制状态并重新开始当前回合
+                        self.dataset.clear_episode_buffer()
+                        frame_count = 0
+                        start_time = time.perf_counter()
+                        continue
+
+                    if events["exit_early"]:  # 右箭头键 - 提前结束当前回合但保存数据
+                        events["exit_early"] = False
+                        logger.info("⏩ Exiting episode early but saving data")
+                        break
 
                 observation = self.get_robot_observation()
                 action = self.get_robot_action()
@@ -447,9 +592,21 @@ class RynnLeRobotRecorder:
                 frame = {**observation_frame, **action_frame}
                 self.dataset.add_frame(frame, task=task)
 
-                # Log data to rerun if display_data is enabled
-                if self.display_data:
-                    log_rerun_data(observation, action)
+                # 创建一个新字典，将numpy数组转换为适合display_imgs的格式
+                display_obs = {
+                    k: v for k, v in observation.items() if isinstance(v, np.ndarray)
+                }
+                try:
+                    display_imgs(display_obs, self.show_display, self.show_webcam)
+                except Exception as e:
+                    self.logger.debug(f"Error displaying images: {e}")
+
+                if self.show_display and self.windows_created:
+                    # 定期刷新窗口以保持焦点
+                    import cv2
+
+                    if frame_count % 5 == 0:  # 每5帧检查一次焦点
+                        cv2.waitKey(1)
 
                 frame_count += 1
 
@@ -458,13 +615,28 @@ class RynnLeRobotRecorder:
                 if sleep_time > 0:
                     time.sleep(sleep_time)
 
+                if frame_count % (self.fps * 1) == 0:  # Every 1 seconds
+                    state_arr = frame.get("observation.state", np.array([]))
+                    action_arr = frame.get("action", np.array([]))
+                    #self.show_commands(state_arr, " state", "degree")
+                    #self.show_commands(action_arr, "action", "degree")
+
                 if frame_count % (self.fps * 5) == 0:  # Every 5 seconds
                     elapsed = time.perf_counter() - start_time
-                    logger.info(f"  📊 Frame {frame_count}/{episode_frames} ({elapsed:.1f}s)")
+                    logger.info(
+                        f"  📊 Frame {frame_count}/{episode_frames} ({elapsed:.1f}s)"
+                    )
 
         except KeyboardInterrupt:
             logger.info("⚠️ Episode recording interrupted")
             self.recording = False
+
+        # 重置事件标志
+        if events:
+            events["exit_early"] = False
+            events["rerecord_episode"] = False
+            events["stop_recording"] = False
+            events["continue"] = False
 
         if frame_count > 0:
             self.dataset.save_episode()
@@ -482,7 +654,7 @@ class RynnLeRobotRecorder:
         num_episodes: int,
         episode_time_s: float,
         reset_time_s: float = 10.0,
-        push_to_hub: bool = False
+        push_to_hub: bool = False,
     ):
         """Record a complete dataset."""
         logger.info(f"🎬 Starting dataset recording")
@@ -490,63 +662,172 @@ class RynnLeRobotRecorder:
         logger.info(f"   Episodes: {num_episodes}")
         logger.info(f"   Episode length: {episode_time_s}s")
 
+        # 尝试重置摄像头设备
+        self.reset_camera_devices()
+
         listener, events = init_keyboard_listener()
 
         try:
+            # 初始化摄像头
             self.setup_cameras()  # Initialize cameras (using config file ports)
             self.setup_dataset()
             self.start_teleoperation_thread()
 
+            if self.show_webcam:
+                self.webcam_server = WebServer()
+                self.webcam_server.start()
+
             with VideoEncodingManager(self.dataset):
                 recorded_episodes = 0
-                while recorded_episodes < num_episodes and not events["stop_recording"]:
-                    logger.info(f"\n{'='*60}")
-                    logger.info(f"Episode {recorded_episodes + 1}/{num_episodes}")
-                    logger.info(f"{'='*60}")
+                current_episode = 0
+
+                while current_episode < num_episodes and not (
+                    events.get("stop_recording", False)
+                ):
+                    logger.info(f"\n{'=' * 60}")
+                    logger.info(f"Episode {current_episode + 1}/{num_episodes}")
+                    logger.info(f"{'=' * 60}")
 
                     logger.info("🎮 Teleoperation is running")
                     logger.info("📋 Setup your robot and environment for recording")
                     logger.info(f"⏱️  Recording will last {episode_time_s} seconds")
 
-                    input("▶️  Press ENTER when ready to start recording this episode...")
+                    # 在每次开始录制前清理可能存在的OpenCV窗口
+                    if self.show_display and self.windows_created:
+                        import cv2
+
+                        cv2.destroyAllWindows()
+                        self.windows_created = False
+
+                    print(
+                        "▶️  Press ENTER when ready to start recording this episode..."
+                    )
+                    while True:
+                        if events.get("continue", False):
+                            events["continue"] = False
+                            break
+                        time.sleep(0.5)
+
+                    # 在开始录制时创建窗口并确保获得焦点
+                    # if self.show_display and not self.windows_created:
+                    #     self.windows_created = True
+                    #     import cv2
+
+                    #     # 创建控制窗口
+                    #     cv2.namedWindow("Recording Control", cv2.WINDOW_AUTOSIZE)
+                    #     cv2.setWindowTitle(
+                    #         "Recording Control",
+                    #         "Recording in Progress - Click to focus",
+                    #     )
+                    #     # # 设置窗口位置到屏幕右侧
+                    #     # cv2.moveWindow("Recording Control", 1000, 100)  # x=1000, y=100 将窗口移到右侧
+                    #     # 获取屏幕尺寸并计算窗口位置
+                    #     import tkinter as tk
+
+                    #     root = tk.Tk()
+                    #     screen_width = root.winfo_screenwidth()
+                    #     screen_height = root.winfo_screenheight()
+                    #     root.destroy()
+
+                    #     # 将窗口放在右上角
+                    #     window_x = screen_width - 650  # 600是窗口宽度+一些边距
+                    #     window_y = 50
+                    #     cv2.moveWindow("Recording Control", window_x, window_y)
+
+                    #     # 显示提示信息
+                    #     info_img = np.zeros((120, 600, 3), dtype=np.uint8)
+                    #     cv2.putText(
+                    #         info_img,
+                    #         "RECORDING IN PROGRESS",
+                    #         (10, 30),
+                    #         cv2.FONT_HERSHEY_SIMPLEX,
+                    #         1,
+                    #         (0, 0, 255),
+                    #         2,
+                    #     )
+                    #     cv2.putText(
+                    #         info_img,
+                    #         "ESC: Stop Session",
+                    #         (10, 60),
+                    #         cv2.FONT_HERSHEY_SIMPLEX,
+                    #         0.6,
+                    #         (255, 255, 255),
+                    #         1,
+                    #     )
+                    #     cv2.putText(
+                    #         info_img,
+                    #         "Left Arrow: Re-record, Right Arrow: Exit Early",
+                    #         (10, 90),
+                    #         cv2.FONT_HERSHEY_SIMPLEX,
+                    #         0.6,
+                    #         (255, 255, 255),
+                    #         1,
+                    #     )
+                    #     cv2.imshow("Recording Control", info_img)
+
+                    #     # 强制将焦点转移到OpenCV窗口
+                    #     cv2.waitKey(1)
+                    #     # 再次调用提升焦点概率
+                    #     cv2.setWindowProperty(
+                    #         "Recording Control", cv2.WND_PROP_TOPMOST, 1
+                    #     )
+                    #     cv2.waitKey(100)  # 给一些时间让窗口获得焦点
 
                     episode_recorded = self.record_episode(task, episode_time_s, events)
 
-                    if events["rerecord_episode"]:
+                    # 每次录制结束后销毁窗口
+                    if self.show_display and self.windows_created:
+                        import cv2
+
+                        cv2.destroyAllWindows()
+                        self.windows_created = False
+
+                    # 检查是否需要重新录制
+                    if events.get("rerecord_episode", False):
                         logger.info("🔄 Re-recording episode...")
                         events["rerecord_episode"] = False
                         events["exit_early"] = False
-                        continue  # Don't increment recorded_episodes
+                        continue  # 不增加episode计数，重新录制
 
                     if episode_recorded:
                         recorded_episodes += 1
+                        current_episode += 1
                     else:
                         logger.info("⏭️  Episode skipped - continuing to next episode")
+                        current_episode += 1
 
-                    if (recorded_episodes < num_episodes and
-                        not events["stop_recording"] and
-                        not events["rerecord_episode"]):
+                    # 重置事件标志
+                    events["exit_early"] = False
+                    events["rerecord_episode"] = False
+                    events["stop_recording"] = False
+                    events["continue"] = False
+
+                    if current_episode < num_episodes and not events.get(
+                        "stop_recording", False
+                    ):
                         logger.info(f"⏳ Reset time: {reset_time_s}s")
                         logger.info("   Please reset the environment for next episode")
 
                         reset_start = time.time()
                         while time.time() - reset_start < reset_time_s:
-                            if events["stop_recording"]:
+                            if events.get("stop_recording", False):
                                 break
                             time.sleep(0.1)
 
-            if events["stop_recording"]:
-                logger.info(f"\n🛑 Recording stopped by user")
-            else:
-                logger.info(f"\n🎉 Dataset recording completed!")
+                if events.get("stop_recording", False):
+                    logger.info(f"\n🛑 Recording stopped by user")
+                else:
+                    logger.info(f"\n🎉 Dataset recording completed!")
 
-            logger.info(f"   Episodes recorded: {recorded_episodes}")
-            logger.info(f"   Location: {self.dataset.root}")
+                logger.info(f"   Episodes recorded: {recorded_episodes}")
+                logger.info(f"   Location: {self.dataset.root}")
 
-            if push_to_hub and recorded_episodes > 0:
-                logger.info("☁️  Uploading to HuggingFace Hub...")
-                self.dataset.push_to_hub()
-                logger.info(f"✅ Uploaded: https://huggingface.co/datasets/{self.repo_id}")
+                if push_to_hub and recorded_episodes > 0:
+                    logger.info("☁️  Uploading to HuggingFace Hub...")
+                    self.dataset.push_to_hub()
+                    logger.info(
+                        f"✅ Uploaded: https://huggingface.co/datasets/{self.repo_id}"
+                    )
 
         except KeyboardInterrupt:
             logger.info("\n⚠️  Recording interrupted by user")
@@ -554,66 +835,125 @@ class RynnLeRobotRecorder:
             logger.error(f"❌ Recording failed: {e}")
             raise
         finally:
+            # 清理OpenCV窗口
+            if self.show_display and self.windows_created:
+                import cv2
+
+                cv2.destroyAllWindows()
+            if self.show_webcam:
+                self.webcam_server.stop()
             cleanup_keyboard_listener(listener)
+            # 断开摄像头
             self.disconnect_cameras()  # Disconnect cameras
             self.stop_teleoperation()
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Record LeRobot dataset with integrated teleoperation")
+    parser = argparse.ArgumentParser(
+        description="Record LeRobot dataset with integrated teleoperation"
+    )
 
-    parser.add_argument("--repo-id", required=True,
-                       help="Dataset repository ID (e.g., 'username/dataset_name')")
-    parser.add_argument("--task", required=True,
-                       help="Task description")
+    parser.add_argument(
+        "--repo-id",
+        required=True,
+        help="Dataset repository ID (e.g., 'username/dataset_name')",
+    )
+    parser.add_argument("--task", required=True, help="Task description")
 
-    parser.add_argument("--episodes", type=int, default=5,
-                       help="Number of episodes (default: 5)")
-    parser.add_argument("--episode-time", type=float, default=30.0,
-                       help="Episode length in seconds (default: 30)")
-    parser.add_argument("--reset-time", type=float, default=10.0,
-                       help="Reset time between episodes (default: 10)")
-    parser.add_argument("--fps", type=int, default=30,
-                       help="Recording FPS (default: 30)")
-    parser.add_argument("--root", default="./outputs",
-                       help="Local storage directory (default: ./outputs)")
+    parser.add_argument(
+        "--episodes", type=int, default=5, help="Number of episodes (default: 5)"
+    )
+    parser.add_argument(
+        "--episode-time",
+        type=float,
+        default=30.0,
+        help="Episode length in seconds (default: 30)",
+    )
+    parser.add_argument(
+        "--reset-time",
+        type=float,
+        default=10.0,
+        help="Reset time between episodes (default: 10)",
+    )
+    parser.add_argument(
+        "--fps", type=int, default=30, help="Recording FPS (default: 30)"
+    )
+    parser.add_argument(
+        "--root",
+        default="./outputs",
+        help="Local storage directory (default: ./outputs)",
+    )
     parser.add_argument("--config", default="configs/so101.yaml",
                        help="Config file path (default: configs/so101.yaml)")
-    parser.add_argument("--push-to-hub", action="store_true",
-                       help="Upload to HuggingFace Hub")
-    parser.add_argument("--cameras", type=str, default=None,
-                       help="Camera configuration JSON string (overrides config file)")
-    parser.add_argument("--auto-detect-cameras", action="store_true",
-                       help="Auto-detect camera ports and update config file")
-    parser.add_argument("--display-data", action="store_true",
-                       help="Enable real-time data visualization with rerun")
+    parser.add_argument(
+        "--push-to-hub",
+        action="store_true",
+        default=False,
+        help="Upload to HuggingFace Hub",
+    )
+    parser.add_argument(
+        "--cameras",
+        type=str,
+        default=None,
+        help="Camera configuration JSON string (overrides config file)",
+    )
+    parser.add_argument(
+        "--auto-detect-cameras",
+        action="store_true",
+        help="Auto-detect camera ports and update config file",
+    )
+    parser.add_argument(
+        "--show-display",
+        action="store_true",
+        help="Enable real-time data visualization with opencv",
+    )
+    parser.add_argument(
+        "--show-webcam",
+        action="store_true",
+        help="Enable real-time data visualization with webcam",
+    )
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["INFO", "DEBUG", "WARNING", "ERROR"],
+        help="log level",
+    )
+    parser.add_argument("--lang", default="EN", choices=["EN", "CN"], help="Language")
     parser.add_argument("--godview", "-gv", type=lambda x: x.lower() in ('yes', 'true', '1'),
                        default=True, help="Express poses in front camera frame (default: yes)")
 
     args = parser.parse_args()
 
+    if is_headless():
+        logging.warning("Running in headless mode. Set args.show_display=False.")
+        args.show_display = False
+
+    logging.basicConfig(
+        level=getattr(logging, args.log_level.upper()),
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
+    logging.info(args)
+
     cameras_config = None
     if args.cameras:
         try:
             cameras_config = json.loads(args.cameras)
-            logger.info(f"🎥 Using camera config from arguments: {list(cameras_config.keys())}")
+            logger.info(
+                f"🎥 Using camera config from arguments: {list(cameras_config.keys())}"
+            )
         except json.JSONDecodeError as e:
             logger.error(f"❌ Invalid camera configuration JSON: {e}")
             return 1
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
-
     try:
-        if args.display_data:
-            logger.info("📊 Initializing rerun for data visualization...")
-            _init_rerun(session_name="recording")
+        if not (args.show_display or args.show_webcam):
+            logger.info("📊 No visualization show...")
+            # _init_rerun(session_name="recording")
 
         if args.auto_detect_cameras:
             logger.info("🔍 Running camera auto-detection...")
             from scripts.find_camera_port import find_cameras
+
             detected_cameras = find_cameras()
             logger.info(f"Detected cameras: {detected_cameras}")
             return 0
@@ -621,11 +961,13 @@ def main():
         recorder = RynnLeRobotRecorder(
             repo_id=args.repo_id,
             fps=args.fps,
-            root=args.root,
+            root=os.path.join(args.root, args.repo_id),
             config_path=args.config,
             cameras_config=cameras_config,
-            display_data=args.display_data,
-            godview=args.godview
+            show_display=args.show_display,
+            show_webcam=args.show_webcam,
+            log_level=args.log_level,
+            godview=args.godview,
         )
 
         recorder.record_dataset(
@@ -633,7 +975,7 @@ def main():
             num_episodes=args.episodes,
             episode_time_s=args.episode_time,
             reset_time_s=args.reset_time,
-            push_to_hub=args.push_to_hub
+            push_to_hub=args.push_to_hub,
         )
 
     except Exception as e:

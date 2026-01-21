@@ -7,7 +7,7 @@ This module provides a single interface that can handle all robot types:
 - Teleop mode for leader robot control
 
 Inherits from RobotInterfaceBase to follow the unified interface pattern.
-For MuJoCo simulation, use MujocoRobotInterface from RynnMotion.core.mj_interface.
+For MuJoCo simulation, use MujocoRobotInterface from RynnMotion.core.mjrobot_interface.
 """
 
 import os
@@ -30,7 +30,7 @@ from RynnLeRobot.hardware.teleoperators.so101_leader.config_so101_leader import 
 )
 from RynnLeRobot.hardware.teleoperators.so101_leader.so101_leader import SO101Leader
 
-from RynnMotion.core.interface_base import (
+from RynnMotion.core.robotinterface_base import (
     RobotInterfaceBase,
     register_robotinterface_factory_func,
 )
@@ -203,8 +203,8 @@ class LeRobotInterface(RobotInterfaceBase):
             robot_model: LeRobotModel or RobotManager instance
             robot_config: Configuration dictionary containing:
                 - mode: "real", "mock", "teleop"
-                - follower: dict with port, calibration_dir
-                - leader: dict with port, calibration_dir (for teleop mode)
+                - robot: dict with port, calibration_dir
+                - teleoperate: dict with port, calibration_dir (for teleop mode)
                 - joint_names: list of joint names
                 - joint_range: dict of joint limits
             logger: Optional logger instance
@@ -331,7 +331,7 @@ class LeRobotInterface(RobotInterfaceBase):
 
     def _init_teleop_robot(self):
         """Initialize teleop (leader) robot."""
-        teleop_config = self._raw_config.get("leader", {})
+        teleop_config = self._raw_config.get("teleoperate", {})
 
         port = teleop_config.get("port", "/dev/ttyACM1")
         calibration_dir = teleop_config.get("calibration_dir")
@@ -563,24 +563,24 @@ def create_robot_interface(
     # Override port if provided
     if port is not None:
         if mode == "teleop":
-            if "leader" not in config:
-                config["leader"] = {}
-            config["leader"]["port"] = port
+            if "teleoperate" not in config:
+                config["teleoperate"] = {}
+            config["teleoperate"]["port"] = port
         else:
-            if "follower" not in config:
-                config["follower"] = {}
-            config["follower"]["port"] = port
+            if "robot" not in config:
+                config["robot"] = {}
+            config["robot"]["port"] = port
 
     # Override calibration_dir if provided
     if calibration_dir is not None:
         if mode == "teleop":
-            if "leader" not in config:
-                config["leader"] = {}
-            config["leader"]["calibration_dir"] = calibration_dir
+            if "teleoperate" not in config:
+                config["teleoperate"] = {}
+            config["teleoperate"]["calibration_dir"] = calibration_dir
         else:
-            if "follower" not in config:
-                config["follower"] = {}
-            config["follower"]["calibration_dir"] = calibration_dir
+            if "robot" not in config:
+                config["robot"] = {}
+            config["robot"]["calibration_dir"] = calibration_dir
 
     # Create lightweight robot model
     robot_model = LeRobotModel(config)

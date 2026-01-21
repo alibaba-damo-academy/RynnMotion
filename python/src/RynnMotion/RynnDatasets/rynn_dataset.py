@@ -898,6 +898,9 @@ class RynnDataset(torch.utils.data.Dataset):
         ep_dataset.to_parquet(ep_data_path)
 
     def clear_episode_buffer(self) -> None:
+        # 检查 episode_buffer 是否存在且不为空
+        if not self.episode_buffer:
+            return
         episode_index = self.episode_buffer["episode_index"]
 
         # Clean up image files for the current episode buffer
@@ -906,8 +909,17 @@ class RynnDataset(torch.utils.data.Dataset):
                 img_dir = self._get_image_file_path(
                     episode_index=episode_index, image_key=cam_key, frame_index=0
                 ).parent
-                if img_dir.is_dir():
-                    shutil.rmtree(img_dir)
+
+                # 使用异常处理避免因文件不存在引发的错误
+                try:
+                    if img_dir.is_dir():
+                        shutil.rmtree(img_dir)
+                except FileNotFoundError:
+                    # 忽略文件不存在的情况
+                    pass
+                except Exception as e:
+                    # 记录其他可能的异常但不中断执行
+                    logging.warning(f"Failed to remove directory {img_dir}: {e}")
 
         # Reset the buffer
         self.episode_buffer = self.create_episode_buffer()

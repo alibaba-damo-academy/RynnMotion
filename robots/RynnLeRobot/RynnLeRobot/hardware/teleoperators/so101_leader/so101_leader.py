@@ -96,7 +96,8 @@ class SO101Leader(Teleoperator):
         if self.calibration:
             # Calibration file exists, ask user whether to use it or run new calibration
             user_input = input(
-                f"Press ENTER to use provided calibration file associated with the id {self.id}, or type 'c' and press ENTER to run calibration: "
+                f"Press ENTER to use provided calibration file associated with the id={self.id}, or type 'c' and press ENTER to run calibration:\n"
+                f"按下回车键以使用 id={self.id} 提供的关联校准文件，或者输入'c'并按下回车键以重新运行校准: "
             )
             if user_input.strip().lower() != "c":
                 logger.info(
@@ -110,12 +111,13 @@ class SO101Leader(Teleoperator):
         for motor in self.bus.motors:
             self.bus.write("Operating_Mode", motor, OperatingMode.POSITION.value)
 
-        input(f"Move {self} to the middle of its range of motion and press ENTER....")
+        input(f"Move {self} to the middle of its range of motion and press ENTER\n把所有关节移动到零状态位, 再按回车键继续....")
         homing_offsets = self.bus.set_half_turn_homings()
 
         print(
             "Move all joints sequentially through their entire ranges "
-            "of motion.\nRecording positions. Press ENTER to stop..."
+            "of motion. Recording positions. Press ENTER to stop...\n"
+            "依次移动所有关节，通过其整个运动范围记录最大、最小的位置。按回车键停止 ..."
         )
         range_mins, range_maxes = self.bus.record_ranges_of_motion()
 
@@ -131,7 +133,7 @@ class SO101Leader(Teleoperator):
 
         self.bus.write_calibration(self.calibration)
         self._save_calibration()
-        print(f"Calibration saved to {self.calibration_fpath}")
+        print("Calibration saved to", self.calibration_fpath)
 
     def configure(self) -> None:
         self.bus.disable_torque()

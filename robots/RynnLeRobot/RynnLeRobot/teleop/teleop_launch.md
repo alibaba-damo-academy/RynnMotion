@@ -177,57 +177,6 @@ so101-teleop --robot fr3 --mode glfw    # Linux
 
 ---
 
-## SO101 Floating End-Effector Mode
-
-Control floating grippers in MuJoCo using SO101 master arm end-effector pose. This mode reads the EE position and orientation from two SO101 master arms and maps them directly to floating grippers in simulation.
-
-### Usage
-
-```bash
-# Use different gripper types
-so101-floating-ee --gripper robotiq   # Robotiq 2F85 gripper (default)
-so101-floating-ee --gripper umi       # UMI gripper
-so101-floating-ee --gripper openarm   # OpenArm gripper
-
-# Custom configuration
-so101-floating-ee --gripper robotiq --config /path/to/so101.yaml
-```
-
-### Supported Grippers
-
-| Gripper | Description |
-|---------|-------------|
-| `robotiq` | Robotiq 2F85 parallel gripper |
-| `umi` | UMI gripper with GoPro mount |
-| `openarm` | OpenArm crank-slider gripper |
-
-### Control Mapping
-
-| Master SO101 | Floating Gripper |
-|--------------|------------------|
-| EE delta position | Gripper position (slide joints) |
-| EE delta orientation | Gripper orientation (hinge joints) |
-| Gripper (0-1) | Gripper actuator (0-1) |
-
-### How It Works
-
-1. **Home Pose Capture**: On startup, the system captures the current EE pose of both SO101 arms as the "home" reference
-2. **Relative Motion**: During teleoperation, the system tracks the delta (change) from home position/orientation
-3. **Workspace Mapping**: Delta motion is applied to gripper scene centers:
-   - Arm 0 (left): centered at (0, 0, 0.3)
-   - Arm 1 (right): centered at (0.25, 0, 0.3)
-4. **Rotation**: Relative rotation from home is converted to euler angles (xyz intrinsic) for hinge joint control
-
-### Notes
-
-- **Gripper control**: Standardized 0=closed, 1=open
-- **Dual-arm**: Two SO101 master arms control two floating grippers
-- **FK computation**: Uses PinKine (Pinocchio-based) for forward kinematics
-- **Quaternion format**: (x, y, z, w) - same as scipy and Eigen conventions
-- **Position is relative**: Move arms from their current position to see gripper motion
-
----
-
 **Project**: RynnMotion RynnLeRobot
 **Version**: 0.1.0
-**Last Updated**: 2025-12-21
+**Last Updated**: 2025-11-28

@@ -75,11 +75,11 @@ if [[ ! -f "setup_env.sh" ]]; then
     exit 1
 fi
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
+#if [[ "$OSTYPE" == "darwin"* ]]; then
     VENV_DIR="venv"
-else
-    VENV_DIR=".venv"
-fi
+#else
+#    VENV_DIR=".venv"
+#fi
 
 msg "📦 Creating virtual environment with uv..." "📦 正在使用 uv 创建虚拟环境..."
 uv venv $VENV_DIR --python 3.13

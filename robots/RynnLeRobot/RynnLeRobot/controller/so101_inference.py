@@ -23,12 +23,12 @@ if platform.system() == "Darwin":
     matplotlib.use("Agg")
 
 # New factory pattern imports for simulation
-from RynnMotion.core.mj_interface import MujocoRobotInterface
+from RynnMotion.core.mjrobot_interface import MujocoRobotInterface
 from RynnMotion.manager.robot_manager import RobotManager
 from RynnMotion.utils.path_config import get_models_root
 
 # Utility imports
-from RynnMotion.algorithms.policy_interpolator import PolicyInterpolator, lerp
+from RynnMotion.utils.policy_interpolator import PolicyInterpolator, lerp
 from RynnMotion.utils.lcm_handler import LCMHandler
 from RynnMotion.utils.joint_plotter import JointPlotter
 from RynnMotion.utils.interpolator_plotter import InterpolatorPlotter
@@ -85,7 +85,7 @@ class SO101Inference:
             self.config.get("home_joint_positions", [0.0, np.pi, 3.0, 1.1, 0.0, 0.0])
         )
 
-        self.inference_rate = self.config.get("follower", {}).get("inference_rate", 30.0)
+        self.inference_rate = self.config.get("robot", {}).get("inference_rate", 30.0)
         self.joint_plot_flag = self.config.get("plot", {}).get("enable_joint_plotting", False)
         self.interpolator_plot_flag = self.config.get("plot", {}).get("enable_interpolator_plotting", False)
         self.show_plots = self.config.get("plot", {}).get("show_plots", False)
@@ -117,7 +117,7 @@ class SO101Inference:
         self.qPos_command = None
         self.qPos_feedback = None
 
-        self.timeout_seconds = self.config.get("follower", {}).get("timeout_seconds", 30.0)
+        self.timeout_seconds = self.config.get("robot", {}).get("timeout_seconds", 30.0)
         self.timeout_seconds = max(20.0, min(self.timeout_seconds, 90.0))
         self.go_home_start_position = None
         self.go_home_start_time = None
@@ -238,7 +238,7 @@ class SO101Inference:
             qACT.extend(self.executing_ACT.gripperPos[gripper_start:gripper_end])
 
         total_dof = self.executing_ACT.numJoint + self.executing_ACT.numGripper
-        self.interpolator.prepare_trajectory_async(qACT, total_dof, self.executing_ACT.chunkSize)
+        self.interpolator.prepare_trajectory(qACT, total_dof, self.executing_ACT.chunkSize)
 
         self.lowfreq_chunksize = self.executing_ACT.chunkSize
         self.highfreq_chunksize = self.frequency / self.inference_rate * self.executing_ACT.chunkSize

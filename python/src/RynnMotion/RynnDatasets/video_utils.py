@@ -28,6 +28,7 @@ import torch
 import torchvision
 from datasets.features.features import register_feature
 from PIL import Image
+from RynnMotion.RynnDatasets.encode_multi_platform import create_video_from_images
 
 
 def get_safe_default_codec():
@@ -247,7 +248,7 @@ def encode_video_frames(
     imgs_dir: Path | str,
     video_path: Path | str,
     fps: int,
-    vcodec: str = "libsvtav1",
+    vcodec: str = "libsvtav1", # "h264",
     pix_fmt: str = "yuv420p",
     g: int | None = 2,
     crf: int | None = 30,
@@ -255,6 +256,19 @@ def encode_video_frames(
     log_level: int | None = av.logging.ERROR,
     overwrite: bool = False,
 ) -> None:
+    """使用多平台硬件加速编码视频帧"""
+    success = create_video_from_images(
+        file_path=str(imgs_dir),
+        image_pattern="frame_%06d.png",
+        output_file=str(video_path),
+        framerate=fps
+    )
+    if success:
+        print("Encode video with hardware acceleration SUCCEED!")
+        return
+    else:
+        print("Encode video with hardware acceleration FAILED! Use default software acceleration.")
+
     """More info on ffmpeg arguments tuning on `benchmark/video/README.md`"""
     # Check encoder availability
     if vcodec not in ["h264", "hevc", "libsvtav1"]:

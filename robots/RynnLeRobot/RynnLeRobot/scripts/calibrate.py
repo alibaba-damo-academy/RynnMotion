@@ -26,13 +26,19 @@ import logging
 import os
 import sys
 import yaml
+import argparse
+from pathlib import Path
+from pprint import pformat
 
-from RynnLeRobot.hardware.robots.so101_follower.config_so101_follower import SO101FollowerConfig
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from RynnLeRobot.hardware.robots.so101_follower.config_so101_follower import (
+    SO101FollowerConfig,
+)
 from RynnLeRobot.hardware.robots.so101_follower.so101_follower import SO101Follower
 from RynnLeRobot.hardware.robots.lekiwi.config_lekiwi import LeKiwiConfig
 from RynnLeRobot.hardware.robots.lekiwi.lekiwi import LeKiwi
-from RynnLeRobot.hardware.teleoperators.so101_leader.config_so101_leader import SO101LeaderConfig
-from RynnLeRobot.hardware.teleoperators.so101_leader.so101_leader import SO101Leader
 from RynnLeRobot.scripts.lang import select_language, t
 
 logger = logging.getLogger(__name__)
@@ -53,19 +59,33 @@ def load_config(config_path: str = "configs/so101.yaml"):
 
 
 def extract_id_from_path(calibration_dir: str) -> str:
-    """Extract device ID from calibration directory path."""
+    """Extract device ID from calibration directory path.
+
+    Args:
+        calibration_dir: Path like '~/.cache/huggingface/lerobot/calibration/robots/so101_follower'
+
+    Returns:
+        str: The last directory name (e.g., 'so101_follower')
+    """
     from pathlib import Path
+
     path = Path(os.path.expanduser(calibration_dir))
     return path.name
 
 
-def make_robot_from_config(robot_type: str, port: str = None, calibration_dir: str = None):
+def make_robot_from_config(
+    robot_type: str, port: str = None, calibration_dir: str = None
+):
     """Create robot instance based on type."""
     if robot_type == "so101_follower":
-        robot_id = extract_id_from_path(calibration_dir) if calibration_dir else robot_type
+        # Auto-derive ID from calibration directory path, default to robot_type if no calibration_dir
+        robot_id = (
+            extract_id_from_path(calibration_dir) if calibration_dir else robot_type
+        )
         config = SO101FollowerConfig(port=port or "/dev/ttyACM0", id=robot_id)
         if calibration_dir:
             from pathlib import Path
+
             calibration_path = Path(os.path.expanduser(calibration_dir))
             config.calibration_dir = calibration_path
             logging.info(f"Set calibration file path: {calibration_path}")
@@ -77,17 +97,23 @@ def make_robot_from_config(robot_type: str, port: str = None, calibration_dir: s
         raise ValueError(f"Unsupported robot type: {robot_type}")
 
 
-def make_teleoperator_from_config(teleop_type: str, port: str = None, calibration_dir: str = None):
+def make_teleoperator_from_config(
+    teleop_type: str, port: str = None, calibration_dir: str = None
+):
     """Create teleoperator instance based on type."""
     if teleop_type == "so101_leader":
-        teleop_id = extract_id_from_path(calibration_dir) if calibration_dir else teleop_type
-        config = SO101LeaderConfig(port=port or "/dev/ttyUSB0", id=teleop_id)
+        # Auto-derive ID from calibration directory path, default to teleop_type if no calibration_dir
+        teleop_id = (
+            extract_id_from_path(calibration_dir) if calibration_dir else teleop_type
+        )
+        config = SO101FollowerConfig(port=port or "/dev/ttyUSB0", id=teleop_id)
         if calibration_dir:
             from pathlib import Path
+
             calibration_path = Path(os.path.expanduser(calibration_dir))
             config.calibration_dir = calibration_path
             logging.info(f"Set calibration file path: {calibration_path}")
-        return SO101Leader(config)
+        return SO101Follower(config)
     else:
         raise ValueError(f"Unsupported teleoperator type: {teleop_type}")
 
@@ -95,8 +121,8 @@ def make_teleoperator_from_config(teleop_type: str, port: str = None, calibratio
 def calibrate_device(device):
     """Calibrate the given device."""
     try:
-        logging.info("Connecting to device...")
-        device.connect(calibrate=False)
+        #logger.info(i18n.get("device_connected", device_type=device.__class__.__name__))
+        device.connect()
 
         logging.info("Starting calibration...")
         if hasattr(device, 'calibrate'):
@@ -111,14 +137,17 @@ def calibrate_device(device):
         logging.error(f"Calibration failed: {e}")
         return False
     finally:
-        if hasattr(device, 'disconnect'):
+        if hasattr(device, "disconnect"):
             device.disconnect()
-            logging.info("Device disconnected")
+            logger.info(
+                #i18n.get("device_disconnected", device_type=device.__class__.__name__)
+                t("device_disconnected", device_type=device.__class__.__name__)
+            )
 
 
 def calibrate_follower(config: dict) -> str:
     """Calibrate follower robot. Returns status string."""
-    robot_config = config.get("follower", {})
+    robot_config = config.get("robot", {})
     if not robot_config or not robot_config.get("port"):
         return t("calib_status_no_config")
 
@@ -156,7 +185,7 @@ def calibrate_follower(config: dict) -> str:
 
 def calibrate_leader(config: dict) -> str:
     """Calibrate leader teleoperator. Returns status string."""
-    teleop_config = config.get("leader", {})
+    teleop_config = config.get("teleoperate", {})
     if not teleop_config or not teleop_config.get("port"):
         return t("calib_status_no_config")
 
@@ -194,7 +223,7 @@ def calibrate_leader(config: dict) -> str:
 
 def calibrate_second_leader(config: dict) -> str:
     """Calibrate second leader teleoperator. Returns status string."""
-    teleop_config = config.get("leader", {})
+    teleop_config = config.get("teleoperate", {})
     if not teleop_config or not teleop_config.get("port_2"):
         return t("calib_status_no_config")
 
@@ -245,13 +274,13 @@ def main():
     # Sequential calibration: follower -> leader -> second leader
     follower_status = calibrate_follower(config)
     leader_status = calibrate_leader(config)
-    second_leader_status = calibrate_second_leader(config)
+    #second_leader_status = calibrate_second_leader(config)
 
     # Print summary
     print(t("calib_summary"))
     print(t("calib_follower_status", status=follower_status))
     print(t("calib_leader_status", status=leader_status))
-    print(t("calib_second_leader_status", status=second_leader_status))
+    #print(t("calib_second_leader_status", status=second_leader_status))
     print("=" * 60)
 
     # Force clean exit

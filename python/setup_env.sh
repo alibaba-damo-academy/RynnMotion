@@ -70,11 +70,7 @@ echo ""
 # ----------------------------
 # Step 2: Create and activate virtual environment
 # ----------------------------
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    VENV_DIR="venv"
-else
-    VENV_DIR=".venv"
-fi
+VENV_DIR="venv"
 
 echo "📦 Creating virtual environment in $VENV_DIR using Python 3.13..."
 uv venv $VENV_DIR --python 3.13

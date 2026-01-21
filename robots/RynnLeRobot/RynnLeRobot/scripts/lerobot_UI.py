@@ -108,7 +108,7 @@ class LeRobotUIController:
             with open(config_path, "r") as f:
                 config = yaml.safe_load(f)
 
-        port = config.get("follower", {}).get("port", "/dev/ttyACM0")
+        port = config.get("robot", {}).get("port", "/dev/ttyACM0")
         joint_names = list(SO101_JOINT_RANGE.keys())
         joint_mapping = {i + 1: name for i, name in enumerate(joint_names)}
         return joint_mapping, SO101_JOINT_RANGE, port

@@ -42,7 +42,115 @@ from RynnLeRobot.scripts.lang import select_language, t
 logger = logging.getLogger(__name__)
 
 
-def filter_ubuntu_external_cameras(camera_list: list[dict[str, Any]]) -> list[dict[str, Any]]:
+class I18nMessages:
+    def __init__(self, language='EN'):
+        self.lang = language
+        self.messages = {
+            'EN': {
+                'hardcoded_detection_title': "🔍 Hardcoded camera detection - using platform-specific camera assignment...",
+                'found_ubuntu_cameras': "Found {count} external cameras on Ubuntu",
+                'assigned_front_camera': "✅ Assigned front camera: {port}",
+                'assigned_wrist_camera': "✅ Assigned wrist camera: {port}",
+                'not_enough_ubuntu_cameras': "⚠️ Only found {count} external cameras, need at least 2",
+                'found_macos_cameras': "Found {count} cameras on macOS",
+                'hardcoded_failed': "⚠️ Hardcoded detection failed, falling back to manual detection...",
+                'using_manual_detection': "📋 Using manual plug/unplug detection method...",
+                'unplug_prompt': "Please make sure the {camera_name} camera is UNPLUGGED and press Enter to continue.",
+                'plug_prompt': "Please connect the {camera_name} camera and press Enter to continue.",
+                'detected_camera_id': "The camera ID of this {camera_name} camera is '{port}'",
+                'detected_camera_env': "DETECTED_{camera_name}_CAMERA={port}",
+                'camera_detection_title': "🎯 Camera Detection",
+                'detection_summary': "Port Detection Summary:",
+                'detection_completed': "✅ Camera detection completed using hardcoded assignment",
+                'detected_cameras_title': "--- Detected Cameras ---",
+                'camera_number': "Camera #{index}:",
+                'camera_property': "  {property}:",
+                'camera_sub_property': "    {property}: {value}",
+                'property_separator': "-" * 20,
+                'error_detecting_camera': "Error detecting {camera_name} camera: {error}",
+                'camera_not_found': "DETECTED_{camera_name}_CAMERA=NOT_FOUND",
+                'saving_test_images': "Saving test images from detected cameras",
+                'finalizing_saving': "\nFinalizing image saving...",
+                'capture_finished': "Image capture finished. Images saved to {path}",
+                'detection_title': "Camera Detection Summary:",
+                'front_camera': "Front camera port: ",
+                'wrist_camera': "Wrist camera port: ",
+                'not_detected_skipped': "Not detected or skipped",
+                'detection_separator': "=" * 50,
+                'no_cameras_detected': "No cameras were detected.",
+                'camera_detection_header': "Camera Detection",
+                'press_enter': "Press Enter to continue...",
+                'saving_images_to': "Saving images to {path}",
+                'record_time': "Recording for {time:.1f} seconds",
+                'camera_connection': "Connecting to camera: {id}",
+                'camera_disconnection': "Disconnecting {count} cameras...",
+                'camera_capture_started': "Starting image capture for {time:.1f} seconds from {count} cameras.",
+                'camera_test': "Testing camera: {id}",
+                'camera_test_success': "✓ Camera {id} test successful",
+                'camera_test_failed': "✗ Camera {id} test failed: {error}",
+                'camera_listing': "Listing available cameras...",
+                'camera_listing_complete': "Camera listing completed.",
+                'camera_listing_none': "No cameras found.",
+            },
+            'CN': {
+                'hardcoded_detection_title': "🔍 硬编码相机检测 - 使用平台特定的相机分配...",
+                'found_ubuntu_cameras': "在 Ubuntu 上找到 {count} 个外部相机",
+                'assigned_front_camera': "✅ 已分配正面相机: {port}",
+                'assigned_wrist_camera': "✅ 已分配腕部相机: {port}",
+                'not_enough_ubuntu_cameras': "⚠️ 仅找到 {count} 个外部相机，至少需要 2 个",
+                'found_macos_cameras': "在 macOS 上找到 {count} 个相机",
+                'hardcoded_failed': "⚠️ 硬编码检测失败，回退到手动检测...",
+                'using_manual_detection': "📋 使用手动插拔检测方法...",
+                'unplug_prompt': "请确保 {camera_name} 相机已断开连接，然后按 Enter 继续。",
+                'plug_prompt': "请连接 {camera_name} 相机，然后按 Enter 继续。",
+                'detected_camera_id': "{camera_name} 相机的 ID 为: '{port}'",
+                'detected_camera_env': "DETECTED_{camera_name}_CAMERA={port}",
+                'camera_detection_title': "🎯 相机检测",
+                'detection_summary': "相机检测摘要:",
+                'detection_completed': "✅ 已使用硬编码分配完成相机检测",
+                'detected_cameras_title': "--- 已检测到的相机 ---",
+                'camera_number': "相机 #{index}:",
+                'camera_property': "  {property}:",
+                'camera_sub_property': "    {property}: {value}",
+                'property_separator': "-" * 20,
+                'error_detecting_camera': "检测 {camera_name} 相机时出错: {error}",
+                'camera_not_found': "DETECTED_{camera_name}_CAMERA=未找到",
+                'saving_test_images': "正在从检测到的相机保存测试图像",
+                'finalizing_saving': "\n正在完成图像保存...",
+                'capture_finished': "图像捕获已完成。图像已保存至 {path}",
+                'detection_title': "相机检测摘要:",
+                'front_camera': "正面相机端口: ",
+                'wrist_camera': "腕部相机端口: ",
+                'not_detected_skipped': "未检测到或已跳过",
+                'detection_separator': "=" * 50,
+                'no_cameras_detected': "未检测到相机。",
+                'camera_detection_header': "相机检测",
+                'press_enter': "按 Enter 继续...",
+                'saving_images_to': "正在将图像保存至 {path}",
+                'record_time': "正在录制 {time:.1f} 秒",
+                'camera_connection': "正在连接相机: {id}",
+                'camera_disconnection': "正在断开 {count} 个相机的连接...",
+                'camera_capture_started': "开始从 {count} 个相机捕获图像，持续 {time:.1f} 秒。",
+                'camera_test': "正在测试相机: {id}",
+                'camera_test_success': "✓ 相机 {id} 测试成功",
+                'camera_test_failed': "✗ 相机 {id} 测试失败: {error}",
+                'camera_listing': "正在列出可用相机...",
+                'camera_listing_complete': "相机列表已完成。",
+                'camera_listing_none': "未找到相机。",
+            }
+        }
+
+    def get(self, key, **kwargs):
+        """获取指定键的翻译消息"""
+        message = self.messages[self.lang].get(key, key)
+        return message.format(**kwargs)
+
+    def get_with_separator(self, key, **kwargs):
+        """获取带分隔线的消息"""
+        return f"{self.get(key, **kwargs)}\n{self.get('detection_separator')}"
+
+
+def filter_ubuntu_external_cameras(camera_list: list[dict[str, Any]], i18n: I18nMessages) -> list[dict[str, Any]]:
     """
     Filter cameras for Ubuntu laptops to get only external cameras.
     Ubuntu laptops typically have:
@@ -75,7 +183,7 @@ def filter_ubuntu_external_cameras(camera_list: list[dict[str, Any]]) -> list[di
     return external_cameras
 
 
-def find_all_opencv_cameras(filter_ubuntu_external: bool = False) -> list[dict[str, Any]]:
+def find_all_opencv_cameras(filter_ubuntu_external: bool = False, i18n: I18nMessages = None) -> list[dict[str, Any]]:
     """
     Finds all available OpenCV cameras plugged into the system.
 
@@ -85,6 +193,9 @@ def find_all_opencv_cameras(filter_ubuntu_external: bool = False) -> list[dict[s
     Returns:
         A list of all available OpenCV cameras with their metadata.
     """
+    if i18n is None:
+        i18n = I18nMessages()
+        
     all_opencv_cameras_info: list[dict[str, Any]] = []
     logger.info(t("searching_opencv"))
     try:
@@ -161,40 +272,43 @@ def update_camera_config_yaml(front_camera_id=None, wrist_camera_id=None, config
         print(t("manual_set_cameras", config_path=config_path))
 
 
-def find_camera_by_difference(camera_name: str) -> int | None:
+def find_camera_by_difference(camera_name: str, i18n: I18nMessages = None) -> int | None:
     """
     Find a camera by unplugging and plugging it back in.
     Following the same pattern as find_motor_port.py
     """
-    print(f"Please make sure the {camera_name} camera is UNPLUGGED and press Enter to continue.")
+    if i18n is None:
+        i18n = I18nMessages()
+        
+    print(i18n.get('unplug_prompt', camera_name=camera_name))
     input()
-    cameras_before = find_all_opencv_cameras()
+    cameras_before = find_all_opencv_cameras(i18n=i18n)
     camera_ids_before = {cam["id"] for cam in cameras_before}
 
     time.sleep(0.5)
 
-    print(f"Please connect the {camera_name} camera and press Enter to continue.")
+    print(i18n.get('plug_prompt', camera_name=camera_name))
     input()
-    cameras_after = find_all_opencv_cameras()
+    cameras_after = find_all_opencv_cameras(i18n=i18n)
     camera_ids_after = {cam["id"] for cam in cameras_after}
     camera_diff = list(camera_ids_after - camera_ids_before)
 
     if len(camera_diff) == 1:
         camera_id = camera_diff[0]
-        print(f"The camera ID of this {camera_name} camera is '{camera_id}'")
-        print(f"DETECTED_{camera_name.upper()}_CAMERA={camera_id}")
+        print(i18n.get('detected_camera_id', camera_name=camera_name, port=camera_id))
+        print(i18n.get('detected_camera_env', camera_name=camera_name.upper(), port=camera_id))
         return camera_id
     elif len(camera_diff) == 0:
         raise OSError(
-            f"Could not detect the {camera_name} camera. No difference was found ({camera_diff})."
+            i18n.get('no_cameras_detected')
         )
     else:
         raise OSError(
-            f"Could not detect the {camera_name} camera. More than one camera was found ({camera_diff})."
+            i18n.get('not_enough_ubuntu_cameras', count=len(camera_diff))
         )
 
 
-def find_cameras_hardcoded():
+def find_cameras_hardcoded(i18n: I18nMessages = None):
     """
     Hardcoded camera detection - platform-specific assignment:
     - Ubuntu: Use external cameras (video4+ devices) - typically /dev/video4 (front) and /dev/video6 (wrist)
@@ -246,7 +360,7 @@ def find_cameras_hardcoded():
             return {"front": None, "wrist": None}
 
 
-def find_cameras():
+def find_cameras(i18n: I18nMessages = None):
     """
     Find FRONT and WRIST cameras using hardcoded assignment (last two cameras).
     Similar to motor port detection pattern but without plug/unplug.
@@ -255,9 +369,9 @@ def find_cameras():
     print("=" * 50)
 
     # First try hardcoded detection (works for most cases)
-    result = find_cameras_hardcoded()
+    result = find_cameras_hardcoded(i18n=i18n)
     if result["front"] and result["wrist"]:
-        print("=" * 50)
+        #print(i18n.get('detection_separator'))
         return result
 
     # Commented out manual detection - may be needed in the future
@@ -291,7 +405,7 @@ def find_cameras():
     return result
 
 
-def find_and_print_cameras(camera_type_filter: str | None = None) -> list[dict[str, Any]]:
+def find_and_print_cameras(camera_type_filter: str | None = None, i18n: I18nMessages = None) -> list[dict[str, Any]]:
     """
     Finds available cameras based on an optional filter and prints their information.
 
@@ -302,13 +416,16 @@ def find_and_print_cameras(camera_type_filter: str | None = None) -> list[dict[s
     Returns:
         A list of all available cameras matching the filter, with their metadata.
     """
+    if i18n is None:
+        i18n = I18nMessages()
+        
     all_cameras_info: list[dict[str, Any]] = []
 
     if camera_type_filter:
         camera_type_filter = camera_type_filter.lower()
 
     if camera_type_filter is None or camera_type_filter == "opencv":
-        all_cameras_info.extend(find_all_opencv_cameras())
+        all_cameras_info.extend(find_all_opencv_cameras(i18n=i18n))
 
     if not all_cameras_info:
         if camera_type_filter:
@@ -321,12 +438,12 @@ def find_and_print_cameras(camera_type_filter: str | None = None) -> list[dict[s
             print(t("camera_num", num=i))
             for key, value in cam_info.items():
                 if key == "default_stream_profile" and isinstance(value, dict):
-                    print(f"  {key.replace('_', ' ').capitalize()}:")
+                    print(i18n.get('camera_property', property=key.replace('_', ' ').capitalize()))
                     for sub_key, sub_value in value.items():
-                        print(f"    {sub_key.capitalize()}: {sub_value}")
+                        print(i18n.get('camera_sub_property', property=sub_key.capitalize(), value=sub_value))
                 else:
-                    print(f"  {key.replace('_', ' ').capitalize()}: {value}")
-            print("-" * 20)
+                    print(i18n.get('camera_property', property=key.replace('_', ' ').capitalize(), value=value))
+            print(i18n.get('property_separator'))
     return all_cameras_info
 
 
@@ -336,10 +453,14 @@ def save_image(
     images_dir: Path,
     camera_type: str,
     sequence_number: int = 1,
+    i18n: I18nMessages = None,
 ):
     """
     Saves a single image to disk using Pillow. Handles color conversion if necessary.
     """
+    if i18n is None:
+        i18n = I18nMessages()
+        
     try:
         img = Image.fromarray(img_array, mode="RGB")
 
@@ -363,13 +484,16 @@ def save_image(
         logger.error(f"Failed to save image for camera {camera_identifier} (type {camera_type}): {e}")
 
 
-def create_camera_instance(cam_meta: dict[str, Any]) -> dict[str, Any] | None:
+def create_camera_instance(cam_meta: dict[str, Any], i18n: I18nMessages = None) -> dict[str, Any] | None:
     """Create and connect to a camera instance based on metadata."""
+    if i18n is None:
+        i18n = I18nMessages()
+        
     cam_type = cam_meta.get("type")
     cam_id = cam_meta.get("id")
     instance = None
 
-    logger.info(f"Preparing {cam_type} ID {cam_id} with default profile")
+    logger.info(i18n.get('camera_connection', id=cam_id))
 
     try:
         if cam_type == "OpenCV":
@@ -383,20 +507,27 @@ def create_camera_instance(cam_meta: dict[str, Any]) -> dict[str, Any] | None:
             return None
 
         if instance:
-            logger.info(f"Connecting to {cam_type} camera: {cam_id}...")
+            logger.info(i18n.get('camera_test', id=cam_id))
             instance.connect(warmup=False)
             return {"instance": instance, "meta": cam_meta}
     except Exception as e:
-        logger.error(f"Failed to connect or configure {cam_type} camera {cam_id}: {e}")
+        logger.error(i18n.get('camera_test_failed', id=cam_id, error=e))
         if instance and instance.is_connected:
             instance.disconnect()
         return None
 
 
 def process_camera_image(
-    cam_dict: dict[str, Any], output_dir: Path, current_time: float, sequence_number: int = 1
+    cam_dict: dict[str, Any], 
+    output_dir: Path, 
+    current_time: float, 
+    sequence_number: int = 1,
+    i18n: I18nMessages = None,
 ) -> concurrent.futures.Future | None:
     """Capture and process an image from a single camera."""
+    if i18n is None:
+        i18n = I18nMessages()
+        
     cam = cam_dict["instance"]
     meta = cam_dict["meta"]
     cam_type_str = str(meta.get("type", "unknown"))
@@ -411,6 +542,7 @@ def process_camera_image(
             output_dir,
             cam_type_str,
             sequence_number,
+            i18n=i18n,
         )
     except TimeoutError:
         logger.warning(
@@ -421,9 +553,12 @@ def process_camera_image(
     return None
 
 
-def cleanup_cameras(cameras_to_use: list[dict[str, Any]]):
+def cleanup_cameras(cameras_to_use: list[dict[str, Any]], i18n: I18nMessages = None):
     """Disconnect all cameras."""
-    logger.info(f"Disconnecting {len(cameras_to_use)} cameras...")
+    if i18n is None:
+        i18n = I18nMessages()
+        
+    logger.info(i18n.get('camera_disconnection', count=len(cameras_to_use)))
     for cam_dict in cameras_to_use:
         try:
             if cam_dict["instance"] and cam_dict["instance"].is_connected:
@@ -436,6 +571,7 @@ def save_images_from_all_cameras(
     output_dir: Path,
     record_time_s: float = 2.0,
     camera_type: str | None = None,
+    i18n: I18nMessages = None,
 ):
     """
     Connects to detected cameras (optionally filtered by type) and saves images from each.
@@ -447,17 +583,20 @@ def save_images_from_all_cameras(
         camera_type: Optional string to filter cameras ("realsense" or "opencv").
                             If None, uses all detected cameras.
     """
+    if i18n is None:
+        i18n = I18nMessages()
+        
     output_dir.mkdir(parents=True, exist_ok=True)
-    logger.info(f"Saving images to {output_dir}")
-    all_camera_metadata = find_and_print_cameras(camera_type_filter=camera_type)
+    logger.info(i18n.get('saving_images_to', path=output_dir))
+    all_camera_metadata = find_and_print_cameras(camera_type_filter=camera_type, i18n=i18n)
 
     if not all_camera_metadata:
-        logger.warning("No cameras detected matching the criteria. Cannot save images.")
+        logger.warning(i18n.get('no_cameras_detected'))
         return
 
     cameras_to_use = []
     for cam_meta in all_camera_metadata:
-        camera_instance = create_camera_instance(cam_meta)
+        camera_instance = create_camera_instance(cam_meta, i18n=i18n)
         if camera_instance:
             cameras_to_use.append(camera_instance)
 
@@ -465,7 +604,7 @@ def save_images_from_all_cameras(
         logger.warning("No cameras could be connected. Aborting image save.")
         return
 
-    logger.info(f"Starting image capture for {record_time_s} seconds from {len(cameras_to_use)} cameras.")
+    logger.info(i18n.get('camera_capture_started', time=record_time_s, count=len(cameras_to_use)))
     start_time = time.perf_counter()
 
     # Initialize sequence counters for each camera
@@ -500,10 +639,10 @@ def save_images_from_all_cameras(
         except KeyboardInterrupt:
             logger.info("Capture interrupted by user.")
         finally:
-            print("\nFinalizing image saving...")
+            print(i18n.get('finalizing_saving'))
             executor.shutdown(wait=True)
-            cleanup_cameras(cameras_to_use)
-            print(f"Image capture finished. Images saved to {output_dir}")
+            cleanup_cameras(cameras_to_use, i18n=i18n)
+            print(i18n.get('capture_finished', path=output_dir))
 
 
 def main():
@@ -551,10 +690,12 @@ def main():
         # Force clean exit to avoid memory corruption during cleanup
         os._exit(0)
     elif args.save_images:
+        print(i18n.get('saving_test_images'))
         save_images_from_all_cameras(
             output_dir=args.output_dir,
             record_time_s=args.record_time_s,
-            camera_type="opencv"
+            camera_type="opencv",
+            i18n=i18n
         )
         # Force clean exit to avoid memory corruption during cleanup
         os._exit(0)
