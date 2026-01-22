@@ -18,8 +18,8 @@ LANG_STRINGS = {
         "doc_init": """Initialize keyboard listener for recording controls.
 
     Keyboard controls:
-    - Right Arrow (→): Exit current episode early
-    - Left Arrow (←): Exit and re-record current episode
+    - Right Arrow (→) or N: Exit current episode early
+    - Left Arrow (←) or R: Exit and re-record current episode
     - Enter: Continue data recording
     - q or Esc: Stop entire recording session
 
@@ -28,8 +28,8 @@ LANG_STRINGS = {
     """,
         "doc_cleanup": "Stop the keyboard listener thread and clean up resources.",
         "warn_sshkeyboard_unavailable": "sshkeyboard not available. Keyboard controls disabled.",
-        "info_right_arrow": "\n→ Right arrow pressed: Ending episode early and saving data...",
-        "info_left_arrow": "\n← Left arrow pressed: Discarding episode and re-record...",
+        "info_right_arrow": "\n→ Right arrow (or N) pressed: Ending episode early and saving data...",
+        "info_left_arrow": "\n← Left arrow (or R) pressed: Discarding episode and re-record...",
         "info_enter": "Enter key pressed. Continuing data recording...",
         "info_stop": "\n⏹️ q or Esc pressed: Stopping entire recording session...",
         "error_key_press": "Error handling key press: {e}",
@@ -45,8 +45,8 @@ LANG_STRINGS = {
         "control_left": "   ← (Left Arrow) or R:  Discard episode and re-record from start",
         "control_enter": "   Enter:           Continue when paused",
         "control_esc": "   q or Esc:        Stop entire recording session",
-        "note_right": "   💡 Note: Press right arrow if you want to end episode early but keep the data",
-        "note_left": "           Press left arrow if you made a mistake and want to redo completely",
+        "note_right": "   💡 Note: Press right arrow (N) if you want to end episode early but keep the data",
+        "note_left": "           Press left arrow (R) if you made a mistake and want to redo completely",
         "error_stop_listener": "Error stopping keyboard listener: {e}",
     },
     "CN": {
@@ -54,18 +54,18 @@ LANG_STRINGS = {
         "doc_init": """初始化用于录制控制的键盘监听器。
 
     键盘控制:
-    - 右方向键 (→): 提前结束当前片段
-    - 左方向键 (←): 放弃并重新录制当前片段
+    - 右方向键 (→) 或 N: 提前结束当前片段
+    - 左方向键 (←) 或 R: 放弃并重新录制当前片段
     - 回车键 (Enter): 继续数据录制
-    - q 或 Esc: 停止整个录制会话
+    - Q 或 Esc: 停止整个录制会话
 
     返回:
         元组: (监听器线程, 事件字典)
     """,
         "doc_cleanup": "停止键盘监听线程并清理资源。",
         "warn_sshkeyboard_unavailable": "sshkeyboard 库不可用。键盘控制功能已禁用。",
-        "info_right_arrow": "\n→ 已按下右方向键: 提前结束片段并保存数据...",
-        "info_left_arrow": "\n← 已按下左方向键: 放弃当前片段并准备重录...",
+        "info_right_arrow": "\n→ 已按下右方向键或N: 提前结束片段并保存数据...",
+        "info_left_arrow": "\n← 已按下左方向键或R: 放弃当前片段并准备重录...",
         "info_enter": "已按下回车键。继续数据录制...",
         "info_stop": "\n⏹️ 已按下 q 或 Esc: 正在停止整个录制会话...",
         "error_key_press": "处理按键时出错: {e}",
@@ -81,7 +81,7 @@ LANG_STRINGS = {
         "control_left": "   ← (左方向键) 或 R 键:  放弃当前片段并从头开始重录",
         "control_enter": "   回车键:        暂停后继续",
         "control_esc": "   q 或 Esc:        停止整个录制会话",
-        "note_right": "   💡 提示: 如果想提前结束但保留已录制的数据，请按右方向键",
+        "note_right": "   💡 提示: 如果想提前结束但保留已录制的数据，请按右方向键 或 N",
         "note_left": "           如果操作失误想完全重做，请按左方向键",
         "error_stop_listener": "停止键盘监听器时出错: {e}",
     },
