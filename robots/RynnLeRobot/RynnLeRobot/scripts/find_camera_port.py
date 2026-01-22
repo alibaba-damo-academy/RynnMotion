@@ -294,7 +294,7 @@ def find_camera_by_difference(camera_name: str, i18n: I18nMessages = None) -> in
     camera_diff = list(camera_ids_after - camera_ids_before)
 
     if len(camera_diff) == 1:
-        camera_id = camera_diff[0]
+        camera_id = convert_camera_id_to_numeric(camera_diff[0])  # 转换为数字格式
         print(i18n.get('detected_camera_id', camera_name=camera_name, port=camera_id))
         print(i18n.get('detected_camera_env', camera_name=camera_name.upper(), port=camera_id))
         return camera_id
@@ -324,8 +324,8 @@ def find_cameras_hardcoded(i18n: I18nMessages = None):
         if len(all_cameras) >= 2:
             # Sort by camera ID and take the last two (highest numbered external cameras)
             all_cameras.sort(key=lambda cam: str(cam["id"]))
-            front_camera_id = all_cameras[-2]["id"]   # Second to last (typically /dev/video4)
-            wrist_camera_id = all_cameras[-1]["id"]   # Last camera (typically /dev/video6)
+            front_camera_id = convert_camera_id_to_numeric(all_cameras[-2]["id"])   # Second to last (typically /dev/video4)
+            wrist_camera_id = convert_camera_id_to_numeric(all_cameras[-1]["id"])   # Last camera (typically /dev/video6)
 
             print(t("assigned_front", camera_id=front_camera_id))
             print(t("assigned_wrist", camera_id=wrist_camera_id))
@@ -345,8 +345,8 @@ def find_cameras_hardcoded(i18n: I18nMessages = None):
         if len(all_cameras) >= 2:
             # Sort by camera ID and take the first two (lowest numbered)
             all_cameras.sort(key=lambda cam: str(cam["id"]))
-            front_camera_id = all_cameras[0]["id"]   # First camera (typically 0)
-            wrist_camera_id = all_cameras[1]["id"]   # Second camera (typically 1)
+            front_camera_id = convert_camera_id_to_numeric(all_cameras[0]["id"])   # First camera (typically 0)
+            wrist_camera_id = convert_camera_id_to_numeric(all_cameras[1]["id"])   # Second camera (typically 1)
 
             print(t("assigned_front", camera_id=front_camera_id))
             print(t("assigned_wrist", camera_id=wrist_camera_id))
@@ -359,6 +359,31 @@ def find_cameras_hardcoded(i18n: I18nMessages = None):
             print(t("not_enough_cameras", count=len(all_cameras)))
             return {"front": None, "wrist": None}
 
+def convert_camera_id_to_numeric(camera_id):
+    """
+    将摄像头 ID 转换为数字格式
+    对于 /dev/videoX 格式，提取 X 部分作为数字
+    对于已经是数字的，直接返回
+    """
+    if isinstance(camera_id, int):
+        return camera_id
+    elif isinstance(camera_id, str):
+        if "/dev/video" in camera_id:
+            # 提取 /dev/video 后面的数字部分
+            try:
+                return int(camera_id.replace("/dev/video", ""))
+            except ValueError:
+                # 如果无法转换为整数，返回默认值 0
+                return 0
+        else:
+            # 如果不是 /dev/video 格式，尝试直接转换为整数
+            try:
+                return int(camera_id)
+            except ValueError:
+                # 如果无法转换，则返回默认值 0
+                return 0
+    else:
+        return 0
 
 def find_cameras(i18n: I18nMessages = None):
     """
