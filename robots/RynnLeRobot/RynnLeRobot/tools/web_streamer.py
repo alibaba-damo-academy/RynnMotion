@@ -78,7 +78,7 @@ async def video_feed():
 
 
 class WebServer:
-    def __init__(self, host="0.0.0.0", port=5001, log_level="info"):
+    def __init__(self, host="127.0.0.1", port=5001, log_level="info"):
         self.config = uvicorn.Config(
             app,
             host=host,
