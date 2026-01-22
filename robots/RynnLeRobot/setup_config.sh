@@ -21,6 +21,10 @@ case "$lang_choice" in
     ;;
 esac
 
+if [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "win32"* ]]; then
+    VIRTUAL_ENV="venv"
+fi
+
 # Language strings
 if [[ "$LANGUAGE" == "CN" ]]; then
     MSG_CONFIGURING="🔧 正在配置 RynnLeRobot 系统..."
@@ -101,15 +105,19 @@ echo "$MSG_CONFIGURING"
 #    VENV_DIR=".venv"
 #fi
 
-# Activate virtual environment
-if [[ -f "$VENV_DIR/bin/activate" ]]; then
-    source "$VENV_DIR/bin/activate"
-    echo "$MSG_VENV_ACTIVATED"
+if [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "win32"* ]]; then
+    echo "Windows detected. Skipping virtual environment activation."
 else
-    echo "$MSG_VENV_NOT_FOUND"
-    read -p "$MSG_CONTINUE_WITHOUT_VENV" continue_without_venv
-    if [[ ! "$continue_without_venv" =~ ^[Yy]$ ]]; then
-        exit 1
+    # Activate virtual environment
+    if [[ -f "$VENV_DIR/bin/activate" ]]; then
+        source "$VENV_DIR/bin/activate"
+        echo "$MSG_VENV_ACTIVATED"
+    else
+        echo "$MSG_VENV_NOT_FOUND"
+        read -p "$MSG_CONTINUE_WITHOUT_VENV" continue_without_venv
+        if [[ ! "$continue_without_venv" =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
     fi
 fi
 
