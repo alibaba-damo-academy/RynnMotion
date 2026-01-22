@@ -362,7 +362,7 @@ Namespace(mode='real', ctrlfreq=100, config='configs/lerobot.yaml', show_display
 INFO:     Started server process [13887]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:5001 (Press CTRL+C to quit)
+INFO:     Uvicorn running on http://127.0.0.1:5001 (Press CTRL+C to quit)
 2025-12-04 23:10:27,518 [INFO] follower (degree): [ 13.60, -99.49,  99.91,  49.06,  12.87,   0.21]
 2025-12-04 23:10:27,518 [WARNING] Control loop running behind by 0.022s
 2025-12-04 23:10:29,177 [INFO] follower (degree): [ 13.60, -99.49,  99.91,  49.06,  12.87,   0.21]
@@ -472,12 +472,12 @@ WARNING:root:Running in headless mode. Set args.show_display=False.
 正在启动键盘监听器...
 
 🎮 键盘控制 (录制期间有效):
-   → (右方向键): 提前结束片段并保存部分数据
-   ← (左方向键):  放弃当前片段并从头开始重录
+   → (右方向键) 或 N: 提前结束片段并保存部分数据
+   ← (左方向键) 或 R:  放弃当前片段并从头开始重录
    回车键:        暂停后继续
    q 或 Esc:        停止整个录制会话
-   💡 提示: 如果想提前结束但保留已录制的数据，请按右方向键
-           如果操作失误想完全重做，请按左方向键
+   💡 提示: 如果想提前结束但保留已录制的数据，请按右方向键或 N
+           如果操作失误想完全重做，请按左方向键或 R
 
 WARNING:root:'torchcodec' is not available in your platform, falling back to 'pyav' as a default decoder
 ✓ Log file: /home/shengke/RynnRcplog/robotMotion/robotMotion_20251204_2311.log
@@ -518,7 +518,7 @@ WARNING:root:'torchcodec' is not available in your platform, falling back to 'py
 INFO:     Started server process [14118]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:5001 (Press CTRL+C to quit)
+INFO:     Uvicorn running on http://127.0.0.1:5001 (Press CTRL+C to quit)
 
 已按下回车键。继续数据录制...
 2025-12-04 23:12:02,507 [INFO] 📹 Recording episode: 300 frames (10.0s)
