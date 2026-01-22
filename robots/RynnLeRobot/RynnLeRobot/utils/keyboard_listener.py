@@ -41,8 +41,8 @@ LANG_STRINGS = {
         "info_starting_listener": "Starting keyboard listener...",
         "info_skipping_listener": "Unsupported OS. Skipping keyboard listener.",
         "header_controls": "\n🎮 Keyboard Controls (Active During Recording):",
-        "control_right": "   → (Right Arrow): End episode early and SAVE partial data",
-        "control_left": "   ← (Left Arrow):  Discard episode and re-record from start",
+        "control_right": "   → (Right Arrow) or N: End episode early and SAVE partial data",
+        "control_left": "   ← (Left Arrow) or R:  Discard episode and re-record from start",
         "control_enter": "   Enter:           Continue when paused",
         "control_esc": "   q or Esc:        Stop entire recording session",
         "note_right": "   💡 Note: Press right arrow if you want to end episode early but keep the data",
@@ -77,8 +77,8 @@ LANG_STRINGS = {
         "info_starting_listener": "正在启动键盘监听器...",
         "info_skipping_listener": "不支持的操作系统。跳过键盘监听器。",
         "header_controls": "\n🎮 键盘控制 (录制期间有效):",
-        "control_right": "   → (右方向键): 提前结束片段并保存部分数据",
-        "control_left": "   ← (左方向键):  放弃当前片段并从头开始重录",
+        "control_right": "   → (右方向键) 或 N 键: 提前结束片段并保存部分数据",
+        "control_left": "   ← (左方向键) 或 R 键:  放弃当前片段并从头开始重录",
         "control_enter": "   回车键:        暂停后继续",
         "control_esc": "   q 或 Esc:        停止整个录制会话",
         "note_right": "   💡 提示: 如果想提前结束但保留已录制的数据，请按右方向键",
@@ -119,10 +119,10 @@ def init_keyboard_listener():
 
     def on_press(key):
         try:
-            if key == "right":
+            if key == "right" or key == "n":
                 print(TEXT["info_right_arrow"])
                 events["exit_early"] = True
-            elif key == "left":
+            elif key == "left" or key == "r":
                 print(TEXT["info_left_arrow"])
                 events["rerecord_episode"] = True
             elif key == "enter":
