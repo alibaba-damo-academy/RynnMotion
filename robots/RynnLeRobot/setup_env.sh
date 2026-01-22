@@ -75,32 +75,40 @@ if [[ ! -f "setup_env.sh" ]]; then
     exit 1
 fi
 
-#if [[ "$OSTYPE" == "darwin"* ]]; then
-    VENV_DIR="venv"
-#else
-#    VENV_DIR=".venv"
-#fi
+VENV_DIR="venv"
 
-msg "📦 Creating virtual environment with uv..." "📦 正在使用 uv 创建虚拟环境..."
-uv venv $VENV_DIR --python 3.13
 
-source "$VENV_DIR/bin/activate"
-msg "✅ Virtual environment activated: $(basename $VIRTUAL_ENV)" "✅ 虚拟环境已激活：$(basename $VIRTUAL_ENV)"
+if [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "win32"* ]]; then
+    # Windows Git Bash with conda venv
+    msg "🔧 Setting up windows env for common modules..." "🔧 正在为公共模块设置..."
+    mamba create -n venv python=3.13 -y
 
-# Ensure proper PATH for uv venv
-export PATH="$VIRTUAL_ENV/bin:$PATH"
-msg "📍 Updated PATH to prioritize venv binaries" "📍 已更新 PATH 以优先使用 venv 二进制文件"
+    eval "$(mamba.exe shell hook --shell bash)"
 
-msg "🔧 Setting up PYTHONPATH for common modules..." "🔧 正在为公共模块设置 PYTHONPATH..."
-export PYTHONPATH="$(pwd)/../../../:$PYTHONPATH"
-msg "✅ PYTHONPATH set to include common directory: $(pwd)/../../../" "✅ PYTHONPATH 已设置为包含公共目录：$(pwd)/../../../"
+    mamba activate venv
 
-echo "export PYTHONPATH=\"$(pwd)/../../../:\$PYTHONPATH\"" >> "$VENV_DIR/bin/activate"
-echo "export PATH=\"\$VIRTUAL_ENV/bin:\$PATH\"" >> "$VENV_DIR/bin/activate"
-msg "✅ Added PYTHONPATH and PATH to virtual environment activation script" "✅ 已将 PYTHONPATH 和 PATH 添加到虚拟环境激活脚本"
+else
+    msg "📦 Creating virtual environment with uv..." "📦 正在使用 uv 创建虚拟环境..."
+    uv venv $VENV_DIR --python 3.13
+    source "$VENV_DIR/bin/activate"
 
-msg "📦 Installing dependencies with uv..." "📦 正在使用 uv 安装依赖..."
-export UV_VIRTUAL_ENV="$(pwd)/$VENV_DIR"
+    msg "✅ Virtual environment activated: $(basename $VIRTUAL_ENV)" "✅ 虚拟环境已激活：$(basename $VIRTUAL_ENV)"
+
+    # Ensure proper PATH for uv venv
+    export PATH="$VIRTUAL_ENV/bin:$PATH"
+    msg "📍 Updated PATH to prioritize venv binaries" "📍 已更新 PATH 以优先使用 venv 二进制文件"
+
+    msg "🔧 Setting up PYTHONPATH for common modules..." "🔧 正在为公共模块设置 PYTHONPATH..."
+    export PYTHONPATH="$(pwd)/../../../:$PYTHONPATH"
+    msg "✅ PYTHONPATH set to include common directory: $(pwd)/../../../" "✅ PYTHONPATH 已设置为包含公共目录：$(pwd)/../../../"
+
+    echo "export PYTHONPATH=\"$(pwd)/../../../:\$PYTHONPATH\"" >> "$VENV_DIR/bin/activate"
+    echo "export PATH=\"\$VIRTUAL_ENV/bin:\$PATH\"" >> "$VENV_DIR/bin/activate"
+    msg "✅ Added PYTHONPATH and PATH to virtual environment activation script" "✅ 已将 PYTHONPATH 和 PATH 添加到虚拟环境激活脚本"
+
+    msg "📦 Installing dependencies with uv..." "📦 正在使用 uv 安装依赖..."
+    export UV_VIRTUAL_ENV="$(pwd)/$VENV_DIR"
+fi
 
 # ----------------------------
 # User Choice: PyTorch Version (BEFORE installing other packages)
@@ -139,7 +147,14 @@ msg "🔧 Installing RynnMotion core package from main repo (skipping torch depe
 uv pip install -e ../../python/ --no-deps
 
 msg "🔧 Installing remaining RynnMotion dependencies..." "🔧 正在安装其余 RynnMotion 依赖..."
-uv pip install numpy scipy PyYAML matplotlib opencv-python tqdm mujoco fsspec pin pillow build lcm python-statemachine datasets huggingface_hub packaging
+uv pip install numpy scipy PyYAML matplotlib opencv-python tqdm mujoco fsspec pillow build lcm python-statemachine datasets huggingface_hub packaging mink loop-rate-limiters robot_descriptions ruckig
+
+if [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "win32"* ]]; then
+    msg "⚠️ Windows detected. Skipping pin installation, Install by conda..." "⚠️ 检测到 Windows。跳过 pin 安装, 使用conda 安装..."
+    conda install -c conda-forge pinocchio hpp-fcl eigenpy assimp -y
+else
+    uv pip install pin
+fi
 
 msg "🔧 Installing RynnLeRobot package and its dependencies..." "🔧 正在安装 RynnLeRobot 包及其依赖..."
 uv pip install -e .
@@ -151,7 +166,7 @@ uv pip install -e .[dev]
 
 msg "✅ Verifying critical packages are installed..." "✅ 正在验证关键包是否已安装..."
 
-python -c "import importlib.util; spec = importlib.util.find_spec('RynnMotion'); print('✅ RynnMotion package installed successfully' if spec else exit(1))" || {
+python -c "import RynnMotion; print('✅ RynnMotion package installed successfully')" || {
     msg "❌ RynnMotion package installation failed, trying again with uv..." "❌ RynnMotion 包安装失败，正在使用 uv 重试..."
     uv pip install --force-reinstall -e ../../python/
 }
@@ -177,15 +192,19 @@ if [[ "$(which pip)" != *"$VENV_DIR"* ]]; then
     uv pip install pip
     msg "✅ Installed pip in venv: $VIRTUAL_ENV/bin/pip" "✅ 已在 venv 中安装 pip：$VIRTUAL_ENV/bin/pip"
 
-    # Verify the fix
-    if [[ -f "$VIRTUAL_ENV/bin/pip" ]]; then
-        msg "✅ Pip is now available in venv" "✅ Pip 现已在 venv 中可用"
+    if [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "win32"* ]]; then
+        msg "⚠️  Skipping pip wrapper creation for Windows..." "⚠️  跳过在 Windows 上创建 pip 包装器..."
     else
-        msg "⚠️  Creating pip wrapper..." "⚠️  正在创建 pip 包装器..."
-        echo '#!/bin/bash' > "$VIRTUAL_ENV/bin/pip"
-        echo 'exec python -m pip "$@"' >> "$VIRTUAL_ENV/bin/pip"
-        chmod +x "$VIRTUAL_ENV/bin/pip"
-        msg "✅ Created pip wrapper in venv" "✅ 已在 venv 中创建 pip 包装器"
+        # Verify the fix
+        if [[ -f "$VIRTUAL_ENV/bin/pip" ]]; then
+            msg "✅ Pip is now available in venv" "✅ Pip 现已在 venv 中可用"
+        else
+            msg "⚠️  Creating pip wrapper..." "⚠️  正在创建 pip 包装器..."
+            echo '#!/bin/bash' > "$VIRTUAL_ENV/bin/pip"
+            echo 'exec python -m pip "$@"' >> "$VIRTUAL_ENV/bin/pip"
+            chmod +x "$VIRTUAL_ENV/bin/pip"
+            msg "✅ Created pip wrapper in venv" "✅ 已在 venv 中创建 pip 包装器"
+        fi
     fi
 else
     msg "✅ Pip is correctly pointing to venv" "✅ Pip 已正确指向 venv"
@@ -263,7 +282,12 @@ echo ""
 msg "✅ Setup completed successfully!" "✅ 设置成功完成！"
 echo ""
 msg "🔄 To activate the environment in the future:" "🔄 以后激活环境："
-echo "  source $VENV_DIR/bin/activate"
+if [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "win32"* ]]; then
+    echo '  eval "$(mamba.exe shell hook --shell bash)"'
+    echo "  mamba activate venv"
+else
+    echo "  source $VENV_DIR/bin/activate"
+fi
 echo ""
 msg "🎯 Quick start commands (after activation):" "🎯 快速启动命令（激活后）："
 echo ""
