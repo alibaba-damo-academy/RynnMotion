@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/C%2B%2B-20-blue" alt="C++20">
   <img src="https://img.shields.io/badge/Python-3.13%2B-blue" alt="Python 3.13+">
   <img src="https://img.shields.io/badge/version-0.9.0--pre-orange" alt="Version">
-  <img src="https://img.shields.io/badge/MuJoCo-3.4.0-green" alt="MuJoCo 3.4.0">
+  <img src="https://img.shields.io/badge/MuJoCo-3.5.0-green" alt="MuJoCo 3.5.0">
   <img src="https://img.shields.io/badge/Pinocchio-3.7.0-green" alt="Pinocchio 3.7.0">
 </p>
 
@@ -202,7 +202,7 @@ One SO101 master arm controlling 4 different slave robots (FR3, UR5e, Piper, RM7
 
 ```bash
 cd robots/RynnLeRobot
-./setup_env.sh && source .venv/bin/activate
+./setup_env.sh && source venv/bin/activate
 multi-teleop -d
 ```
 

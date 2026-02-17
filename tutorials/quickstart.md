@@ -37,7 +37,7 @@ sudo ./scripts/setup_dependencies.sh
 **What gets installed?**
 - Eigen 3.3.0+ (linear algebra)
 - Pinocchio 3.7.0 (rigid body dynamics)
-- MuJoCo 3.4.0 (physics simulation)
+- MuJoCo 3.5.0 (physics simulation)
 - Boost, yaml-cpp, qpOASES, Ruckig, and more
 
 **Troubleshooting:** If the script fails, check the [Installation Guide](../docs/installation.md) for manual steps.

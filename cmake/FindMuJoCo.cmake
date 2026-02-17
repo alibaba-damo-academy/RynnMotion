@@ -1,4 +1,4 @@
-set(MUJOCO_VERSION_CANDIDATES "3.4.0" "3.3.7" "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0")
+set(MUJOCO_VERSION_CANDIDATES "3.5.0" "3.4.0" "3.3.7" "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0")
 
 function(find_mujoco)
     set(MUJOCO_DIR "" CACHE PATH "Path to MuJoCo installation")
@@ -27,7 +27,7 @@ function(find_mujoco)
             endif()
 
             if(NOT MUJOCO_DIR OR NOT EXISTS "${MUJOCO_DIR}")
-                set(MUJOCO_DIR "/usr/local/mujoco-3.3.7" CACHE PATH "Path to MuJoCo installation" FORCE)
+                set(MUJOCO_DIR "/usr/local/mujoco-3.5.0" CACHE PATH "Path to MuJoCo installation" FORCE)
                 message(WARNING "MuJoCo not found, using default path: ${MUJOCO_DIR}")
             endif()
         else()
@@ -42,7 +42,7 @@ function(find_mujoco)
             endforeach()
 
             if(NOT MUJOCO_DIR OR NOT EXISTS "${MUJOCO_DIR}")
-                set(MUJOCO_DIR "/usr/local/mujoco-3.3.7" CACHE PATH "Path to MuJoCo installation" FORCE)
+                set(MUJOCO_DIR "/usr/local/mujoco-3.5.0" CACHE PATH "Path to MuJoCo installation" FORCE)
                 message(WARNING "MuJoCo not found, using default path: ${MUJOCO_DIR}")
             endif()
         endif()
@@ -69,7 +69,7 @@ function(find_mujoco)
         endforeach()
 
         if(NOT MUJOCO_VERSION)
-            set(MUJOCO_VERSION "3.3.7" CACHE STRING "MuJoCo version" FORCE)
+            set(MUJOCO_VERSION "3.5.0" CACHE STRING "MuJoCo version" FORCE)
         endif()
     endif()
 
