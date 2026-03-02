@@ -21,6 +21,7 @@ set(SOURCE_FILES
     module/teleopfollow/teleop_follow.cpp
     module/teleopfollow/fr3_teleopfollow.cpp
     module/joint/fr3_jointmove.cpp
+    module/joint/rizon_joint_move.cpp
     interface/interface_base.cpp
     fsm/src/motion_fsm.cpp
     runtime/scene_manager.cpp

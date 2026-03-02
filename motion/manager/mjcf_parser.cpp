@@ -139,6 +139,15 @@ void MjcfParser::computeEEParentJoints() {
     return;
   }
 
+  if (jointIndices.empty()) {
+    DEBUG_LOG("  No motion joints found - fixed-base gripper mode");
+    DEBUG_LOG("  Skipping parent joint mapping, eeJointIndices will be empty");
+
+    std::vector<std::pair<double, double>> eeRanges = rm_.getEERanges();
+    rm_.setEndEffectorConfig(rm_.getActionDOF(), eeJointIndices, eeRanges);
+    return;
+  }
+
   for (int eeActuatorIdx : eeIndices) {
     int parentJointIdx = -1;
     int parentJointActuatorId = -1;

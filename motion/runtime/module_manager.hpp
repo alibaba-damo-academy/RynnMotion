@@ -14,6 +14,7 @@
 #include "lcm_logger.hpp"
 #include "osc.hpp"
 #include "planner.hpp"
+#include "rizon_joint_move.hpp"
 #include "runtime_data.hpp"
 #include "scene_manager.hpp"
 
@@ -29,6 +30,7 @@ enum class ModuleType {
   OSC,
   Fr3TeleopFollow,
   Fr3JointMove,
+  RizonJointMove,
   LeRobotPlanner,
 };
 

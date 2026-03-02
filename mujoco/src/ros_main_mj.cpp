@@ -2,8 +2,10 @@
 #include <iostream>
 #include <string>
 
+#include "discovery.hpp"
 #include "robot_manager.hpp"
 #include "ros_mj_interface.hpp"
+#include "scene_manager.hpp"
 
 /**
  * ROS MuJoCo Robot Simulation Launcher
@@ -30,23 +32,38 @@
  */
 
 int parseRobotInput(const std::string &robotInput) {
+  auto &discovery = rynn::RobotDiscovery::getInstance();
+
   try {
-    // Try to parse as number first
-    int robotNumber = std::stoi(robotInput);
-    return robotNumber;
-  } catch (std::exception &) {
-    // Parse as string name
-    try {
-      return rynn::RobotManager::getRobotNumberFromName(robotInput);
-    } catch (const std::exception &e) {
-      std::cerr << e.what() << std::endl;
-      throw;
-    }
+    // Discovery handles both names and numbers
+    auto info = discovery.getRobotInfo(robotInput);
+    return info.number;
+  } catch (const std::exception &e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+    throw;
   }
 }
 
+int parseSceneInput(const std::string &sceneInput) {
+  try {
+    int sceneNum = std::stoi(sceneInput);
+    if (sceneNum >= 1 && sceneNum <= 6) {
+      return sceneNum;
+    }
+  } catch (...) {
+  }
+
+  rynn::SceneType sceneType = rynn::SceneManager::sceneNameToType(sceneInput);
+  return static_cast<int>(sceneType);
+}
+
 int main(int argc, char *argv[]) {
+  // Initialize robot discovery
+  auto &discovery = rynn::RobotDiscovery::getInstance();
+  discovery.scanRobots(MODEL_DIR);
+
   int robotNumber = 1;
+  int sceneNumber = 1;
 
   if (argc > 1) {
     try {
@@ -57,7 +74,19 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  std::cout << "Starting ROS MuJoCo simulation with robot #" << robotNumber << std::endl;
+  // Parse scene argument if provided
+  if (argc > 2) {
+    try {
+      sceneNumber = parseSceneInput(argv[2]);
+    } catch (const std::exception &e) {
+      std::cerr << "Error parsing scene input. Use scene name or number." << std::endl;
+      return 1;
+    }
+  }
+
+  std::string sceneName = rynn::SceneManager::sceneNumberToName(sceneNumber);
+  std::cout << "Starting ROS MuJoCo simulation with robot #" << robotNumber
+            << ", scene '" << sceneName << "' (" << sceneNumber << ")" << std::endl;
 
   std::filesystem::path motionConfigPath = "../config/motion.yaml";
   std::filesystem::path mujocoConfigPath = "../config/mujoco.yaml";
@@ -70,7 +99,7 @@ int main(int argc, char *argv[]) {
     std::cerr << "Failed to load config file: " << e.what() << std::endl;
   }
 
-  auto rosMujocoSimulation = std::make_shared<mujoco::RosMujocoInterface>(config1, config2, robotNumber);
+  auto rosMujocoSimulation = std::make_shared<mujoco::RosMujocoInterface>(config1, config2, robotNumber, sceneNumber);
   rosMujocoSimulation->runApplication();
   return 0;
 }

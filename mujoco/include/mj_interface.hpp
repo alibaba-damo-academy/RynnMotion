@@ -157,8 +157,10 @@ protected:
 
   void resetRoutine();
 
+protected:
+  virtual void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods);
+
 private:
-  void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods);
   void mouse_move(GLFWwindow *window, double xpos, double ypos);
   void mouse_button(GLFWwindow *window, int button, int act, int mods);
   void scroll(GLFWwindow *window, double xoffset, double yoffset);

@@ -42,7 +42,17 @@
     <!-- Table -->
     <geom mesh="tabletop" material="table" class="visual" />
     <geom mesh="tablelegs" material="table" class="visual" />
-    <geom name="table" pos="0 0 -0.1009" size="0.61 0.37 0.1" type="box" class="collision" />
+    <geom name="table" pos="0 0 0.65" size="0.61 0.37 0.1" type="box" class="collision" />
+
+    <body name="cooking_surface" pos="0.1 0 0.85">
+      <geom type="box" size="0.06 0.06 0.02" class="collision" />
+      <geom type="box" size="0.06 0.06 0.02" rgba="0.5 0.5 0.5 1" class="visual" />
+    </body>
+
+    <body name="steak_plate" pos="0.1 0 0.88">
+      <freejoint name="steak_plate" />
+      <geom type="box" mass="1" size="0.08 0.12 0.01" rgba="0.7 0.25 0.2 1" solref="0.001 1" solimp="0. 1 0.0001 0.02 3" />
+    </body>
 
     <!-- Cameras -->
     <camera name="overhead_cam" focal="1.93e-3 1.93e-3" resolution="1280 720" sensorsize="3896e-6 2140e-6" pos="-1.5 0 2" euler="0 -1 -1.57079" />

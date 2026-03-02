@@ -92,7 +92,7 @@ void RobotManager::setEEJointIndices(const std::vector<int> &indices) {
 }
 
 int RobotManager::getNumEndEffectors() const {
-  return _eeJointIndices.size();
+  return static_cast<int>(_eeRanges.size());
 }
 
 std::vector<std::pair<double, double>> RobotManager::getEERanges() const {
@@ -164,7 +164,7 @@ void RobotManager::setJointLimits(const Eigen::VectorXd &qPosMin, const Eigen::V
 Eigen::VectorXd RobotManager::getQStandby(int index) const {
   int keyframeIndex = 1 + index;
   if (keyframeIndex >= static_cast<int>(_keyframes.size())) {
-    std::cerr << "Warning: Standby keyframe " << index << " not available, returning zero vector" << std::endl;
+    // std::cerr << "Warning: Standby keyframe " << index << " not available, returning zero vector" << std::endl;
     return Eigen::VectorXd::Zero(_mdof);
   }
   return _keyframes[keyframeIndex];

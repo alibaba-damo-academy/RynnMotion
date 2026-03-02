@@ -93,21 +93,14 @@ void ModuleManager::createModules() {
 void ModuleManager::createModuleChain(const ModuleChainConfig &config) {
   modules_.clear();
 
-  // Create shared_ptr to RuntimeData (no-op deleter since ModuleManager owns it by reference)
   auto runtimeDataPtr = std::shared_ptr<data::RuntimeData>(
       &runtimeData_,
-      [](void *) {} // No-op deleter - ModuleManager owns the actual object
-  );
+      [](void *) {});
 
   for (size_t i = 0; i < config.modules.size(); ++i) {
     auto module = createModuleByType(config.modules[i]);
-
-    // All modules share the same RuntimeData
     module->setRuntimeData(runtimeDataPtr);
-
-    // Initialize module (allocates RuntimeData structures and internal data)
     module->initModule();
-
     modules_.emplace_back(std::move(module));
   }
 }
@@ -134,8 +127,10 @@ std::unique_ptr<CModuleBase> ModuleManager::createModuleByType(ModuleType type) 
   case ModuleType::Fr3JointMove:
     module = std::make_unique<Fr3JointMove>(_yamlNode);
     break;
+  case ModuleType::RizonJointMove:
+    module = std::make_unique<RizonJointMove>(_yamlNode);
+    break;
   case ModuleType::LeRobotPlanner:
-    // Note: LeRobotPlanner is defined in robot satellites, not core
     throw std::runtime_error("LeRobotPlanner should be loaded from robot-specific module");
     break;
   default:
@@ -151,13 +146,11 @@ std::unique_ptr<CModuleBase> ModuleManager::createModuleByType(ModuleType type) 
 }
 
 void ModuleManager::updateAllModules() {
-  // All modules share the same RuntimeData, so just update them sequentially
   for (auto &module : modules_) {
     module->update();
   }
 
   if (!modules_.empty()) {
-    // Update timing data in shared RuntimeData
     runtimeData_.wallTime = modules_.back()->getCurrentTime();
     runtimeData_.duration = modules_.back()->getDurationSinceLastCall();
 
@@ -202,6 +195,9 @@ ModuleChainConfig ModuleManager::getSmartDefaultChain(SceneType sceneType) {
 
   case SceneType::kPickPlace:
     return {{ModuleType::Estimator, ModuleType::Planner, ModuleType::OSC}};
+
+  case SceneType::kUsscan:
+    return {{ModuleType::RizonJointMove}};
 
   case SceneType::kDefault:
   case SceneType::kKeyframeCycle:
@@ -266,6 +262,7 @@ std::optional<ModuleType> ModuleManager::parseModuleType(const std::string &type
   if (lower == "osc") return ModuleType::OSC;
   if (lower == "fr3teleopfollow") return ModuleType::Fr3TeleopFollow;
   if (lower == "fr3jointmove") return ModuleType::Fr3JointMove;
+  if (lower == "rizonjointmove") return ModuleType::RizonJointMove;
   if (lower == "lerobotplanner") return ModuleType::LeRobotPlanner;
 
   return std::nullopt;

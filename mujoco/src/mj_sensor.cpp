@@ -383,7 +383,7 @@ void MujocoSensor::updateMultiRay() {
   mjtNum dists[num_rays];
 
   mj_multiRay(mj_.mjModel_, mj_.mjData_, multi_ray_point, directions, NULL,
-              include_static_flag ? 1 : 0, -1, geomids, dists, NULL, num_rays, max_dis_check);
+              include_static_flag ? 1 : 0, -1, geomids, dists, num_rays, max_dis_check);
   mj_.multiRayDistances_.clear();
   mj_.multiRayDistances_.assign(dists, dists + num_rays);
 }

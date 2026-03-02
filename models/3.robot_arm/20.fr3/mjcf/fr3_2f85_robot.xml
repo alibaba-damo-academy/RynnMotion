@@ -1,0 +1,26 @@
+<mujoco model="fr3_2f85">
+  <option timestep="0.001" gravity="0 0 -9.80665" integrator="implicitfast" />
+  <compiler angle="radian" meshdir="../assets" autolimits="true" />
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.2 0.2 0.2" width="512" height="3072" />
+  </asset>
+
+  <include file="../mjcf/fr3_2f85_defaults.xml" />
+  <include file="../mjcf/fr3_2f85_contacts.xml" />
+  <include file="../mjcf/fr3_2f85_assets.xml" />
+  <include file="../mjcf/fr3_2f85_actuators.xml" />
+  <include file="../mjcf/fr3_2f85_sensors.xml" />
+
+  <worldbody>
+    <include file="../mjcf/fr3_2f85_links.xml" />
+  </worldbody>
+
+  <keyframe>
+    <!-- nq: 7 arm + 8 gripper linkage = 15 joints -->
+    <!-- nu: 7 arm + 1 gripper = 8 actuators -->
+    <key name="home" qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0 1" />
+    <key name="standby1" qpos="0 0 0 -1.57079 0 1.57079 0.7853 0 0 0 0 0 0 0 0" ctrl="0 0 0 -1.57079 0 1.57079 0.7853 1" />
+    <key name="standby2" qpos="0 0 0 -1.57079 0 1.57079 0.7853 0 0 0 0 0 0 0 0" ctrl="0 0 0 -1.57079 0 1.57079 0.7853 1" />
+  </keyframe>
+
+</mujoco>

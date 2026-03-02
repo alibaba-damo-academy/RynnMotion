@@ -74,6 +74,8 @@ SceneType SceneManager::sceneNumberToType(int number) {
     return SceneType::kTracking;
   case 5:
     return SceneType::kPickPlace;
+  case 6:
+    return SceneType::kUsscan;
   default:
     return SceneType::kDefault;
   }
@@ -91,6 +93,8 @@ std::string SceneManager::sceneNumberToName(int number) {
     return "predefined";
   case 5:
     return "pickplace";
+  case 6:
+    return "usscan";
   default:
     return "joint";
   }
@@ -113,6 +117,9 @@ SceneType SceneManager::sceneNameToType(const std::string &name) {
   }
   if (lower == "pickplace" || lower == "pick" || lower == "pick-place") {
     return SceneType::kPickPlace;
+  }
+  if (lower == "usscan" || lower == "ultrasound" || lower == "scan") {
+    return SceneType::kUsscan;
   }
 
   return SceneType::kDefault;
