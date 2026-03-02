@@ -101,6 +101,7 @@ SCS_GOAL_ACC          = AddressInfo(41, 1)
 SCS_GOAL_POSITION     = AddressInfo(42, 2)
 SCS_GOAL_SPEED        = AddressInfo(46, 2)
 SCS_TORQUE_LIMIT      = AddressInfo(48, 2)
+SCS_RES_4             = AddressInfo(54, 1)
 SCS_LOCK_BIT          = AddressInfo(55, 1)
 SCS_PRESENT_POSITION  = AddressInfo(56, 2)
 SCS_PRESENT_VOLTAGE   = AddressInfo(62, 1)
@@ -125,6 +126,7 @@ SCS_ADDRESS_LIST = [
     ("SCS_GOAL_ACC", SCS_GOAL_ACC),
     ("SCS_GOAL_POSITION", SCS_GOAL_POSITION),
     ("SCS_GOAL_SPEED", SCS_GOAL_SPEED),
+    ("SCS_RES_4", SCS_RES_4),
     ("SCS_LOCK_BIT", SCS_LOCK_BIT),
     ("SCS_PRESENT_POSITION", SCS_PRESENT_POSITION),
     ("SCS_PRESENT_VOLTAGE", SCS_PRESENT_VOLTAGE)
@@ -688,6 +690,39 @@ def factory_mode(portHandler, packetHandler, dev, port, baudrate):
     logger.info("Factory mode completed successfully.")
     return True
 
+def print_key(portHandler, packetHandler, port, servo_id):
+    """以4Hz频率读取并打印SCS_RES_4的值"""
+    logger = logging.getLogger("FeetechTool")
+    logger.info(f"Printing SCS_RES_4 for servo {servo_id} at 4Hz on {port}")
+    
+    try:
+        while True:
+            # 读取SCS_RES_4值
+            res_value, scs_comm_result, scs_error = packetHandler.read1ByteTxRx(
+                portHandler, servo_id, SCS_RES_4.head)
+            
+            if scs_comm_result != scs.COMM_SUCCESS:
+                logger.error("Communication error: %s" % packetHandler.getTxRxResult(scs_comm_result))
+                break
+            elif scs_error != 0:
+                logger.error("Packet error: %s" % packetHandler.getRxPacketError(scs_error))
+                break
+            else:
+                # 打印值到控制台（不记录到日志文件）
+                print(f"Servo {servo_id} SCS_RES_4: {res_value}")
+            
+            # 休眠0.25秒以达到4Hz频率
+            time.sleep(0.05)
+            
+    except KeyboardInterrupt:
+        logger.info("Stopped printing SCS_RES_4 values.")
+        return True
+    except Exception as e:
+        logger.error(f"Error reading SCS_RES_4: {e}")
+        return False
+
+# ... existing code ...
+
 def main():
     parser = argparse.ArgumentParser(
         description="Feetech Servo Tool - Control Feetech/SCSCL servos via serial port",
@@ -703,6 +738,7 @@ Examples:
   %(prog)s --port /dev/ttyACM0 --job read_config
   %(prog)s --dev tele --port /dev/ttyUSB0 --baudrate 115200 --job write_config
   %(prog)s --port /dev/ttyACM0 --dev robot --job factory_mode
+  %(prog)s --port /dev/ttyACM0 --job print_key --servo_id 9
         """
     )
     
@@ -712,7 +748,8 @@ Examples:
                         help="Serial port name (e.g., /dev/ttyACM0). Must be specified.")
     parser.add_argument('--baudrate', type=int, default=1000000,
                         help="Baud rate (default: 1000000)")
-    parser.add_argument('--job', choices=['ping', 'set_id', 'set_p', 'set_d', 'set_i', 'set_torque', 'read_config', 'write_config', 'factory_mode'], default='ping',
+    parser.add_argument('--job', choices=['ping', 'set_id', 'set_p', 'set_d', 'set_i', 'set_torque',
+                                          'read_config', 'write_config', 'factory_mode', 'print_key'], default='ping',
                         help="Operation to perform (default: ping)")
     
     # set_id 专用参数
@@ -798,6 +835,8 @@ Examples:
             success = write_config(portHandler, packetHandler, args.dev, args.port, args.baudrate)
         elif args.job == 'factory_mode':
             success = factory_mode(portHandler, packetHandler, args.dev, args.port, args.baudrate)
+        elif args.job == 'print_key':
+            success = print_key(portHandler, packetHandler, args.port, args.servo_id)
         else:
             logger.error(f"Unknown job: {args.job}")
             success = False

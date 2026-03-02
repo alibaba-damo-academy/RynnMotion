@@ -202,6 +202,7 @@ lekiwi_ui_main = create_mujoco_wrapper("RynnLeRobot.scripts.lekiwi_UI")
 calibrate_main = create_mujoco_wrapper("RynnLeRobot.scripts.calibrate")
 so101_teleop_main = create_mujoco_wrapper("RynnLeRobot.teleop.so101_teleop")
 so101_pickplace_main = create_mujoco_wrapper("RynnLeRobot.controller.so101_pickplace")
+so101_floating_ee_main = create_mujoco_wrapper("RynnLeRobot.teleop.so101_floating_ee")
 
 
 # Entry point functions for pyproject.toml
@@ -252,6 +253,11 @@ def so101_teleop():
 def so101_pickplace():
     """Entry point for so101-pickplace command."""
     so101_pickplace_main()
+
+
+def so101_floating_ee():
+    """Entry point for so101-floating-ee command."""
+    so101_floating_ee_main()
 
 
 # For direct execution testing

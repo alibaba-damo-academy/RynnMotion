@@ -51,9 +51,9 @@ def select_device(config: dict) -> str:
     Returns:
         str: "follower", "leader", or "second_leader"
     """
-    robot_available = config.get("robot", {}).get("port")
-    teleop_available = config.get("teleoperate", {}).get("port")
-    teleop2_available = config.get("teleoperate", {}).get("port_2")
+    robot_available = config.get("follower", {}).get("port")
+    teleop_available = config.get("leader", {}).get("port")
+    teleop2_available = config.get("leader", {}).get("port_2")
 
     if not robot_available and not teleop_available:
         print(t("show_angles_no_config"))
@@ -144,7 +144,7 @@ def main():
                 config_path=config_path,
             )
         else:  # second_leader
-            teleop_config = config.get("teleoperate", {})
+            teleop_config = config.get("leader", {})
             interface = create_robot_interface(
                 name="so101",
                 mode="teleop",
@@ -200,6 +200,7 @@ def main():
 
                 # Wait before next reading (10 Hz update rate)
                 time.sleep(0.1)
+                print("\033[12A", end="")
 
             except KeyboardInterrupt:
                 print(f"\n\n{t('show_angles_stopping')}")

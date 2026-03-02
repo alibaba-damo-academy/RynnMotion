@@ -308,11 +308,11 @@ class UnifiedMujocoGLFW:
             print("Using default port settings")
             self.master_config = {}
 
-        self.master_port = self.master_config.get("teleoperate", {}).get("port", "/dev/ttyACM1")
-        self.master_port_2 = self.master_config.get("teleoperate", {}).get("port_2", "/dev/ttyACM2")
+        self.master_port = self.master_config.get("leader", {}).get("port", "/dev/ttyACM1")
+        self.master_port_2 = self.master_config.get("leader", {}).get("port_2", "/dev/ttyACM2")
 
-        self.master_calibration_dir = self.master_config.get("teleoperate", {}).get("calibration_dir")
-        self.master_calibration_dir_2 = self.master_config.get("teleoperate", {}).get("calibration_dir_2")
+        self.master_calibration_dir = self.master_config.get("leader", {}).get("calibration_dir")
+        self.master_calibration_dir_2 = self.master_config.get("leader", {}).get("calibration_dir_2")
 
     def get_slaves_info(self):
         """Initialize slave robot information using PRobotManager"""
@@ -632,7 +632,7 @@ class UnifiedMujocoGLFW:
                 # Compute gripper command
                 slave_gripper_ctrlrange_min = self.model.actuator_ctrlrange[self.slaves_range_in_ctrl[key][1] - 1][0]
                 slave_gripper_ctrlrange_max = self.model.actuator_ctrlrange[self.slaves_range_in_ctrl[key][1] - 1][1]
-                slave_gripper_cmd = slave_gripper_ctrlrange_min + slave_gripper_ctrlrange_max * (self.master2_gripper_position if self.is_dual_arm else self.master_gripper_position) / 100.0 * 2.0
+                slave_gripper_cmd = slave_gripper_ctrlrange_min + slave_gripper_ctrlrange_max * (self.master2_gripper_position if self.is_dual_arm else self.master_gripper_position) * 2.0
 
                 slave_joint_command = np.append(slave_motion_command, slave_gripper_cmd)
                 self.whole_joint_command[self.slaves_range_in_ctrl[key][0] : self.slaves_range_in_ctrl[key][1]] = slave_joint_command
@@ -643,7 +643,7 @@ class UnifiedMujocoGLFW:
 
                     slave2_gripper_ctrlrange_min = self.model.actuator_ctrlrange[self.slaves2_range_in_ctrl[key][1] - 1][0]
                     slave2_gripper_ctrlrange_max = self.model.actuator_ctrlrange[self.slaves2_range_in_ctrl[key][1] - 1][1]
-                    slave2_gripper_cmd = slave2_gripper_ctrlrange_min + slave2_gripper_ctrlrange_max * self.master_gripper_position / 100.0 * 2.0
+                    slave2_gripper_cmd = slave2_gripper_ctrlrange_min + slave2_gripper_ctrlrange_max * self.master_gripper_position * 2.0
 
                     slave2_joint_command = np.append(slave2_motion_command, slave2_gripper_cmd)
                     self.whole_joint_command[self.slaves2_range_in_ctrl[key][0] : self.slaves2_range_in_ctrl[key][1]] = slave2_joint_command

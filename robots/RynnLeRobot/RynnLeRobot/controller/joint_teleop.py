@@ -343,6 +343,21 @@ class TeleOperator:
             except Exception:
                 pass
 
+            # 获取摄像头观测数据（仅在real模式下）
+            if self.mode == "real" and self.cameras and not self.recording:
+                try:
+                    print("self.cached_camera_obs = self.get_camera_observations()")
+                    self.cached_camera_obs = self.get_camera_observations()
+                except Exception as e:
+                    if not self.is_shutting_down:
+                        self.logger.debug(f"Error caching camera observations: {e}")
+            if self.recording and self.cameras:
+                try:
+                    self.cached_camera_obs = self.get_record_observations()
+                except Exception as e:
+                    if not self.is_shutting_down:
+                        self.logger.debug(f"Error caching camera observations: {e}")
+
     def _update_follower_fk(self, positions):
         try:
             self.follower_pin_kine.update(positions[:5])
@@ -373,20 +388,6 @@ class TeleOperator:
                 self.cached_camera_poses_action[cam_name] = np.concatenate([cam_pos, cam_quat]).astype(np.float32)
         except Exception:
             pass
-
-        # 获取摄像头观测数据（仅在real模式下）
-        if self.mode == "real" and self.cameras and not self.recording:
-            try:
-                self.cached_camera_obs = self.get_camera_observations()
-            except Exception as e:
-                if not self.is_shutting_down:
-                    self.logger.debug(f"Error caching camera observations: {e}")
-        if self.recording and self.cameras:
-            try:
-                self.cached_camera_obs = self.get_record_observations()
-            except Exception as e:
-                if not self.is_shutting_down:
-                    self.logger.debug(f"Error caching camera observations: {e}")
 
     def send_follower_commands(self):
         if self.command_joint_positions is not None:

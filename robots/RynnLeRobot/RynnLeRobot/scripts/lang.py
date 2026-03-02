@@ -76,7 +76,7 @@ MESSAGES = {
         # calibrate.py
         "calib_loading_config": "Loaded configuration from {config_path}",
         "calib_no_config": "No follower or leader configuration found in config file",
-        "calib_expected_section": "Expected 'robot' or 'teleoperate' section with 'port' specified",
+        "calib_expected_section": "Expected 'follower' or 'leader' section with 'port' specified",
         "calib_prompt": "Do you want to calibrate {dev_type}? ({default}, default={default_val}): ",
         "calib_skip": "Skipping {dev_type} calibration.\n",
         "calib_header_follower": "CALIBRATING FOLLOWER",
@@ -200,7 +200,7 @@ MESSAGES = {
         # calibrate.py
         "calib_loading_config": "已从 {config_path} 加载配置",
         "calib_no_config": "配置文件中未找到从臂或主臂配置",
-        "calib_expected_section": "需要配置 'robot' 或 'teleoperate' 部分，并指定 'port'",
+        "calib_expected_section": "需要配置 'follower' 或 'leader' 部分，并指定 'port'",
         "calib_prompt": "是否校准 {dev_type}？({default}, 默认={default_val}): ",
         "calib_skip": "跳过 {dev_type} 校准。\n",
         "calib_header_follower": "校准从臂",

@@ -3,14 +3,14 @@ cameras:
     color_mode: rgb
     fps: 30
     height: 360
-    index_or_path: /dev/video2
+    index_or_path: 0
     type: opencv
     width: 640
   wrist:
     color_mode: rgb
     fps: 30
     height: 360
-    index_or_path: /dev/video0
+    index_or_path: 1
     type: opencv
     width: 640
 logging:
@@ -25,7 +25,7 @@ robot:
   calibration_dir: ~/.cache/huggingface/lerobot/calibration/robots/so101_follower
   inference_rate: 30.0
   model: sts3215
-  port: /dev/ttyACM0
+  port: /dev/cu.usbmodem5AF71731751
   timeout_seconds: 30.0
 simulation:
   camera_frequency: 30
@@ -42,8 +42,6 @@ teleoperate:
   calibration_dir_2: ~/.cache/huggingface/lerobot/calibration/teleoperators/so101_leader_2
   inference_rate: 30.0
   model: sts3215
-  port: /dev/ttyACM1
+  port: /dev/cu.usbmodem5AF71732871
   port_2: /dev/cu.usbmodem5A7A0578461
   timeout_seconds: 30.0
-leader:
-  port: /dev/ttyACM1

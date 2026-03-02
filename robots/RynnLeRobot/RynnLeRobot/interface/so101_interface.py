@@ -203,8 +203,8 @@ class LeRobotInterface(RobotInterfaceBase):
             robot_model: LeRobotModel or RobotManager instance
             robot_config: Configuration dictionary containing:
                 - mode: "real", "mock", "teleop"
-                - robot: dict with port, calibration_dir
-                - teleoperate: dict with port, calibration_dir (for teleop mode)
+                - follower: dict with port, calibration_dir
+                - leader: dict with port, calibration_dir (for teleop mode)
                 - joint_names: list of joint names
                 - joint_range: dict of joint limits
             logger: Optional logger instance
@@ -563,24 +563,24 @@ def create_robot_interface(
     # Override port if provided
     if port is not None:
         if mode == "teleop":
-            if "teleoperate" not in config:
-                config["teleoperate"] = {}
-            config["teleoperate"]["port"] = port
+            if "leader" not in config:
+                config["leader"] = {}
+            config["leader"]["port"] = port
         else:
-            if "robot" not in config:
-                config["robot"] = {}
-            config["robot"]["port"] = port
+            if "follower" not in config:
+                config["follower"] = {}
+            config["follower"]["port"] = port
 
     # Override calibration_dir if provided
     if calibration_dir is not None:
         if mode == "teleop":
-            if "teleoperate" not in config:
-                config["teleoperate"] = {}
-            config["teleoperate"]["calibration_dir"] = calibration_dir
+            if "leader" not in config:
+                config["leader"] = {}
+            config["leader"]["calibration_dir"] = calibration_dir
         else:
-            if "robot" not in config:
-                config["robot"] = {}
-            config["robot"]["calibration_dir"] = calibration_dir
+            if "follower" not in config:
+                config["follower"] = {}
+            config["follower"]["calibration_dir"] = calibration_dir
 
     # Create lightweight robot model
     robot_model = LeRobotModel(config)

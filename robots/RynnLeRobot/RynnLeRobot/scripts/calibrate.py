@@ -39,6 +39,16 @@ from RynnLeRobot.hardware.robots.so101_follower.config_so101_follower import (
 from RynnLeRobot.hardware.robots.so101_follower.so101_follower import SO101Follower
 from RynnLeRobot.hardware.robots.lekiwi.config_lekiwi import LeKiwiConfig
 from RynnLeRobot.hardware.robots.lekiwi.lekiwi import LeKiwi
+from RynnLeRobot.hardware.teleoperators.so101_leader.config_so101_leader import (
+    SO101LeaderConfig,
+)
+from RynnLeRobot.hardware.teleoperators.so101_leader.so101_leader import SO101Leader
+from RynnLeRobot.hardware.teleoperators.so101_6dofleader.config_so101_6dofleader import (
+    SO1016dofLeaderConfig,
+)
+from RynnLeRobot.hardware.teleoperators.so101_6dofleader.so101_6dofleader import (
+    SO1016dofLeader,
+)
 from RynnLeRobot.scripts.lang import select_language, t
 
 logger = logging.getLogger(__name__)
@@ -106,14 +116,26 @@ def make_teleoperator_from_config(
         teleop_id = (
             extract_id_from_path(calibration_dir) if calibration_dir else teleop_type
         )
-        config = SO101FollowerConfig(port=port or "/dev/ttyUSB0", id=teleop_id)
+        config = SO101LeaderConfig(port=port or "/dev/ttyUSB0", id=teleop_id)
         if calibration_dir:
             from pathlib import Path
 
             calibration_path = Path(os.path.expanduser(calibration_dir))
             config.calibration_dir = calibration_path
             logging.info(f"Set calibration file path: {calibration_path}")
-        return SO101Follower(config)
+        return SO101Leader(config)
+    elif teleop_type == "so101_6dof_leader":
+        teleop_id = (
+            extract_id_from_path(calibration_dir) if calibration_dir else teleop_type
+        )
+        config = SO1016dofLeaderConfig(port=port or "/dev/ttyUSB0", id=teleop_id)
+        if calibration_dir:
+            from pathlib import Path
+
+            calibration_path = Path(os.path.expanduser(calibration_dir))
+            config.calibration_dir = calibration_path
+            logging.info(f"Set calibration file path: {calibration_path}")
+        return SO1016dofLeader(config)
     else:
         raise ValueError(f"Unsupported teleoperator type: {teleop_type}")
 
@@ -121,11 +143,11 @@ def make_teleoperator_from_config(
 def calibrate_device(device):
     """Calibrate the given device."""
     try:
-        #logger.info(i18n.get("device_connected", device_type=device.__class__.__name__))
-        device.connect()
+        logging.info("Connecting to device...")
+        device.connect(calibrate=False)
 
         logging.info("Starting calibration...")
-        if hasattr(device, 'calibrate'):
+        if hasattr(device, "calibrate"):
             device.calibrate()
         else:
             logging.warning("Device does not support calibration method")
@@ -152,11 +174,22 @@ def calibrate_follower(config: dict) -> str:
         return t("calib_status_no_config")
 
     # Prompt user
-    response = input(t("calib_prompt", dev_type=t("dev_type_follower"), default="Y/n", default_val="Y")).strip().lower()
+    response = (
+        input(
+            t(
+                "calib_prompt",
+                dev_type=t("dev_type_follower"),
+                default="Y/n",
+                default_val="Y",
+            )
+        )
+        .strip()
+        .lower()
+    )
     if not response:
         response = "y"
 
-    if response in ['n', 'no']:
+    if response in ["n", "no"]:
         print(t("calib_skip", dev_type=t("dev_type_follower")))
         return t("calib_status_skipped")
 
@@ -167,13 +200,27 @@ def calibrate_follower(config: dict) -> str:
     robot_port = robot_config.get("port")
     robot_calibration_dir = robot_config.get("calibration_dir")
     robot_type = "so101_follower"
-    robot_id = extract_id_from_path(robot_calibration_dir) if robot_calibration_dir else "unknown"
+    robot_id = (
+        extract_id_from_path(robot_calibration_dir)
+        if robot_calibration_dir
+        else "unknown"
+    )
 
-    logging.info(t("calib_info", dev_type=t("dev_type_follower"), type=robot_type, id=robot_id, port=robot_port))
+    logging.info(
+        t(
+            "calib_info",
+            dev_type=t("dev_type_follower"),
+            type=robot_type,
+            id=robot_id,
+            port=robot_port,
+        )
+    )
     logging.info(t("calib_file_path", path=robot_calibration_dir))
 
     try:
-        robot_device = make_robot_from_config(robot_type, robot_port, robot_calibration_dir)
+        robot_device = make_robot_from_config(
+            robot_type, robot_port, robot_calibration_dir
+        )
         if calibrate_device(robot_device):
             return t("calib_status_done")
         else:
@@ -190,11 +237,22 @@ def calibrate_leader(config: dict) -> str:
         return t("calib_status_no_config")
 
     # Prompt user
-    response = input(t("calib_prompt", dev_type=t("dev_type_leader"), default="Y/n", default_val="Y")).strip().lower()
+    response = (
+        input(
+            t(
+                "calib_prompt",
+                dev_type=t("dev_type_leader"),
+                default="Y/n",
+                default_val="Y",
+            )
+        )
+        .strip()
+        .lower()
+    )
     if not response:
         response = "y"
 
-    if response in ['n', 'no']:
+    if response in ["n", "no"]:
         print(t("calib_skip", dev_type=t("dev_type_leader")))
         return t("calib_status_skipped")
 
@@ -204,14 +262,28 @@ def calibrate_leader(config: dict) -> str:
 
     teleop_port = teleop_config.get("port")
     teleop_calibration_dir = teleop_config.get("calibration_dir")
-    teleop_type = "so101_leader"
-    teleop_id = extract_id_from_path(teleop_calibration_dir) if teleop_calibration_dir else "unknown"
+    teleop_type = teleop_config.get("teleop_type", "so101_leader")
+    teleop_id = (
+        extract_id_from_path(teleop_calibration_dir)
+        if teleop_calibration_dir
+        else "unknown"
+    )
 
-    logging.info(t("calib_info", dev_type=t("dev_type_leader"), type=teleop_type, id=teleop_id, port=teleop_port))
+    logging.info(
+        t(
+            "calib_info",
+            dev_type=t("dev_type_leader"),
+            type=teleop_type,
+            id=teleop_id,
+            port=teleop_port,
+        )
+    )
     logging.info(t("calib_file_path", path=teleop_calibration_dir))
 
     try:
-        teleop_device = make_teleoperator_from_config(teleop_type, teleop_port, teleop_calibration_dir)
+        teleop_device = make_teleoperator_from_config(
+            teleop_type, teleop_port, teleop_calibration_dir
+        )
         if calibrate_device(teleop_device):
             return t("calib_status_done")
         else:
@@ -223,16 +295,27 @@ def calibrate_leader(config: dict) -> str:
 
 def calibrate_second_leader(config: dict) -> str:
     """Calibrate second leader teleoperator. Returns status string."""
-    teleop_config = config.get("teleoperate", {})
+    teleop_config = config.get("leader", {})
     if not teleop_config or not teleop_config.get("port_2"):
         return t("calib_status_no_config")
 
     # Prompt user (default N for second leader)
-    response = input(t("calib_prompt", dev_type=t("dev_type_second_leader"), default="y/N", default_val="N")).strip().lower()
+    response = (
+        input(
+            t(
+                "calib_prompt",
+                dev_type=t("dev_type_second_leader"),
+                default="y/N",
+                default_val="N",
+            )
+        )
+        .strip()
+        .lower()
+    )
     if not response:
         response = "n"
 
-    if response in ['n', 'no']:
+    if response in ["n", "no"]:
         print(t("calib_skip", dev_type=t("dev_type_second_leader")))
         return t("calib_status_skipped")
 
@@ -242,14 +325,28 @@ def calibrate_second_leader(config: dict) -> str:
 
     teleop_port = teleop_config.get("port_2")
     teleop_calibration_dir = teleop_config.get("calibration_dir_2")
-    teleop_type = "so101_leader"
-    teleop_id = extract_id_from_path(teleop_calibration_dir) if teleop_calibration_dir else "unknown"
+    teleop_type = teleop_config.get("teleop_type", "so101_leader")
+    teleop_id = (
+        extract_id_from_path(teleop_calibration_dir)
+        if teleop_calibration_dir
+        else "unknown"
+    )
 
-    logging.info(t("calib_info", dev_type=t("dev_type_second_leader"), type=teleop_type, id=teleop_id, port=teleop_port))
+    logging.info(
+        t(
+            "calib_info",
+            dev_type=t("dev_type_second_leader"),
+            type=teleop_type,
+            id=teleop_id,
+            port=teleop_port,
+        )
+    )
     logging.info(t("calib_file_path", path=teleop_calibration_dir))
 
     try:
-        teleop_device = make_teleoperator_from_config(teleop_type, teleop_port, teleop_calibration_dir)
+        teleop_device = make_teleoperator_from_config(
+            teleop_type, teleop_port, teleop_calibration_dir
+        )
         if calibrate_device(teleop_device):
             return t("calib_status_done")
         else:
@@ -261,7 +358,9 @@ def calibrate_second_leader(config: dict) -> str:
 
 def main():
     """Main calibration function."""
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
 
     # Select language if not set via environment
     select_language()

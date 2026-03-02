@@ -545,6 +545,19 @@ class RynnLeRobotRecorder:
         logger.info(
             f" Recording episode: {episode_frames} frames ({episode_length_s}s)"
         )
+        
+        # 清空相机缓冲区，避免第一帧是上一轮的最后一帧
+        logger.info(" Flushing camera buffers...")
+        for camera_name, camera in self.cameras.items():
+            if camera and camera.is_connected:
+                try:
+                    # 读取并丢弃几帧来清空缓冲区
+                    for _ in range(5):
+                        camera.read(color_mode=ColorMode.RGB)
+                        time.sleep(0.01)  # 短暂延迟确保读取新帧
+                except Exception as e:
+                    logger.warning(f" Error flushing {camera_name} camera buffer: {e}")
+        
         self.recording = True
         frame_count = 0
         start_time = time.perf_counter()
@@ -609,6 +622,7 @@ class RynnLeRobotRecorder:
                         cv2.waitKey(1)
 
                 frame_count += 1
+                frame_count = frame_count % 10**9
 
                 dt_s = time.perf_counter() - frame_start
                 sleep_time = (1.0 / self.fps) - dt_s
@@ -702,76 +716,31 @@ class RynnLeRobotRecorder:
                     print(
                         "  Press ENTER when ready to start recording this episode..."
                     )
+                    frame_count = 0
                     while True:
                         if events.get("continue", False):
                             events["continue"] = False
                             break
-                        time.sleep(0.5)
 
-                    # 在开始录制时创建窗口并确保获得焦点
-                    # if self.show_display and not self.windows_created:
-                    #     self.windows_created = True
-                    #     import cv2
+                        observation = self.get_robot_observation()
+                        # 创建一个新字典，将numpy数组转换为适合display_imgs的格式
+                        display_obs = {
+                            k: v for k, v in observation.items() if isinstance(v, np.ndarray)
+                        }
+                        try:
+                            display_imgs(display_obs, self.show_display, self.show_webcam)
+                        except Exception as e:
+                            self.logger.debug(f"Error displaying images: {e}")
+                        frame_count += 1
+                        frame_count = frame_count % 10**9
+                        if self.show_display and self.windows_created:
+                            # 定期刷新窗口以保持焦点
+                            import cv2
 
-                    #     # 创建控制窗口
-                    #     cv2.namedWindow("Recording Control", cv2.WINDOW_AUTOSIZE)
-                    #     cv2.setWindowTitle(
-                    #         "Recording Control",
-                    #         "Recording in Progress - Click to focus",
-                    #     )
-                    #     # # 设置窗口位置到屏幕右侧
-                    #     # cv2.moveWindow("Recording Control", 1000, 100)  # x=1000, y=100 将窗口移到右侧
-                    #     # 获取屏幕尺寸并计算窗口位置
-                    #     import tkinter as tk
+                            if frame_count % 5 == 0:  # 每5帧检查一次焦点
+                                cv2.waitKey(1)
 
-                    #     root = tk.Tk()
-                    #     screen_width = root.winfo_screenwidth()
-                    #     screen_height = root.winfo_screenheight()
-                    #     root.destroy()
-
-                    #     # 将窗口放在右上角
-                    #     window_x = screen_width - 650  # 600是窗口宽度+一些边距
-                    #     window_y = 50
-                    #     cv2.moveWindow("Recording Control", window_x, window_y)
-
-                    #     # 显示提示信息
-                    #     info_img = np.zeros((120, 600, 3), dtype=np.uint8)
-                    #     cv2.putText(
-                    #         info_img,
-                    #         "RECORDING IN PROGRESS",
-                    #         (10, 30),
-                    #         cv2.FONT_HERSHEY_SIMPLEX,
-                    #         1,
-                    #         (0, 0, 255),
-                    #         2,
-                    #     )
-                    #     cv2.putText(
-                    #         info_img,
-                    #         "ESC: Stop Session",
-                    #         (10, 60),
-                    #         cv2.FONT_HERSHEY_SIMPLEX,
-                    #         0.6,
-                    #         (255, 255, 255),
-                    #         1,
-                    #     )
-                    #     cv2.putText(
-                    #         info_img,
-                    #         "Left Arrow: Re-record, Right Arrow: Exit Early",
-                    #         (10, 90),
-                    #         cv2.FONT_HERSHEY_SIMPLEX,
-                    #         0.6,
-                    #         (255, 255, 255),
-                    #         1,
-                    #     )
-                    #     cv2.imshow("Recording Control", info_img)
-
-                    #     # 强制将焦点转移到OpenCV窗口
-                    #     cv2.waitKey(1)
-                    #     # 再次调用提升焦点概率
-                    #     cv2.setWindowProperty(
-                    #         "Recording Control", cv2.WND_PROP_TOPMOST, 1
-                    #     )
-                    #     cv2.waitKey(100)  # 给一些时间让窗口获得焦点
+                        time.sleep(1/self.fps)
 
                     episode_recorded = self.record_episode(task, episode_time_s, events)
 
