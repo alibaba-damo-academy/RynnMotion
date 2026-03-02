@@ -37,6 +37,7 @@ class RobotManager(ABC):
         """
         self.logger = logger or logging.getLogger(__name__)
 
+        self._robot_model_config = robotmodel_config
         self._robot_name = robotmodel_config.get("robot_name", "")
         self._robot_control_freq = robotmodel_config.get("robot_control_freq", 100)
         self._robot_mjcf = robotmodel_config.get("robot_mjcf", "")
@@ -62,9 +63,12 @@ class RobotManager(ABC):
         self._actuator_modes = self._load_actuator_modes()
         self._actuator_gains = self._load_actuator_gains()
         self._keyframes = self._load_keyframes()
+        self._update_keyframes()
         self._site_names = self._load_site_names()
 
-        self.logger.info("mdof: %d, adof: %d, num_ee: %d", self._mdof, self._adof, self._num_ee)
+        self.logger.info(
+            "mdof: %d, adof: %d, num_ee: %d", self._mdof, self._adof, self._num_ee
+        )
         self.logger.info("joint_indices: %s", self._joint_indices)
         self.logger.info("ee_indices: %s", self._ee_indices)
         self.logger.info("ee_joint_indices: %s", self._ee_joint_indices)
@@ -79,20 +83,32 @@ class RobotManager(ABC):
         try:
             return MjcfParser.extract_robot_state_dim(self._robot_mjcf)
         except Exception as e:
-            self.logger.error("Failed to extract robot state from %s: %s", self._robot_mjcf, e)
+            self.logger.error(
+                "Failed to extract robot state from %s: %s", self._robot_mjcf, e
+            )
             return None
 
     def _load_joint_limits(self) -> dict:
         """Load joint limits from MJCF file"""
         if not self._robot_mjcf:
-            return {"q_pos_min": np.array([]), "q_pos_max": np.array([]),
-                    "q_vel_max": np.array([]), "q_torque_max": np.array([])}
+            return {
+                "q_pos_min": np.array([]),
+                "q_pos_max": np.array([]),
+                "q_vel_max": np.array([]),
+                "q_torque_max": np.array([]),
+            }
         try:
-            return MjcfParser.extract_joint_limits(self._robot_mjcf, self._joint_indices)
+            return MjcfParser.extract_joint_limits(
+                self._robot_mjcf, self._joint_indices
+            )
         except Exception as e:
             self.logger.warning("Failed to load joint limits: %s", e)
-            return {"q_pos_min": np.zeros(self._mdof), "q_pos_max": np.zeros(self._mdof),
-                    "q_vel_max": np.zeros(self._mdof), "q_torque_max": np.zeros(self._mdof)}
+            return {
+                "q_pos_min": np.zeros(self._mdof),
+                "q_pos_max": np.zeros(self._mdof),
+                "q_vel_max": np.zeros(self._mdof),
+                "q_torque_max": np.zeros(self._mdof),
+            }
 
     def _load_actuator_modes(self) -> List[ActuatorMode]:
         """Load actuator modes from MJCF file"""
@@ -121,8 +137,52 @@ class RobotManager(ABC):
         try:
             return MjcfParser.extract_keyframes(self._robot_mjcf)
         except Exception as e:
-            self.logger.warning("Failed to load keyframes from %s: %s", self._robot_mjcf, e)
+            self.logger.warning(
+                "Failed to load keyframes from %s: %s", self._robot_mjcf, e
+            )
             return {"keyframes": [], "names": [], "nq": 0}
+
+    def _update_keyframes(self) -> None:
+        """Update keyframes dictionary.
+
+        Args:
+            keyframes: New keyframes dictionary.
+        """
+        home_position = self._robot_model_config.get("home_position", None)
+        if home_position is not None:
+            self.logger.info("Home position update by config file!")
+            if len(home_position) < self._mdof + self._adof:
+                self._keyframes["keyframes"][0][: len(home_position)] = np.array(
+                    home_position
+                )
+            else:
+                self._keyframes["keyframes"][0] = np.array(
+                    home_position[: self._mdof + self._adof]
+                )
+
+        standby1_position = self._robot_model_config.get("standby1_position", None)
+        if standby1_position is not None:
+            self.logger.info("Standby1 position update by config file!")
+            if len(standby1_position) < self._mdof + self._adof:
+                self._keyframes["keyframes"][1][: len(standby1_position)] = np.array(
+                    standby1_position
+                )
+            else:
+                self._keyframes["keyframes"][1] = np.array(
+                    standby1_position[: self._mdof + self._adof]
+                )
+
+        standby2_position = self._robot_model_config.get("standby2_position", None)
+        if standby2_position is not None:
+            self.logger.info("Standby2 position update by config file!")
+            if len(standby2_position) < self._mdof + self._adof:
+                self._keyframes["keyframes"][2][: len(standby2_position)] = np.array(
+                    standby2_position
+                )
+            else:
+                self._keyframes["keyframes"][2] = np.array(
+                    standby2_position[: self._mdof + self._adof]
+                )
 
     def _load_site_names(self) -> List[str]:
         """Load site names from MJCF file"""
@@ -243,17 +303,22 @@ class RobotManager(ABC):
             motion_only: If True, return only motion DOF (exclude gripper). Default True.
         """
         keyframes = self._keyframes.get("keyframes", [])
+        joint_indices = self._joint_indices
         nq = self._keyframes.get("nq", 0)
         if index < len(keyframes):
             kf = keyframes[index]
             if motion_only:
-                return kf[:self._mdof]
+                return kf[joint_indices]  # kf[: self._mdof]
             return kf
         return np.zeros(self._mdof if motion_only else nq)
 
     def get_q_standby(self, index: int = 0) -> np.ndarray:
         """Get standby keyframe (0=standby1, 1=standby2). Returns motion DOF only."""
         return self.get_keyframe(1 + index, motion_only=True)
+
+    def get_full_q_standby(self, index: int = 0) -> np.ndarray:
+        """Get standby keyframe (0=standby1, 1=standby2). Returns full DOF including grippers."""
+        return self.get_keyframe(1 + index, motion_only=False)
 
     def get_q_home(self) -> np.ndarray:
         """Get home keyframe (keyframes[0]). Returns motion DOF only."""

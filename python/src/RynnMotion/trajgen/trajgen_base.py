@@ -105,6 +105,12 @@ class TrajectoryGeneratorBase(object):
 
         self.robot_model = robot_model
 
+    def process_parameters_update(self, parameters=None):
+        """
+        process parameters update
+        """
+        pass
+
     @abstractmethod
     def process_input_command(self, latest_command, new_command_flag):
         """

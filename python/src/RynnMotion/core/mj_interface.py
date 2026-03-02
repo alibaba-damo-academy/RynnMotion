@@ -74,6 +74,9 @@ class MujocoRobotInterface(RobotInterfaceBase):
         # Timing (single frequency, no multi-threading)
         self.control_freq = robot_model.get_robot_control_freq()
         self.dt = 1.0 / self.control_freq
+        self.render_freq = 50  # Hz
+        self.render_count_duat = int(self.control_freq / self.render_freq)
+        self.render_count = 0
 
         # Camera settings
         self.camera_saving_mode: str = "none"
@@ -148,7 +151,8 @@ class MujocoRobotInterface(RobotInterfaceBase):
 
             self.robot_feedback.joint_pos[i] = self.mjData.qpos[qpos_idx]
             self.robot_feedback.joint_vel[i] = self.mjData.qvel[qpos_idx]
-            self.robot_feedback.joint_torque[i] = self.mjData.actuator_force[qpos_idx]
+            # self.robot_feedback.joint_torque[i] = self.mjData.actuator_force[qpos_idx]
+            self.robot_feedback.joint_torque[i] = self.mjData.actuator_force[i]
 
     def set_joint_commands(self):
         """
@@ -179,6 +183,11 @@ class MujocoRobotInterface(RobotInterfaceBase):
         """
         # Step physics
         mj.mj_step(self.mjModel, self.mjData)
+        self.render_count += 1
+        if self.render_count >= self.render_count_duat:
+            self.render_count = 0
+        else:
+            return
 
         # Render if enabled
         if render_flag:

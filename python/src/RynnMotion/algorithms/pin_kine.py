@@ -32,8 +32,15 @@ class PinKine:
         self.pin_data = self.pin_model.createData()
         self.q = None
 
+        self.q_ref = None
+        self.q_min = self.pin_model.lowerPositionLimit.copy()
+        self.q_max = self.pin_model.upperPositionLimit.copy()
+        self.null_kp = 0.1
+
         # Parse site names
-        if site_names is None or (isinstance(site_names, list) and len(site_names) == 0):
+        if site_names is None or (
+            isinstance(site_names, list) and len(site_names) == 0
+        ):
             # No-site mode
             self._site_names = []
         elif isinstance(site_names, list):
@@ -46,6 +53,8 @@ class PinKine:
 
         # Initialize site data structures
         self._init_sites()
+
+        self.get_endeffector_active_joints()
 
         # Identify end-effector sites (names starting with 'EE' or containing '_EE')
         self._identify_end_effector_sites()
@@ -70,10 +79,12 @@ class PinKine:
             self._sitePos = []
             self._siteQuat = []
             self._siteJaco = []
+            # self._site_ee_ids = []
             return
 
         # Find frame ID for each site
         self._site_frame_ids = []
+        # self._site_ee_ids = []
         for site_name in self._site_names:
             try:
                 # Search for matching frames by name
@@ -95,9 +106,12 @@ class PinKine:
                 elif op_frame_id is not None:
                     frame_id = op_frame_id
                 else:
-                    raise ValueError(f"No BODY or OP_FRAME found for site '{site_name}'")
+                    raise ValueError(
+                        f"No BODY or OP_FRAME found for site '{site_name}'"
+                    )
 
                 self._site_frame_ids.append(frame_id)
+
             except Exception as e:
                 raise ValueError(f"Site '{site_name}' not found in model: {e}")
 
@@ -329,7 +343,6 @@ class PinKine:
 
     # ========== Legacy Single-Site Methods (Backward Compatibility) ==========
 
-
     def getEEPos(self, ee_index=0):
         """
         Get end-effector position by EE index.
@@ -513,3 +526,173 @@ class PinKine:
             return self._ee_indices.index(site_index)
         except ValueError:
             return -1  # Not an end-effector
+
+    def get_endeffector_active_joints(self) -> np.ndarray:
+        """
+        Automatically extract the joint DOF indices that affect a given end-effector frame.
+
+        Returns:
+            np.ndarray: Array of q-space indices (e.g., [0,1,2,4,...]) that are in the kinematic chain to EE
+        """
+        self._sites_active_joint_ids = []
+
+        for frame_id in self._site_frame_ids:
+
+            frame = self.pin_model.frames[frame_id]
+            current_joint = (
+                frame.parentJoint
+            )  # frame.parent  # The joint this frame is attached to
+
+            joint_chain = []
+            while current_joint > 0:  # 0 is universe/root
+                joint_chain.append(current_joint)
+
+                current_joint = self.pin_model.parents[current_joint]
+                if current_joint <= 0:
+                    break
+
+            # reverse joint chain to go from base to end-effector
+            joint_chain = joint_chain[::-1]
+
+            # active joints only (skip fixed joints)
+            active_joint_ids = []
+            for joint_id in joint_chain:
+                if self.pin_model.joints[joint_id].nq > 0:
+                    active_joint_ids.append(joint_id)
+
+            active_q_indices = []
+            for joint_id in active_joint_ids:
+                q_start_idx = self.pin_model.joints[joint_id].idx_q
+                nq_joint = self.pin_model.joints[joint_id].nq
+
+                active_q_indices.extend(range(q_start_idx, q_start_idx + nq_joint))
+
+            self._sites_active_joint_ids.append(np.array(active_q_indices))
+            # print(self._sites_active_joint_ids)
+
+        return self._sites_active_joint_ids
+
+    def set_q_ref(self, q_ref, null_kp=0.1):
+        """
+        Set reference joint configuration for null-space IK.
+
+        Args:
+            q_ref (np.ndarray): Reference joint position vector
+            null_kp (float): Gain for null-space projection
+        """
+        q_ref = np.asarray(q_ref).flatten()
+
+        if len(q_ref) == 0:
+            raise ValueError("q_ref must have at least one element.")
+
+        nq = len(self.q_min)  # actual robot DOF
+
+        if len(q_ref) < nq:
+            # if q_ref is shorter than robot DOF, pad with zeros
+            padded_q = np.zeros(nq)
+            padded_q[: len(q_ref)] = q_ref
+            q_ref = padded_q
+        else:
+            # if q_ref is longer than robot DOF, truncate it
+            q_ref = q_ref[:nq]
+            self.q_ref = self._joint_saturation(q_ref)
+            self.null_kp = null_kp
+
+    def _joint_saturation(self, q):
+        """
+        Apply joint limits to the given joint configuration.
+
+        Args:
+            q (np.ndarray): Joint position vector
+
+        Returns:
+            np.ndarray: Saturated joint position vector
+        """
+        return np.clip(q, self.q_min, self.q_max)
+
+    def single_site_ik_compute(self, pos, quat, q_init, site_ids=0):
+        """
+        calculate the inverse kinematics.
+
+        Args:
+            pos (np.ndarray): Position vector
+            quat (np.ndarray): Quaternion vector (x, y, z, w)
+            q_init (np.ndarray): Joint position vector
+        """
+
+        if len(self._site_names) == 0:
+            return  # No sites to update
+
+        max_iter = 100
+        tol = 1e-4
+        alpha = 0.1
+
+        target_se3 = pin.SE3(R.from_quat(quat).as_matrix(), pos)  # scipy.quat (x,y,z,w)
+        q = q_init.copy()
+
+        err = np.zeros(6)
+        # Update all sites
+        for i in range(max_iter):
+            q = self._joint_saturation(q)
+            pin.forwardKinematics(self.pin_model, self.pin_data, q)
+            pin.updateFramePlacements(self.pin_model, self.pin_data)
+            current_se3 = self.pin_data.oMf[site_ids]  # world_base_frame
+
+            err[0:3] = target_se3.translation - current_se3.translation
+            err[3:6] = pin.log(
+                target_se3.rotation @ np.linalg.inv(current_se3.rotation)
+            )
+
+            if np.linalg.norm(err) < tol:
+                # print("Converged in {} iterations".format(i))
+                break
+
+            # if i == max_iter - 1:
+            #    print("Max iterations reached")
+
+            jaco = pin.computeFrameJacobian(
+                self.pin_model,
+                self.pin_data,
+                q,
+                site_ids,
+                pin.LOCAL_WORLD_ALIGNED,  # WORLD frame
+            )
+
+            # dls_inv_jaco = jaco.T @ np.linalg.inv(jaco @ jaco.T + 1e-4 * np.eye(6))
+            # null_jaco = jaco.T @ np.linalg.inv(jaco @ jaco.T + 1e-8 * np.eye(6))
+            # dq = dls_inv_jaco @ err
+            # if self.q_ref is not None:
+            #    null_space_proj = np.eye(len(q)) - null_jaco @ jaco
+            #    null_dq = (
+            #        null_space_proj @ (self.q_ref - q) * self.null_kp
+            #    )  # null space term
+            #    dq = dq + null_dq
+
+            # use SVD + DLS
+            U, S, Vt = np.linalg.svd(jaco, full_matrices=False)
+            # lambda_ = 1e-2  # damping factor
+            lambda_min = 1e-4
+            lambda_ = lambda_min + 1e-2 * (1 / (1 + max(S)))
+            S_damped = S / (S**2 + lambda_**2)
+            J_inv_dls = (Vt.T * S_damped) @ U.T
+
+            # inverse kinematics step
+            dq = J_inv_dls @ err
+
+            # null space projection
+            if self.q_ref is not None:
+                null_proj = np.eye(len(q)) - J_inv_dls @ jaco
+                dq_null = self.null_kp * null_proj @ (self.q_ref - q)
+                dq += dq_null
+
+            q = pin.integrate(self.pin_model, q, alpha * dq)
+
+        return q
+
+    def site_ik_compute(self, pos, quat, q_init):
+        q_inv_list = []
+        for site_id in self._site_frame_ids:
+            q_inv = self.single_site_ik_compute(pos, quat, q_init, site_id)
+            q_inv_list.append(q_inv)
+        return q_inv_list
+        # return self.single_site_ik_compute(pos, quat, q_init, self._site_frame_ids[0])

@@ -85,12 +85,18 @@ class RealtimeTrajGenRuckig:
 
     def set_input_target(self, q_target, qd_target=None):
         """Set input for trajectory generation."""
-        self._q_target = q_target
+        self._q_target = np.clip(
+            q_target,
+            np.array(self._position_lower_limits) + 0.1,
+            np.array(self._position_upper_limits) - 0.1,
+        )  # q_target
         if qd_target is None:
             self._qd_target = (self._q_target - self._q_target_last) * self._input_freq
         else:
             self._qd_target = qd_target
-        self._qdd_target = (self._qd_target - self._qd_target_last) * self._input_freq
+        self._qdd_target = (
+            (self._qd_target - self._qd_target_last) * self._input_freq * 0.5
+        )
         # self._qdd_target = np.zeros(self._ndof)
 
     def update(self):
@@ -135,33 +141,86 @@ class RealtimeTrajGenRuckig:
             self._q_target, self._position_lower_limits, self._position_upper_limits
         )
         self._qd_target = np.clip(
-            self._qd_target, self._velocity_lower_limits, self._velocity_upper_limits
+            self._qd_target,
+            self._velocity_lower_limits * 0.9,
+            self._velocity_upper_limits * 0.9,
         )
         self._qdd_target = np.clip(
             self._qdd_target,
-            self._acceleration_lower_limits,
-            self._acceleration_upper_limits,
+            self._acceleration_lower_limits * 0.9,
+            self._acceleration_upper_limits * 0.9,
         )
 
     def _ruckig_rt_traj_generation(self):
         """Ruckig realtime trajectory generation."""
         self._ruckig_input.current_position = self._q_plan_last
-        self._ruckig_input.current_velocity = self._qd_plan_last
-        self._ruckig_input.current_acceleration = self._qdd_plan_last
+        self._ruckig_input.current_velocity = np.where(
+            np.abs(self._qd_plan_last) < 1e-8, 0.0, self._qd_plan_last
+        )  # self._qd_plan_last
+        self._ruckig_input.current_acceleration = np.multiply(self._qdd_plan_last, 0.99)
         self._ruckig_input.target_position = self._q_target
         self._ruckig_input.target_velocity = self._qd_target
-        self._ruckig_input.target_acceleration = self._qdd_target
+        self._ruckig_input.target_acceleration = np.multiply(self._qdd_target, 0.99)
         # print("ruckig input:", self._ruckig_input)
 
-        result = self._ruckig_otg.update(self._ruckig_input, self._ruckig_output)
-        if result == ruckig.Result.Working:
-            # qd_plan and qdd_plan is scaled by 0.999, aviodance of numerical error
-            self._q_plan = self._ruckig_output.new_position
-            self._qd_plan = np.multiply(self._ruckig_output.new_velocity, 0.99)
-            self._qdd_plan = np.multiply(self._ruckig_output.new_acceleration, 0.99)
-            # self._ruckig_output.pass_to_input(self._ruckig_input)
-        else:
-            self._q_plan = self._q_plan_last
-            self._qd_plan = self._qd_plan_last
-            self._qdd_plan = self._qdd_plan_last
-            # print("ruckig trajectory generation ", result)
+        try:
+            result = self._ruckig_otg.update(self._ruckig_input, self._ruckig_output)
+            if result == ruckig.Result.Working:
+                # qd_plan and qdd_plan is scaled by 0.999, aviodance of numerical error
+                self._q_plan = self._ruckig_output.new_position
+                self._qd_plan = self._ruckig_output.new_velocity
+                self._qdd_plan = self._ruckig_output.new_acceleration
+                # self._ruckig_output.pass_to_input(self._ruckig_input)
+            else:
+                self._q_plan = self._q_plan_last
+                self._qd_plan = self._qd_plan_last
+                self._qdd_plan = self._qdd_plan_last
+                # print("ruckig trajectory generation ", result)
+        except Exception as e:
+            try:
+                #
+                # self._ruckig_input.current_velocity = np.multiply(
+                #    self._qd_plan_last, 0.9
+                # )
+                self._ruckig_input.current_acceleration = np.multiply(
+                    self._qdd_plan_last, 0.0
+                )
+                #
+                self._ruckig_input.target_velocity = np.multiply(self._qd_target, 0.0)
+                self._ruckig_input.target_acceleration = np.multiply(
+                    self._qdd_target, 0.0
+                )
+                result = self._ruckig_otg.update(
+                    self._ruckig_input, self._ruckig_output
+                )
+                if result == ruckig.Result.Working:
+                    # qd_plan and qdd_plan is scaled by 0.999, aviodance of numerical error
+                    self._q_plan = self._ruckig_output.new_position
+                    self._qd_plan = self._ruckig_output.new_velocity
+                    self._qdd_plan = self._ruckig_output.new_acceleration
+
+                    # self._ruckig_output.pass_to_input(self._ruckig_input)
+                else:
+                    self._q_plan = self._q_plan_last
+                    self._qd_plan = self._qd_plan_last
+                    self._qdd_plan = self._qdd_plan_last
+                    # print("ruckig trajectory generation ", result)
+            except Exception as e:
+                print("Ruckig trajectory generation exception:", e)
+                self._ruckig_input.target_position = self._q_plan_last
+                # self._ruckig_input.target_velocity = np.multiply(self._qd_target, 0.0)
+                # self._ruckig_input.target_acceleration = np.multiply(self._qdd_target, 0.0)
+                result = self._ruckig_otg.update(
+                    self._ruckig_input, self._ruckig_output
+                )
+                if result == ruckig.Result.Working:
+                    # qd_plan and qdd_plan is scaled by 0.999, aviodance of numerical error
+                    self._q_plan = self._ruckig_output.new_position
+                    self._qd_plan = self._ruckig_output.new_velocity
+                    self._qdd_plan = self._ruckig_output.new_acceleration
+                    # self._ruckig_output.pass_to_input(self._ruckig_input)
+                else:
+                    self._q_plan = self._q_plan_last
+                    self._qd_plan = self._qd_plan_last
+                    self._qdd_plan = self._qdd_plan_last
+                    # print("ruckig trajectory generation ", result)

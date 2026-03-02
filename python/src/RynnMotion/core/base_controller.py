@@ -108,12 +108,16 @@ class ControllerBase(ABC):
     def init_logging(self) -> None:
         """Setup logging with timestamped log files."""
         log_dir = os.path.expanduser(self.log_config.get("log_dir", "~/logs/rynn"))
-        log_file = self.log_config.get("log_file", f"{self.get_robot_name()}_controller.log")
+        log_file = self.log_config.get(
+            "log_file", f"{self.get_robot_name()}_controller.log"
+        )
 
         os.makedirs(log_dir, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-        log_path = os.path.join(log_dir, f"{log_file.replace('.log', '')}_{timestamp}.log")
+        log_path = os.path.join(
+            log_dir, f"{log_file.replace('.log', '')}_{timestamp}.log"
+        )
 
         logging.basicConfig(
             level=logging.DEBUG,
@@ -124,8 +128,8 @@ class ControllerBase(ABC):
 
     def init_robotmodel(self) -> None:
         """Initialize robot model from MJCF."""
-        if self.mode != "sim":
-            return
+        # if self.mode != "sim":
+        #    return
 
         models_root = get_models_root()
 
@@ -140,15 +144,24 @@ class ControllerBase(ABC):
             robot_mjcf = str(models_root / scene_config.get("scene_path", ""))
             pino_mjcf = str(models_root / scene_config.get("pino_path", ""))
 
-        resolved_config = {
-            "robot_name": self.get_robot_name(),
-            "robot_control_freq": self.frequency,
-            "robot_mjcf": robot_mjcf,
-            "pino_mjcf": pino_mjcf,
-        }
+        # resolved_config = {
+        #    "robot_name": self.get_robot_name(),
+        #    "robot_control_freq": self.frequency,
+        #    "robot_mjcf": robot_mjcf,
+        #    "pino_mjcf": pino_mjcf,
+        # }
+        # self.robot_model = RobotManager(resolved_config, self.logger)
 
-        self.robot_model = RobotManager(resolved_config, self.logger)
-        self.logger.info(f"Robot model ({self.get_robot_name()}) initialized")
+        #
+        self.robotmodel_config["robot_mjcf"] = robot_mjcf
+        self.robotmodel_config["pino_mjcf"] = pino_mjcf
+
+        #
+        if "robot_name" not in self.robotmodel_config:
+            self.robotmodel_config["robot_name"] = self.get_robot_name()
+
+        self.robot_model = RobotManager(self.robotmodel_config, self.logger)
+        self.logger.info(f"Robot model ({self.get_robot_name()}) initialized\n")
 
     def _resolve_model_path(self, path: str, models_root) -> str:
         """Resolve relative model paths to absolute paths."""
@@ -178,7 +191,7 @@ class ControllerBase(ABC):
                 self.communicator_config,
                 self.logger,
             )
-            self.logger.info(f"Communicator ({communicator_type}) initialized")
+            self.logger.info(f"Communicator ({communicator_type}) initialized\n")
         except Exception as e:
             self.logger.warning(f"Communicator init skipped: {e}")
 
@@ -198,9 +211,9 @@ class ControllerBase(ABC):
                 self.communicator,
                 self.logger,
             )
-            self.logger.info(f"Trajectory generator ({trajgen_name}) initialized")
+            self.logger.info(f"Trajectory generator ({trajgen_name}) initialized\n")
         except Exception as e:
-            self.logger.warning(f"Trajgen init skipped: {e}")
+            self.logger.warning(f"Trajgen init skipped: {e}\n")
 
     def init_robot_interface(self) -> None:
         """Initialize robot interface for simulation or hardware."""
@@ -211,7 +224,7 @@ class ControllerBase(ABC):
 
         self.interface.connect()
         self._init_joint_state()
-        self.logger.info(f"Robot interface initialized (mode={self.mode})")
+        self.logger.info(f"Robot interface initialized (mode={self.mode})\n")
 
     def _init_sim_interface(self) -> None:
         self.interface = robotinterface_factory(
@@ -244,9 +257,9 @@ class ControllerBase(ABC):
             self.robot_state_monitor = RobotStatePublisher(
                 self.robot_model, self.robot_monitor_config
             )
-            self.logger.info("Robot state monitor initialized")
+            self.logger.info("Robot state monitor initialized\n")
         except Exception as e:
-            self.logger.warning(f"Robot state monitor init skipped: {e}")
+            self.logger.warning(f"Robot state monitor init skipped: {e}\n")
 
     def init_fsm(self) -> None:
         """Initialize finite state machine for task management."""
@@ -266,9 +279,9 @@ class ControllerBase(ABC):
                 self.interface,
                 self.logger,
             )
-            self.logger.info(f"FSM ({fsm_type}) initialized")
+            self.logger.info(f"FSM ({fsm_type}) initialized\n")
         except Exception as e:
-            self.logger.warning(f"FSM init skipped: {e}")
+            self.logger.warning(f"FSM init skipped: {e}\n")
 
     @abstractmethod
     def get_robot_name(self) -> str:

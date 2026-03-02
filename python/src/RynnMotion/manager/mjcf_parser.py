@@ -18,6 +18,7 @@ import mujoco
 
 class ActuatorMode(Enum):
     """MuJoCo actuator control modes (matches C++ rynn::ActuatorMode)"""
+
     GENERAL = 0
     POSITION = 1
     VELOCITY = 2
@@ -65,7 +66,9 @@ class MjcfParser:
         return False
 
     @staticmethod
-    def _compute_ee_parent_joints(joint_indices: List[int], ee_indices: List[int]) -> List[int]:
+    def _compute_ee_parent_joints(
+        joint_indices: List[int], ee_indices: List[int]
+    ) -> List[int]:
         """Compute parent joint actuator ID for each end-effector."""
         ee_joint_indices = []
         for ee_actuator_idx in ee_indices:
@@ -138,10 +141,12 @@ class MjcfParser:
             else:
                 joint_indices.append(i)
 
-        ee_joint_indices = MjcfParser._compute_ee_parent_joints(joint_indices, ee_indices)
+        ee_joint_indices = MjcfParser._compute_ee_parent_joints(
+            joint_indices, ee_indices
+        )
 
         mdof = len(joint_indices)
-        adof = 1 if ee_indices else 0
+        adof = len(ee_indices)  # Each gripper is 1 DOF
         num_ee = len(ee_joint_indices)
 
         ee_site_idx = []

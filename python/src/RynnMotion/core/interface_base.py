@@ -80,9 +80,9 @@ class RobotInterfaceBase(ABC):
 
         self.robot_command = RobotState()
         self.robot_command.num_joints = self.mdof
-        self.robot_feedback.num_end_effectors = self.ee_num
-        self.robot_feedback.num_grippers = self.gripper_num
-        self.robot_feedback.num_sites = self.site_num
+        self.robot_command.num_end_effectors = self.ee_num
+        self.robot_command.num_grippers = self.gripper_num
+        self.robot_command.num_sites = self.site_num
 
         self.logger.info(f"robot interface initialized:")
         self.logger.info(f"mdof: {self.mdof}")

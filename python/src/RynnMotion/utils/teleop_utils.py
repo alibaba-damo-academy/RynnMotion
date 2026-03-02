@@ -19,7 +19,7 @@ from RynnMotion.algorithms.policy_interpolator import lerp
 from RynnMotion.utils.path_config import get_models_root
 
 
-ROBOT_NUMBERS = {"fr3": 20, "ur5e": 21, "piper": 22, "rm75": 23, "so101": 24}
+ROBOT_NUMBERS = {"fr3": 20, "ur5e": 21, "piper": 22, "rm75": 23, "so101": 24, "so101v2": 29}
 ROBOT_ALIASES = {
     "fr3": ["FR3", "franka", "panda"],
     "ur5e": ["UR5E", "ur5-e", "ur5_e"],
@@ -33,6 +33,7 @@ ROBOT_MAP = {
     22: ("piper", "3.robot_arm/22.piper/mjcf/piper_robot.xml", "3.robot_arm/22.piper/mjcf/piper_pinocchio.xml"),
     23: ("rm75", "3.robot_arm/23.rm75/mjcf/rm75_robot.xml", "3.robot_arm/23.rm75/mjcf/rm75_pinocchio.xml"),
     24: ("so101", "3.robot_arm/24.so101/mjcf/so101_robot.xml", "3.robot_arm/24.so101/mjcf/so101_pinocchio.xml"),
+    29: ("so101v2", "3.robot_arm/29.so101v2/mjcf/so101v2_robot.xml", "3.robot_arm/29.so101v2/mjcf/so101v2_pinocchio.xml"),
 }
 
 

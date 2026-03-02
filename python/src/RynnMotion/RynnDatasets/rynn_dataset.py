@@ -901,6 +901,7 @@ class RynnDataset(torch.utils.data.Dataset):
         # 检查 episode_buffer 是否存在且不为空
         if not self.episode_buffer:
             return
+
         episode_index = self.episode_buffer["episode_index"]
 
         # Clean up image files for the current episode buffer
@@ -923,6 +924,7 @@ class RynnDataset(torch.utils.data.Dataset):
 
         # Reset the buffer
         self.episode_buffer = self.create_episode_buffer()
+
 
     def start_image_writer(self, num_processes: int = 0, num_threads: int = 4) -> None:
         if isinstance(self.image_writer, AsyncImageWriter):

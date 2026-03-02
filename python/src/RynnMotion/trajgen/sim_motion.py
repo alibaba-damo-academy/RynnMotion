@@ -50,7 +50,9 @@ class SimMotionGenerator(TrajectoryGeneratorBase):
         """
         super().__init__(generator_config, robot_model, communicator, logger)
 
-        self.update_dt = generator_config.get("timestep", 0.01)
+        self.update_dt = (
+            1.0 / self.robot_model.get_robot_control_freq()
+        )  # generator_config.get("timestep", 0.01)
         self.signal_time = 0.0
         self.init_joint_position = [0.0] * self.act_dofs
 

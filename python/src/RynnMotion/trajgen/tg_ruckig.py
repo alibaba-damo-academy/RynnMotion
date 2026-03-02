@@ -75,10 +75,15 @@ class RTInterpolateGenerator(TrajectoryGeneratorBase):
         jerk_limit = self.gen_cfg.get("joint_jerk_limit", None)
         self.joint_jerk_limit = np.array(jerk_limit) * ratio
 
+        self.low_ability_ratio = self.gen_cfg.get("low_ability_ratio", 1.0)
+
         self.logger.info(f"load robot limits config!")
         self.logger.info(f"velocity limit: {self.joint_vel_limit}")
         self.logger.info(f"acceleration limit: {self.joint_acc_limit}")
         self.logger.info(f"jerk limit: {self.joint_jerk_limit}")
+        self.logger.info(f"command traj freq: {self.command_traj_freq}")
+        self.logger.info(f"controller freq: {self.controller_freq}")
+        self.logger.info(f"low ability ratio: {self.low_ability_ratio}")
 
     def init_rt_trajgen(self):
         """Initialize real-time trajectory generator."""
@@ -103,7 +108,7 @@ class RTInterpolateGenerator(TrajectoryGeneratorBase):
         """get joint command in workmode 0"""
         if self.signal_trajectory.workmode == 0:
             num_joint = self.signal_trajectory.trajectory[self.traj_index].num_joint
-            if num_joint != self.act_dofs:
+            if num_joint == self.act_dofs:
                 self.current_joint_command = self.signal_trajectory.trajectory[
                     self.traj_index
                 ].joint_pos
@@ -113,7 +118,7 @@ class RTInterpolateGenerator(TrajectoryGeneratorBase):
                 )
         elif self.signal_trajectory.workmode == 1:
             num_ee = self.signal_trajectory.trajectory[self.traj_index].num_ee
-            if num_ee != self.ee_num:
+            if num_ee == self.ee_num:
                 cartesian_pose = self.signal_trajectory.trajectory[
                     self.traj_index
                 ].ee_pose
@@ -157,6 +162,33 @@ class RTInterpolateGenerator(TrajectoryGeneratorBase):
             f"trajectory module get init joint position: {self.current_joint_command}"
         )
 
+    def set_trajgen_low_albility(self):
+        """Set low robot ability for trajectory generator."""
+        self.rt_trajgen.set_robot_ability(
+            velocity_limits=self.joint_vel_limit * self.low_ability_ratio,
+            acceleration_limits=self.joint_acc_limit * self.low_ability_ratio,
+            jerk_limits=self.joint_jerk_limit,
+        )
+
+    def set_trajgen_norm_albility(self):
+        """Set norm robot ability for trajectory generator."""
+        self.rt_trajgen.set_robot_ability(
+            velocity_limits=self.joint_vel_limit,
+            acceleration_limits=self.joint_acc_limit,
+            jerk_limits=self.joint_jerk_limit,
+        )
+
+    def process_parameters_update(self, parameters="run"):
+        """
+        process parameters update
+        """
+        if parameters == "run":
+            self.set_trajgen_norm_albility()
+        elif parameters == "goto_standby":
+            self.set_trajgen_low_albility()
+        else:
+            self.set_trajgen_low_albility()
+
     def update_trajectory(self):
         """
         update simulation trajectory.
@@ -181,6 +213,9 @@ class RTInterpolateGenerator(TrajectoryGeneratorBase):
                 self.traj_index
             ].joint_pos
             self.rt_trajgen.set_input_target(np.array(self.current_joint_command))
+            # self.logger.debug(
+            #    f"rt_trajgen set new target at traj_index {self.traj_index}: {self.current_joint_command}"
+            # )
 
             if traj_index == self.signal_chunk_size - 1:
                 self.complete = True
