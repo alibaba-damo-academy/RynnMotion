@@ -1,0 +1,125 @@
+<mujoco model="wuji_pinocchio">
+  <compiler angle="radian" />
+
+  <default>
+    <joint armature="0.005" damping="0.05" frictionloss="0.01"/>
+  </default>
+
+  <worldbody>
+    <body name="palm_link" pos="0 0 0">
+      <inertial pos="0 0 0.05" mass="0.15" diaginertia="0.0001 0.0001 0.0001" />
+      <body name="finger1_link1" pos="0.0085244 0.020575 0.028712" quat="0.682219 -0.617669 0.0805047 -0.382859">
+        <inertial pos="-0.0024628 -0.0014428 0.0077802" quat="0.924531 0.222827 0.0390606 -0.306701" mass="0.0075" diaginertia="1.48405e-07 1.33799e-07 9.42758e-08"/>
+        <joint name="finger1_joint1" pos="0 0 0" axis="0 1 0" range="-0.0448 1.6508" actuatorfrcrange="-0.6 0.6"/>
+        <body name="finger1_link2" pos="-0.0047549 -0.0060191 0.014132" quat="0.616955 -0.0855901 -0.290851 0.726255">
+          <inertial pos="0.0011196 -1.2405e-05 0.015663" quat="0.7968 0.000773704 -0.00574143 0.604216" mass="0.0248" diaginertia="1.69711e-06 1.65556e-06 4.09999e-07"/>
+          <joint name="finger1_joint2" pos="0 0 0" axis="0 -1 0" range="-0.1659 0.9339" actuatorfrcrange="-0.6 0.6"/>
+          <body name="finger1_link3" pos="0.00018873 -0.0009916 0.034664" quat="0.577852 0.0212383 -0.0150031 -0.815727">
+            <inertial pos="-0.0011235 -1.579e-05 0.013056" quat="0.999939 -0.00066179 0.010989 0.000796896" mass="0.0165" diaginertia="1.09847e-06 1.0736e-06 3.38802e-07"/>
+            <joint name="finger1_joint3" pos="0 0 0" axis="0 1 0" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+            <body name="finger1_link4" pos="0 -0.00025 0.0295">
+              <inertial pos="-0.00273143 0.00012395 0.0110404" quat="0.669923 -0.143198 -0.155186 0.711769" mass="0.0205" diaginertia="1.44365e-06 1.40141e-06 4.15557e-07"/>
+              <joint name="finger1_joint4" pos="0 0 0" axis="0 1 0" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+              <site name="thumb_tip" pos="-0.0011048 0.00023218 0.0283" size="0.005" />
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="finger2_link1" pos="-0.0058701 0.029434 0.091917" quat="0.991689 -0.0588295 -0.0292755 -0.110614">
+        <inertial pos="-0.0013291 -3.2911e-08 0.00031987" quat="0.934668 0 0.355522 0" mass="0.0032" diaginertia="3.3526e-08 2.2948e-08 1.7331e-08"/>
+        <joint name="finger2_joint1" pos="0 0 0" axis="0 1 0" range="-0.32695 1.63595" actuatorfrcrange="-1 1"/>
+        <body name="finger2_link2" pos="0.0022 0 0.004">
+          <inertial pos="-0.0061577 -4.1189e-07 0.020911" quat="0.706353 0.0103386 0.0102895 0.707709" mass="0.033" diaginertia="4.0532e-06 4.04146e-06 5.6306e-07"/>
+          <joint name="finger2_joint2" pos="0 0 0" axis="-1 0 0" range="-0.495 0.495" actuatorfrcrange="-0.2 0.2"/>
+          <body name="finger2_link3" pos="-0.0047503 0 0.043618" quat="1 0 0 -0.000134305">
+            <inertial pos="-0.0011668 4.1873e-06 0.026893" quat="0.999788 0.000532551 -0.0205741 0.000645438" mass="0.0165" diaginertia="1.34373e-06 1.3154e-06 5.01203e-07"/>
+            <joint name="finger2_joint3" pos="0 0 0" axis="0 1 0" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+            <body name="finger2_link4" pos="0 0 0.0295">
+              <inertial pos="-0.00181752 1.97511e-05 0.00809078" quat="0.988765 -0.000473652 -0.149476 0.00114253" mass="0.018" diaginertia="8.83016e-07 8.41781e-07 2.73851e-07"/>
+              <joint name="finger2_joint4" pos="0 0 0" axis="0 1 0" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+              <site name="index_tip" pos="-0.00105 0 0.0274" size="0.005" />
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="finger3_link1" pos="-0.01046 0.0074615 0.089544" quat="0.999048 -1.26848e-05 -0.0436192 0.000290547">
+        <inertial pos="-0.0013291 3.4987e-09 0.00031994" quat="0.934668 0 0.355522 0" mass="0.0032" diaginertia="3.3526e-08 2.2948e-08 1.7331e-08"/>
+        <joint name="finger3_joint1" pos="0 0 0" axis="0 1 0" range="-0.32695 1.63595" actuatorfrcrange="-1 1"/>
+        <body name="finger3_link2" pos="0.0022 0 0.004">
+          <inertial pos="-0.0061576 -4.1651e-07 0.020911" quat="0.706354 0.0103413 0.0102909 0.707709" mass="0.033" diaginertia="4.0532e-06 4.04146e-06 5.63059e-07"/>
+          <joint name="finger3_joint2" pos="0 0 0" axis="-1 0 0" range="-0.495 0.495" actuatorfrcrange="-0.2 0.2"/>
+          <body name="finger3_link3" pos="-0.00475 0 0.043618" quat="1 0 0 -0.000134305">
+            <inertial pos="-0.0011214 4.331e-06 0.015763" quat="0.999859 0.000617768 -0.0167552 0.00037928" mass="0.0165" diaginertia="1.12038e-06 1.0947e-06 3.3788e-07"/>
+            <joint name="finger3_joint3" pos="0 0 0" axis="0 1 0" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+            <body name="finger3_link4" pos="0 0 0.0295">
+              <inertial pos="-0.00179624 1.91317e-05 0.00809231" quat="0.989227 -0.000361057 -0.146388 0.00109528" mass="0.018" diaginertia="8.81284e-07 8.39863e-07 2.73665e-07"/>
+              <joint name="finger3_joint4" pos="0 0 0" axis="0 1 0" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+              <site name="middle_tip" pos="-0.0010491 0 0.0267" size="0.005" />
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="finger4_link1" pos="-0.0076649 -0.013712 0.084429" quat="0.997789 0.0461019 -0.0405884 0.0254002">
+        <inertial pos="-0.0013291 1.0048e-08 0.00031995" quat="0.934668 0 0.355522 0" mass="0.0032" diaginertia="3.3526e-08 2.2948e-08 1.7331e-08"/>
+        <joint name="finger4_joint1" pos="0 0 0" axis="0 1 0" range="-0.32695 1.63595" actuatorfrcrange="-1 1"/>
+        <body name="finger4_link2" pos="0.0022 0 0.004">
+          <inertial pos="-0.0061576 -4.1601e-07 0.020911" quat="0.706357 0.0103412 0.010291 0.707706" mass="0.033" diaginertia="4.0532e-06 4.04146e-06 5.63059e-07"/>
+          <joint name="finger4_joint2" pos="0 0 0" axis="-1 0 0" range="-0.495 0.495" actuatorfrcrange="-0.2 0.2"/>
+          <body name="finger4_link3" pos="-0.00475 0 0.043618" quat="1 0 0 -0.000134305">
+            <inertial pos="-0.0011214 4.3494e-06 0.015763" quat="0.999859 0.000617864 -0.0167565 0.00036944" mass="0.0165" diaginertia="1.12038e-06 1.0947e-06 3.3788e-07"/>
+            <joint name="finger4_joint3" pos="0 0 0" axis="0 1 0" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+            <body name="finger4_link4" pos="0 0 0.0295">
+              <inertial pos="-0.00179663 1.92161e-05 0.00809236" quat="0.98922 -0.000370884 -0.146433 0.00108147" mass="0.018" diaginertia="8.81379e-07 8.39944e-07 2.73661e-07"/>
+              <joint name="finger4_joint4" pos="0 0 0" axis="0 1 0" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+              <site name="ring_tip" pos="-0.0010528 0 0.0267" size="0.005" />
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="finger5_link1" pos="-0.0022687 -0.034001 0.074281" quat="0.99087 0.0993154 -0.0383256 0.0827347">
+        <inertial pos="-0.0013291 1.7235e-08 0.00031997" quat="0.934668 0 0.355522 0" mass="0.0032" diaginertia="3.35261e-08 2.2948e-08 1.73309e-08"/>
+        <joint name="finger5_joint1" pos="0 0 0" axis="0 1 0" range="-0.32695 1.63595" actuatorfrcrange="-1 1"/>
+        <body name="finger5_link2" pos="0.0022 0 0.004">
+          <inertial pos="-0.0061576 -4.1475e-07 0.020911" quat="0.706366 0.010341 0.0102912 0.707697" mass="0.033" diaginertia="4.0532e-06 4.04146e-06 5.63059e-07"/>
+          <joint name="finger5_joint2" pos="0 0 0" axis="-1 0 0" range="-0.495 0.495" actuatorfrcrange="-0.2 0.2"/>
+          <body name="finger5_link3" pos="-0.00475 0 0.043618" quat="1 0 0 -0.000134305">
+            <inertial pos="-0.0011214 4.3703e-06 0.015763" quat="0.999859 0.000617324 -0.0167577 0.000364458" mass="0.0165" diaginertia="1.12038e-06 1.0947e-06 3.3788e-07"/>
+            <joint name="finger5_joint3" pos="0 0 0" axis="0 1 0" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+            <body name="finger5_link4" pos="0 0 0.0295">
+              <inertial pos="-0.00179519 2.1558e-05 0.00809244" quat="0.98925 -0.000761351 -0.14623 0.00116436" mass="0.018" diaginertia="8.81217e-07 8.39787e-07 2.73647e-07"/>
+              <joint name="finger5_joint4" pos="0 0 0" axis="0 1 0" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+              <site name="pinky_tip" pos="-0.0010446 1.1308e-05 0.0267" size="0.005" />
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="wuji_f1j1" joint="finger1_joint1" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f1j2" joint="finger1_joint2" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f1j3" joint="finger1_joint3" ctrlrange="-1.57 1.57" kp="1" forcerange="-1.5 1.5" />
+    <position name="wuji_f1j4" joint="finger1_joint4" ctrlrange="-1.57 1.57" kp="0.8" forcerange="-1 1" />
+    <position name="wuji_f2j1" joint="finger2_joint1" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f2j2" joint="finger2_joint2" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f2j3" joint="finger2_joint3" ctrlrange="-1.57 1.57" kp="1" forcerange="-1.5 1.5" />
+    <position name="wuji_f2j4" joint="finger2_joint4" ctrlrange="-1.57 1.57" kp="0.8" forcerange="-1 1" />
+    <position name="wuji_f3j1" joint="finger3_joint1" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f3j2" joint="finger3_joint2" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f3j3" joint="finger3_joint3" ctrlrange="-1.57 1.57" kp="1" forcerange="-1.5 1.5" />
+    <position name="wuji_f3j4" joint="finger3_joint4" ctrlrange="-1.57 1.57" kp="0.8" forcerange="-1 1" />
+    <position name="wuji_f4j1" joint="finger4_joint1" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f4j2" joint="finger4_joint2" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f4j3" joint="finger4_joint3" ctrlrange="-1.57 1.57" kp="1" forcerange="-1.5 1.5" />
+    <position name="wuji_f4j4" joint="finger4_joint4" ctrlrange="-1.57 1.57" kp="0.8" forcerange="-1 1" />
+    <position name="wuji_f5j1" joint="finger5_joint1" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f5j2" joint="finger5_joint2" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f5j3" joint="finger5_joint3" ctrlrange="-1.57 1.57" kp="1" forcerange="-1.5 1.5" />
+    <position name="wuji_f5j4" joint="finger5_joint4" ctrlrange="-1.57 1.57" kp="0.8" forcerange="-1 1" />
+  </actuator>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+  </keyframe>
+</mujoco>

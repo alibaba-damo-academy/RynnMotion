@@ -2,7 +2,7 @@
 
 set -e
 
-DEFAULT_VERSION="3.5.0"
+DEFAULT_VERSION="3.6.0"
 MUJOCO_VERSION="${1:-$DEFAULT_VERSION}"
 
 RED='\033[0;31m'
@@ -109,6 +109,13 @@ if [ "$OS" == "macos" ]; then
         fi
 
         INSTALLED_LIB=$(ls "$MUJOCO_DIR/lib/libmujoco"*.dylib 2>/dev/null | head -n 1)
+        # Fix framework-style install names so binaries can find the library by absolute path
+        for dylib in "$MUJOCO_DIR/lib/"libmujoco*.dylib; do
+            install_name_tool -id "$dylib" "$dylib" 2>/dev/null || true
+            codesign --force --sign - "$dylib" 2>/dev/null || true
+        done
+        echo -e "${GREEN}✓ Fixed and re-signed MuJoCo library${NC}"
+
         if [ -n "$INSTALLED_LIB" ] && [ -d "$MUJOCO_DIR/include" ] && [ -f "$MUJOCO_DIR/include/mujoco.h" ]; then
             echo -e "${GREEN}✓ MuJoCo ${MUJOCO_VERSION} installed successfully!${NC}"
             echo "  Library: $INSTALLED_LIB"
@@ -121,6 +128,34 @@ if [ "$OS" == "macos" ]; then
             ls -la "$MUJOCO_DIR/include/" 2>/dev/null || echo "  No include directory"
             hdiutil detach "$DMG_MOUNT_PATH" -quiet 2>/dev/null || true
             exit 1
+        fi
+
+        # Copy MuJoCo plugins (mesh decoders, physics plugins, etc.)
+        PLUGIN_INSTALLED=false
+        for PLUGIN_SRC in \
+            "$DMG_MOUNT_PATH/mujoco.framework/Versions/A/mujoco_plugin" \
+            "$DMG_MOUNT_PATH/mujoco.framework/Versions/A/Resources/mujoco_plugin" \
+            "$DMG_MOUNT_PATH/mujoco.framework/Resources/mujoco_plugin"; do
+            if [ -d "$PLUGIN_SRC" ] && ls "$PLUGIN_SRC"/*.dylib > /dev/null 2>&1; then
+                mkdir -p "$MUJOCO_DIR/bin/mujoco_plugin"
+                for dylib in "$PLUGIN_SRC/"*.dylib; do
+                    cp "$dylib" "$MUJOCO_DIR/bin/mujoco_plugin/"
+                    plugin_dest="$MUJOCO_DIR/bin/mujoco_plugin/$(basename "$dylib")"
+                    install_name_tool -id "$plugin_dest" "$plugin_dest" 2>/dev/null || true
+                    install_name_tool -change \
+                        "@rpath/mujoco.framework/Versions/A/libmujoco.${MUJOCO_VERSION}.dylib" \
+                        "$MUJOCO_DIR/lib/libmujoco.${MUJOCO_VERSION}.dylib" \
+                        "$plugin_dest" 2>/dev/null || true
+                    codesign --force --sign - "$plugin_dest" 2>/dev/null || true
+                done
+                PLUGIN_INSTALLED=true
+                echo -e "${GREEN}✓ MuJoCo plugins installed from: $PLUGIN_SRC${NC}"
+                break
+            fi
+        done
+        if [ "$PLUGIN_INSTALLED" = false ]; then
+            echo -e "${YELLOW}⚠  No plugin directory found in MuJoCo framework DMG${NC}"
+            echo    "   OBJ mesh loading may not work (plugins missing)"
         fi
 
         echo ""

@@ -49,6 +49,11 @@ const std::map<std::string, std::vector<std::string>> ROBOT_ALIASES = {
     {"twoLink", {"twolink", "two-link", "two_link"}},
     {"unitree_g1", {"g1", "G1", "unitree-g1", "unitree_humanoid"}},
     {"agibot_x2", {"x2", "X2", "agibot-x2", "agibot_humanoid", "x2_fist", "x2_hand", "x2_ultra"}},
+    {"so101_6dof", {"SO101_6DOF", "so-101-6dof", "so_101_6dof", "soarm101_6dof", "so-arm-101-6dof"}},
+    {"wuji", {"WUJI", "Wuji", "wuji_hand", "wujihand"}},
+    {"sharpa_wave", {"SHARPA_WAVE", "SharpaWave", "sharpa", "sharpa-wave", "sharpa_ha4", "HA4"}},
+    {"dual_wuji", {"dual-wuji", "dualwuji"}},
+    {"dual_sharpa_wave", {"dual-sharpa-wave", "dual_sharpa", "dualsharpa"}},
 };
 
 const std::map<std::string, std::vector<std::string>> SCENE_ALIASES = {
@@ -57,6 +62,7 @@ const std::map<std::string, std::vector<std::string>> SCENE_ALIASES = {
     {"ui", {"UI", "tracking", "TRACKING", "Tracking"}},
     {"predefined", {"PREDEFINED", "Predefined", "workspace"}},
     {"pickplace", {"PICKPLACE", "PickPlace", "pick", "pick-place"}},
+    {"usscan", {"USSCAN", "ultrasound", "Ultrasound", "scan", "Scan"}},
 };
 
 const std::map<std::string, std::map<std::string, std::vector<int>>> LEGACY_SCENE_MAPPINGS = {
@@ -66,7 +72,7 @@ const std::map<std::string, std::map<std::string, std::vector<int>>> LEGACY_SCEN
     {"rm75", {{"scene.xml", {1, 2, 3, 4}}, {"scene_pickplace.xml", {5}}}},
     {"so101", {{"scene.xml", {1, 2, 3, 4}}, {"scene_pickplace.xml", {5}}}},
     {"openarm", {{"scene.xml", {1, 2}}}},
-    {"rizon4s", {{"scene.xml", {1, 2}}}},
+    {"rizon4s", {{"scene.xml", {1, 2, 3, 4, 5}}, {"scene_usscan.xml", {6}}}},
     {"onelink", {{"scene.xml", {1, 2}}}},
     {"twolink", {{"scene.xml", {1, 2}}}},
     {"dual_fr3", {{"dual_fr3_scene.xml", {1, 2, 3, 4}}, {"dual_fr3_pickplace.xml", {5}}}},
@@ -74,6 +80,7 @@ const std::map<std::string, std::map<std::string, std::vector<int>>> LEGACY_SCEN
     {"dual_piper", {{"dual_piper_scene.xml", {1, 2, 3, 4}}, {"dual_piper_pickplace.xml", {5}}}},
     {"dual_rm75", {{"dual_rm75_scene.xml", {1, 2, 3, 4}}, {"dual_rm75_pickplace.xml", {5}}}},
     {"dual_so101", {{"dual_so101_scene.xml", {1, 2, 3, 4}}, {"dual_so101_pickplace.xml", {5}}}},
+    {"so101_6dof", {{"scene_so101_6dof.xml", {1, 2, 3, 4}}, {"scene_pickplace.xml", {5}}}},
 };
 } // namespace
 

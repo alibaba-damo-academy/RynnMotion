@@ -92,7 +92,7 @@ void RobotManager::setEEJointIndices(const std::vector<int> &indices) {
 }
 
 int RobotManager::getNumEndEffectors() const {
-  return _eeJointIndices.size();
+  return static_cast<int>(_eeRanges.size());
 }
 
 std::vector<std::pair<double, double>> RobotManager::getEERanges() const {
@@ -164,7 +164,7 @@ void RobotManager::setJointLimits(const Eigen::VectorXd &qPosMin, const Eigen::V
 Eigen::VectorXd RobotManager::getQStandby(int index) const {
   int keyframeIndex = 1 + index;
   if (keyframeIndex >= static_cast<int>(_keyframes.size())) {
-    std::cerr << "Warning: Standby keyframe " << index << " not available, returning zero vector" << std::endl;
+    // std::cerr << "Warning: Standby keyframe " << index << " not available, returning zero vector" << std::endl;
     return Eigen::VectorXd::Zero(_mdof);
   }
   return _keyframes[keyframeIndex];
@@ -236,5 +236,49 @@ int RobotManager::getNumSites() const {
 bool RobotManager::hasSites() const {
   return !_siteNames.empty();
 }
+
+std::vector<SensorInfo> RobotManager::getForceSensors() const { return _forceSensors; }
+std::vector<SensorInfo> RobotManager::getTorqueSensors() const { return _torqueSensors; }
+std::vector<SensorInfo> RobotManager::getGyroSensors() const { return _gyroSensors; }
+std::vector<SensorInfo> RobotManager::getAccelerometerSensors() const { return _accelSensors; }
+std::vector<SensorInfo> RobotManager::getRangefinderSensors() const { return _rangefinderSensors; }
+std::vector<SensorInfo> RobotManager::getFramePosSensors() const { return _framePosSensors; }
+std::vector<SensorInfo> RobotManager::getFrameQuatSensors() const { return _frameQuatSensors; }
+std::vector<SensorInfo> RobotManager::getTouchSensors() const { return _touchSensors; }
+
+bool RobotManager::isDexHand() const { return _isDexHand; }
+void RobotManager::setIsDexHand(bool isDexHand) { _isDexHand = isDexHand; }
+
+void RobotManager::setSensors(const std::vector<SensorInfo> &force,
+                              const std::vector<SensorInfo> &torque,
+                              const std::vector<SensorInfo> &gyro,
+                              const std::vector<SensorInfo> &accel,
+                              const std::vector<SensorInfo> &rangefinder,
+                              const std::vector<SensorInfo> &framePos,
+                              const std::vector<SensorInfo> &frameQuat,
+                              const std::vector<SensorInfo> &touch) {
+  _forceSensors = force;
+  _torqueSensors = torque;
+  _gyroSensors = gyro;
+  _accelSensors = accel;
+  _rangefinderSensors = rangefinder;
+  _framePosSensors = framePos;
+  _frameQuatSensors = frameQuat;
+  _touchSensors = touch;
+}
+
+int RobotManager::getNumCameras() const { return static_cast<int>(_cameraNames.size()); }
+std::vector<std::string> RobotManager::getCameraNames() const { return _cameraNames; }
+void RobotManager::setCameraNames(const std::vector<std::string> &cameraNames) { _cameraNames = cameraNames; }
+
+std::vector<std::string> RobotManager::getJointNames() const { return _jointNames; }
+std::vector<std::string> RobotManager::getEENames() const { return _eeNames; }
+void RobotManager::setActuatorNames(const std::vector<std::string> &jointNames,
+                                    const std::vector<std::string> &eeNames) {
+  _jointNames = jointNames;
+  _eeNames = eeNames;
+}
+
+std::vector<std::string> RobotManager::getKeyframeNames() const { return _keyframeNames; }
 
 } // namespace rynn

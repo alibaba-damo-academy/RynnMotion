@@ -14,7 +14,8 @@
 
 namespace rynn {
 
-MjcfParser::MjcfParser(RobotManager &rm) : rm_(rm), robotModel_(nullptr), pinoModel_(nullptr) {
+MjcfParser::MjcfParser(RobotManager &rm) :
+    rm_(rm), robotModel_(nullptr), pinoModel_(nullptr) {
   parseAndPopulate();
 }
 
@@ -31,18 +32,23 @@ MjcfParser::~MjcfParser() {
 }
 
 void MjcfParser::parseAndPopulate() {
-  // Load robotMJCF (*_robot.xml)
-  robotModel_ = mj_loadXML(rm_.getRobotMJCF().c_str(), 0, nullptr, 0);
-  if (!robotModel_) return;
+  char error[1000] = "";
+
+  // Load robotMJCF (*_robot.xml or scene.xml)
+  robotModel_ = mj_loadXML(rm_.getRobotMJCF().c_str(), 0, error, sizeof(error));
+  if (!robotModel_) {
+    std::cerr << "MjcfParser: Failed to load " << rm_.getRobotMJCF() << ": " << error << std::endl;
+    return;
+  }
 
   // Load pinoMJCF (*_pinocchio.xml) or fallback to robotModel_
-  pinoModel_ = mj_loadXML(rm_.getPinoMJCF().c_str(), 0, nullptr, 0);
+  pinoModel_ = mj_loadXML(rm_.getPinoMJCF().c_str(), 0, error, sizeof(error));
   if (!pinoModel_) pinoModel_ = robotModel_;
 
-  parseRobotModel();
+  parseMjcfInfo();
 }
 
-void MjcfParser::parseRobotModel() {
+void MjcfParser::parseMjcfInfo() {
   if (!robotModel_ || !pinoModel_) return;
 
   detectEndEffectors();
@@ -52,6 +58,9 @@ void MjcfParser::parseRobotModel() {
   extractActuatorGains();
   extractKeyframes();
   extractSiteNames();
+  detectSensors();
+  detectCameras();
+  extractActuatorNames();
 }
 
 void MjcfParser::detectEndEffectors() {
@@ -109,6 +118,17 @@ void MjcfParser::detectEndEffectors() {
     }
   }
 
+  // Dex hand reclassification: if ALL actuators are classified as EE and NONE as joints,
+  // this is a standalone dex hand — reclassify all as joints
+  bool isDexHand = false;
+  if (jointIndices.empty() && eeIndices.size() > 5) {
+    isDexHand = true;
+    jointIndices = eeIndices;
+    eeIndices.clear();
+    eeRanges.clear();
+    DEBUG_LOG("Dex hand detected: reclassified " << jointIndices.size() << " EE actuators as joints");
+  }
+
   int mdof = jointIndices.size();
   int adof = eeIndices.empty() ? 0 : 1; // Assume 1 DOF per end effector for now
 
@@ -116,6 +136,7 @@ void MjcfParser::detectEndEffectors() {
   rm_.setActionDOF(adof);
   rm_.setActuatorIndices(jointIndices, eeIndices);
   rm_.setEndEffectorConfig(adof, {}, eeRanges);
+  rm_.setIsDexHand(isDexHand);
 }
 
 void MjcfParser::computeEEParentJoints() {
@@ -136,6 +157,15 @@ void MjcfParser::computeEEParentJoints() {
   DEBUG_LOG("  ]");
 
   if (eeIndices.empty()) {
+    return;
+  }
+
+  if (jointIndices.empty()) {
+    DEBUG_LOG("  No motion joints found - fixed-base gripper mode");
+    DEBUG_LOG("  Skipping parent joint mapping, eeJointIndices will be empty");
+
+    std::vector<std::pair<double, double>> eeRanges = rm_.getEERanges();
+    rm_.setEndEffectorConfig(rm_.getActionDOF(), eeJointIndices, eeRanges);
     return;
   }
 
@@ -429,6 +459,100 @@ void MjcfParser::extractSiteNames() {
   }
 
   rm_.setSiteNames(siteNames);
+}
+
+void MjcfParser::detectSensors() {
+  if (!robotModel_) return;
+
+  std::vector<SensorInfo> force, torque, gyro, accel, rangefinder, framePos, frameQuat, touch;
+
+  for (int i = 0; i < robotModel_->nsensor; ++i) {
+    int type = robotModel_->sensor_type[i];
+    int adr = robotModel_->sensor_adr[i];
+    int dim = robotModel_->sensor_dim[i];
+    const char *name = mj_id2name(robotModel_, mjOBJ_SENSOR, i);
+    std::string sensorName = name ? name : ("sensor_" + std::to_string(i));
+
+    SensorInfo info{sensorName, adr, dim};
+
+    switch (type) {
+    case mjSENS_FORCE:
+      force.push_back(info);
+      break;
+    case mjSENS_TORQUE:
+      torque.push_back(info);
+      break;
+    case mjSENS_GYRO:
+      gyro.push_back(info);
+      break;
+    case mjSENS_ACCELEROMETER:
+      accel.push_back(info);
+      break;
+    case mjSENS_RANGEFINDER:
+      rangefinder.push_back(info);
+      break;
+    case mjSENS_FRAMEPOS:
+      framePos.push_back(info);
+      break;
+    case mjSENS_FRAMEQUAT:
+      frameQuat.push_back(info);
+      break;
+    case mjSENS_TOUCH:
+      touch.push_back(info);
+      break;
+    default:
+      break;
+    }
+  }
+
+  rm_.setSensors(force, torque, gyro, accel, rangefinder, framePos, frameQuat, touch);
+
+  DEBUG_LOG("detectSensors: force=" << force.size() << " torque=" << torque.size()
+                                    << " gyro=" << gyro.size() << " accel=" << accel.size()
+                                    << " rangefinder=" << rangefinder.size()
+                                    << " framePos=" << framePos.size() << " frameQuat=" << frameQuat.size()
+                                    << " touch=" << touch.size());
+}
+
+void MjcfParser::detectCameras() {
+  if (!robotModel_) return;
+
+  std::vector<std::string> cameraNames;
+  cameraNames.reserve(robotModel_->ncam);
+
+  for (int i = 0; i < robotModel_->ncam; ++i) {
+    const char *name = mj_id2name(robotModel_, mjOBJ_CAMERA, i);
+    if (name && name[0] != '\0') {
+      cameraNames.push_back(std::string(name));
+    }
+  }
+
+  rm_.setCameraNames(cameraNames);
+  DEBUG_LOG("detectCameras: " << cameraNames.size() << " camera(s) found");
+}
+
+void MjcfParser::extractActuatorNames() {
+  if (!robotModel_) return;
+
+  std::vector<int> jointIndices = rm_.getJointIndices();
+  std::vector<int> eeIndices = rm_.getEEIndices();
+
+  std::vector<std::string> jointNames;
+  jointNames.reserve(jointIndices.size());
+  for (int idx : jointIndices) {
+    const char *name = mj_id2name(robotModel_, mjOBJ_ACTUATOR, idx);
+    jointNames.push_back(name ? name : ("actuator_" + std::to_string(idx)));
+  }
+
+  std::vector<std::string> eeNames;
+  eeNames.reserve(eeIndices.size());
+  for (int idx : eeIndices) {
+    const char *name = mj_id2name(robotModel_, mjOBJ_ACTUATOR, idx);
+    eeNames.push_back(name ? name : ("actuator_" + std::to_string(idx)));
+  }
+
+  rm_.setActuatorNames(jointNames, eeNames);
+  DEBUG_LOG("extractActuatorNames: " << jointNames.size() << " joint(s), " << eeNames.size() << " EE(s)");
 }
 
 RobotManager::EigenVecXd MjcfParser::extractKeyframesFromModel(mjModel *model, int mdof) {

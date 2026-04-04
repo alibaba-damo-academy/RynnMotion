@@ -61,7 +61,7 @@ private:
   /**
    * @brief Orchestrate all extraction methods
    */
-  void parseRobotModel();
+  void parseMjcfInfo();
 
   /**
    * @brief Detect end-effectors (grippers) vs motion joints
@@ -97,6 +97,21 @@ private:
    * @brief Extract site names from Pinocchio MJCF
    */
   void extractSiteNames();
+
+  /**
+   * @brief Detect sensors from robotModel_ (force, torque, gyro, accel, etc.)
+   */
+  void detectSensors();
+
+  /**
+   * @brief Detect cameras from robotModel_
+   */
+  void detectCameras();
+
+  /**
+   * @brief Extract actuator names for joints and end-effectors
+   */
+  void extractActuatorNames();
 
   RobotManager &rm_;
   mjModel *robotModel_;

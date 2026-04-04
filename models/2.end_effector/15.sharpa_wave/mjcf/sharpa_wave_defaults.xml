@@ -1,0 +1,22 @@
+<mujoco>
+  <default>
+    <default class="CMC_joint">
+      <joint armature="0.0032" frictionloss="0.132" damping="4.20E-05"/>
+    </default>
+    <default class="PCMC_joint">
+      <joint armature="0.00012" frictionloss="0.012" damping="4.20E-05"/>
+    </default>
+    <default class="MCP_joint">
+      <joint armature="0.00265" frictionloss="0.07456" damping="2.38E-05"/>
+    </default>
+    <default class="PIP_joint">
+      <joint armature="0.0006" frictionloss="0.01276" damping="4.06E-06"/>
+    </default>
+    <default class="DIP_joint">
+      <joint armature="0.00042" frictionloss="0.00378738" damping="1.21E-06"/>
+    </default>
+    <default class="elastomer_geom">
+      <geom solref="0.06 0.9"/>
+    </default>
+  </default>
+</mujoco>

@@ -1,0 +1,26 @@
+<mujoco>
+  <actuator>
+    <position name="left_thumb_CMC_FE_ctrl" joint="left_thumb_CMC_FE" kp="6.95" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_thumb_CMC_AA_ctrl" joint="left_thumb_CMC_AA" kp="13.2" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_thumb_MCP_FE_ctrl" joint="left_thumb_MCP_FE" kp="4.76" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_thumb_MCP_AA_ctrl" joint="left_thumb_MCP_AA" kp="6.62" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_thumb_IP_ctrl" joint="left_thumb_IP" kp="0.9" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_index_MCP_FE_ctrl" joint="left_index_MCP_FE" kp="4.76" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_index_MCP_AA_ctrl" joint="left_index_MCP_AA" kp="6.62" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_index_PIP_ctrl" joint="left_index_PIP" kp="0.9" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_index_DIP_ctrl" joint="left_index_DIP" kp="0.9" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_middle_MCP_FE_ctrl" joint="left_middle_MCP_FE" kp="4.76" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_middle_MCP_AA_ctrl" joint="left_middle_MCP_AA" kp="6.62" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_middle_PIP_ctrl" joint="left_middle_PIP" kp="0.9" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_middle_DIP_ctrl" joint="left_middle_DIP" kp="0.9" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_ring_MCP_FE_ctrl" joint="left_ring_MCP_FE" kp="4.76" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_ring_MCP_AA_ctrl" joint="left_ring_MCP_AA" kp="6.62" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_ring_PIP_ctrl" joint="left_ring_PIP" kp="0.9" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_ring_DIP_ctrl" joint="left_ring_DIP" kp="0.9" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_pinky_CMC_ctrl" joint="left_pinky_CMC" kp="1.38" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_pinky_MCP_FE_ctrl" joint="left_pinky_MCP_FE" kp="4.76" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_pinky_MCP_AA_ctrl" joint="left_pinky_MCP_AA" kp="6.62" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_pinky_PIP_ctrl" joint="left_pinky_PIP" kp="0.9" dampratio="0.9" inheritrange="1.0"/>
+    <position name="left_pinky_DIP_ctrl" joint="left_pinky_DIP" kp="0.9" dampratio="0.9" inheritrange="1.0"/>
+  </actuator>
+</mujoco>

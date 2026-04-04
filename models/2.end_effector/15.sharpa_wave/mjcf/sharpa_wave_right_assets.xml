@@ -1,0 +1,27 @@
+<mujoco>
+  <compiler meshdir="../assets/right/" />
+  <asset>
+    <mesh name="right_hand_C_MC_visual" file="right_hand_C_MC_visual_.STL"/>
+    <mesh name="right_hand_C_MC" file="right_hand_C_MC.STL"/>
+    <mesh name="right_thumb_CMC_VL_visual" file="right_thumb_CMC_VL_visual.STL"/>
+    <mesh name="right_thumb_MC_visual" file="right_thumb_MC_visual.STL"/>
+    <mesh name="right_thumb_MC" file="right_thumb_MC.STL"/>
+    <mesh name="right_thumb_MCP_VL_visual" file="right_thumb_MCP_VL_visual.STL"/>
+    <mesh name="right_thumb_PP_visual" file="right_thumb_PP_visual.STL"/>
+    <mesh name="right_thumb_PP" file="right_thumb_PP.STL"/>
+    <mesh name="right_thumb_DP_visual" file="right_thumb_DP_visual.STL"/>
+    <mesh name="right_thumb_DP" file="right_thumb_DP.STL"/>
+    <mesh name="thumb_elastomer" file="thumb_elastomer.STL"/>
+    <mesh name="right_MCP_VL_visual" file="right_MCP_VL_visual.STL"/>
+    <mesh name="MCP_VL" file="MCP_VL.STL"/>
+    <mesh name="right_PP_visual" file="right_PP_visual.STL"/>
+    <mesh name="right_PP" file="right_PP.STL"/>
+    <mesh name="right_MP_visual" file="right_MP_visual.STL"/>
+    <mesh name="right_MP" file="right_MP.STL"/>
+    <mesh name="right_DP_visual" file="right_DP_visual.STL"/>
+    <mesh name="right_DP" file="right_DP.STL"/>
+    <mesh name="elastomer" file="elastomer.STL"/>
+    <mesh name="right_pinky_MC_visual" file="right_pinky_MC_visual.STL"/>
+    <mesh name="right_pinky_MC" file="right_pinky_MC.STL"/>
+  </asset>
+</mujoco>

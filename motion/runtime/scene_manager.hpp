@@ -17,14 +17,16 @@ namespace rynn {
  * @brief Semantic scene types for module chain selection
  *
  * Maps scene numbers to their functional purpose.
- * Scene 1-4 all load scene.xml, scene 5 loads scene_pickplace.xml
+ * Scene 1-4 all load scene.xml, scene 5 loads scene_pickplace.xml,
+ * scene 6 loads scene_usscan.xml for ultrasound scanning with ROS2
  */
 enum class SceneType {
   kDefault = 1,       // Joint range motion
   kKeyframeCycle = 2, // Keyframe cycling
   kUI = 3,            // Keyboard UI / manual control
   kTracking = 4,      // End-effector tracking
-  kPickPlace = 5      // Pick and place tasks
+  kPickPlace = 5,     // Pick and place tasks
+  kUsscan = 6         // Ultrasound scan simulation with ROS2
 };
 
 /**

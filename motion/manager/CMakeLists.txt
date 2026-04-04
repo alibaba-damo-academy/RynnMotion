@@ -21,6 +21,7 @@ message(STATUS "libmanager: Using MuJoCo library: ${MUJOCO_LIBRARY}")
 set(SOURCE_FILES
   robot_manager.cpp
   mjcf_parser.cpp
+  robot_context.cpp
   debug_config.cpp
 )
 
@@ -71,6 +72,10 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/motion/manager
 )
 
+if(APPLE)
+    mujoco_fix_rpath(${LIBRARY_NAME})
+endif()
+
 if(BUILD_DEPLOY)
   target_include_directories(${LIBRARY_NAME}_static PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -111,6 +116,25 @@ if(BUILD_DEPLOY)
   set_target_properties(${LIBRARY_NAME}_static PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/motion/manager
   )
+endif()
+
+add_executable(mjcfDatasetExe main_mjcf_dataset.cpp)
+target_include_directories(mjcfDatasetExe PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/models
+  ${MUJOCO_INCLUDE_DIRS}
+)
+target_compile_definitions(mjcfDatasetExe PUBLIC
+  MODEL_DIR="${MODEL_DIR}"
+  MOTION_DIR="${MOTION_DIR}"
+)
+target_link_libraries(mjcfDatasetExe ${LIBRARY_NAME} Eigen3::Eigen ${YAML_LIB} ${MUJOCO_LIBRARY})
+add_custom_command(TARGET mjcfDatasetExe POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:mjcfDatasetExe> ${CMAKE_SOURCE_DIR}/build/mjcfDatasetExe
+)
+
+if(APPLE)
+    mujoco_fix_rpath(mjcfDatasetExe)
 endif()
 
 message(STATUS "libmanager configured successfully")

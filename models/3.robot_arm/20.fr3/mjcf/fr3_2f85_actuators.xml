@@ -1,0 +1,38 @@
+<mujoco model="fr3_2f85_actuators">
+
+  <contact>
+    <exclude body1="gripper_base" body2="left_driver"/>
+    <exclude body1="gripper_base" body2="right_driver"/>
+    <exclude body1="gripper_base" body2="left_spring_link"/>
+    <exclude body1="gripper_base" body2="right_spring_link"/>
+    <exclude body1="right_coupler" body2="right_follower"/>
+    <exclude body1="left_coupler" body2="left_follower"/>
+  </contact>
+
+  <tendon>
+    <fixed name="split">
+      <joint joint="right_driver_joint" coef="0.5"/>
+      <joint joint="left_driver_joint" coef="0.5"/>
+    </fixed>
+  </tendon>
+
+  <equality>
+    <connect anchor="0 0 0" body1="right_follower" body2="right_coupler" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+    <connect anchor="0 0 0" body1="left_follower" body2="left_coupler" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+    <joint joint1="right_driver_joint" joint2="left_driver_joint" polycoef="0 1 0 0 0" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+  </equality>
+
+  <actuator>
+    <!-- FR3 arm actuators -->
+    <position class="fr3" name="lj1" joint="fr3_joint1" kp="4500" kv="450"/>
+    <position class="fr3" name="lj2" joint="fr3_joint2" kp="4500" kv="450"/>
+    <position class="fr3" name="lj3" joint="fr3_joint3" kp="3500" kv="350"/>
+    <position class="fr3" name="lj4" joint="fr3_joint4" kp="3500" kv="350"/>
+    <position class="fr3" name="lj5" joint="fr3_joint5" kp="2000" kv="200"/>
+    <position class="fr3" name="lj6" joint="fr3_joint6" kp="2000" kv="200"/>
+    <position class="fr3" name="lj7" joint="fr3_joint7" kp="2000" kv="200"/>
+    <!-- 2F85 gripper actuator: 0=closed (joint=0.8), 1=open (joint=0) -->
+    <general class="2f85" name="grip" tendon="split" forcerange="-5 5" ctrlrange="0 1" gainprm="-80 0 0" biasprm="80 -100 -10"/>
+  </actuator>
+
+</mujoco>

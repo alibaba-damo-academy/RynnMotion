@@ -1,0 +1,13 @@
+<mujoco>
+  <default>
+    <joint armature="0.005" damping="0.05" frictionloss="0.01"/>
+    <default class="robot">
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="1" />
+      </default>
+      <default class="collision">
+        <geom type="mesh" contype="1" conaffinity="1" group="3" />
+      </default>
+    </default>
+  </default>
+</mujoco>

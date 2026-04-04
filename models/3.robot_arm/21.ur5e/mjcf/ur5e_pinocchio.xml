@@ -85,7 +85,7 @@
 
   <keyframe>
     <key name="home" qpos="0 -1.5708 0 -1.5708 0 0" />
-    <key name="standby1" qpos="3.1415926 -1.5708 -1.5708 -1.5708 1.5708 0" />
+    <key name="standby1" qpos="3.1415926 -1.5708 -1.5708 -0 1.5708 0" />
     <key name="standby2" qpos="0 -1.5708 1.5708 -1.5708 -1.5708 0" />
   </keyframe>
 

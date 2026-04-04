@@ -1,0 +1,294 @@
+<mujoco model="dual_tianji">
+  <option timestep="0.001" gravity="0 0 -9.80665" integrator="implicitfast" />
+  <compiler angle="radian" meshdir="../assets" autolimits="true" />
+
+  <default>
+    <default class="tianji">
+      <joint armature="0.1" damping="1" />
+      <position inheritrange="1" />
+      <default class="visual">
+        <geom type="mesh" group="2" contype="0" conaffinity="0" />
+      </default>
+      <default class="collision">
+        <geom group="3" type="mesh" />
+      </default>
+      <site size="0.001" rgba="0.5 0.5 0.5 0.3" group="4" />
+    </default>
+  </default>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.2 0.2 0.2" width="512" height="3072" />
+
+    <!-- Left arm meshes -->
+    <mesh name="base_l" file="Base_L.STL" />
+    <mesh name="link1_l" file="Link1_L.STL" />
+    <mesh name="link2_l" file="Link2_L.STL" />
+    <mesh name="link3_l" file="Link3_L.STL" />
+    <mesh name="link4_l" file="Link4_L.STL" />
+    <mesh name="link5_l" file="Link5_L.STL" />
+    <mesh name="link6_l" file="Link6_L.STL" />
+    <mesh name="link7_l" file="Link7_L.STL" />
+
+    <!-- Right arm meshes -->
+    <mesh name="base_r" file="Base_R.STL" />
+    <mesh name="link1_r" file="Link1_R.STL" />
+    <mesh name="link2_r" file="Link2_R.STL" />
+    <mesh name="link3_r" file="Link3_R.STL" />
+    <mesh name="link4_r" file="Link4_R.STL" />
+    <mesh name="link5_r" file="Link5_R.STL" />
+    <mesh name="link6_r" file="Link6_R.STL" />
+    <mesh name="link7_r" file="Link7_R.STL" />
+
+    <!-- Materials -->
+    <material name="white" rgba="1 1 1 1" />
+    <material name="off_white" rgba="0.901961 0.921569 0.929412 1" />
+    <material name="black" rgba="0.2 0.2 0.2 1" />
+    <material name="metal" rgba="0.58 0.58 0.58 1" />
+    <material name="gray" rgba="0.863156 0.863156 0.863157 1" />
+    <material name="red" rgba="1 0.072272 0.039546 1" />
+    <material name="green" rgba="0.0 1.0 0.0 1" />
+    <material name="blue" rgba="0.0 0.0 1.0 1" />
+  </asset>
+
+  <contact>
+    <!-- Arm 0 (Left) contact exclusions -->
+    <exclude body1="tianji_base_0" body2="tianji_link1_0" />
+    <exclude body1="tianji_link1_0" body2="tianji_link2_0" />
+    <exclude body1="tianji_link2_0" body2="tianji_link3_0" />
+    <exclude body1="tianji_link3_0" body2="tianji_link4_0" />
+    <exclude body1="tianji_link4_0" body2="tianji_link5_0" />
+    <exclude body1="tianji_link5_0" body2="tianji_link6_0" />
+    <exclude body1="tianji_link6_0" body2="tianji_link7_0" />
+    <exclude body1="tianji_link5_0" body2="tianji_link7_0" />
+    <!-- Arm 1 (Right) contact exclusions -->
+    <exclude body1="tianji_base_1" body2="tianji_link1_1" />
+    <exclude body1="tianji_link1_1" body2="tianji_link2_1" />
+    <exclude body1="tianji_link2_1" body2="tianji_link3_1" />
+    <exclude body1="tianji_link3_1" body2="tianji_link4_1" />
+    <exclude body1="tianji_link4_1" body2="tianji_link5_1" />
+    <exclude body1="tianji_link5_1" body2="tianji_link6_1" />
+    <exclude body1="tianji_link6_1" body2="tianji_link7_1" />
+    <exclude body1="tianji_link5_1" body2="tianji_link7_1" />
+  </contact>
+
+  <worldbody>
+    <!-- Arm 0 (Left) -->
+    <body name="base_0" pos="0 0.1 1.2" euler="-1.5708 0 0" childclass="tianji">
+      <geom type="cylinder" size="0.002 0.1" rgba="1 0 0 1" pos="0.1 0 0" euler="0 1.57079 0" class="visual" />
+      <geom type="cylinder" size="0.002 0.1" rgba="0 1 0 1" pos="0 0.1 0" euler="1.57079 0 0" class="visual" />
+      <geom type="cylinder" size="0.002 0.1" rgba="0 0 1 1" pos="0 0 0.1" euler="0 0 0" class="visual" />
+      <body name="tianji_base_0">
+        <inertial pos="0.00032267 4.798e-05 0.04066353" mass="1.1962"
+                  fullinertia="0.00107329 0.00107003 0.00127315 -1.68e-06 -1.05e-05 -3.43e-06" />
+        <geom mesh="base_l" material="white" class="visual" />
+        <geom name="tianji_base_collision_0" mesh="base_l" class="collision" />
+        <body name="tianji_link1_0" pos="0 0 0.1745">
+          <site name="shoulderSite_0" pos="0 0 0" rgba="1 0 0 1" />
+          <inertial pos="0.00002347 0.0055715 -0.03075998" mass="1.9705"
+                    fullinertia="0.00492293 0.00526513 0.00188107 0.0000055 0.00000193 0.00033232" />
+          <joint name="tianji_joint1_0" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-108 108" />
+          <geom mesh="link1_l" material="white" class="visual" />
+          <geom name="tianji_link1_collision_0" mesh="link1_l" class="collision" />
+          <body name="tianji_link2_0" quat="1 1 0 0">
+            <inertial pos="0.00013483 0.0617046 0.00950639" mass="2.24398"
+                      fullinertia="0.01194933 0.00361581 0.01098356 0.00000336 0.00000091 -0.00132804" />
+            <joint name="tianji_joint2_0" axis="0 0 1" range="-2.0944 2.0944" actuatorfrcrange="-108 108" />
+            <geom mesh="link2_l" material="white" class="visual" />
+            <geom name="tianji_link2_collision_0" mesh="link2_l" class="collision" />
+            <body name="tianji_link3_0" pos="0 0.287 0" quat="1 -1 0 0">
+              <inertial pos="0.00968562 0.00246599 -0.04627302" mass="1.9242"
+                        fullinertia="0.00718224 0.00762563 0.00178597 0.00004413 0.00089552 0.00022096" />
+              <joint name="tianji_joint3_0" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-66 66" />
+              <geom mesh="link3_l" material="white" class="visual" />
+              <geom name="tianji_link3_collision_0" mesh="link3_l" class="collision" />
+              <body name="tianji_link4_0" pos="0.018 0 0" quat="0 0 -1 1">
+                <site name="elbowSite_0" pos="0 0 0" rgba="1 0 0 1" />
+                <inertial pos="0.00850411 -0.04718223 0.00941509" mass="1.6085"
+                          fullinertia="0.0058048 0.00223807 0.0053306 -0.00066669 -0.00012722 0.00070523" />
+                <joint name="tianji_joint4_0" axis="0 0 1" range="-2.5307 1.0472" actuatorfrcrange="-66 66" />
+                <geom mesh="link4_l" material="white" class="visual" />
+                <geom name="tianji_link4_collision_0" mesh="link4_l" class="collision" />
+                <body name="tianji_link5_0" pos="0.018 -0.314 0" quat="0 0 -1 1">
+                  <inertial pos="0.00051127 0.00101064 -0.11271739" mass="2.0883"
+                            fullinertia="0.00626603 0.00564387 0.00243632 0.00004009 0.00005338 -0.00006193" />
+                  <joint name="tianji_joint5_0" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-18 18" />
+                  <geom mesh="link5_l" material="white" class="visual" />
+                  <geom name="tianji_link5_collision_0" mesh="link5_l" class="collision" />
+                  <body name="tianji_link6_0" quat="1 1 -1 1">
+                    <site name="wristSite_0" pos="0 0 0" rgba="1 0 0 1" />
+                    <inertial pos="0.00032659 0.00531336 -0.00030182" mass="0.72496"
+                              fullinertia="0.0004604 0.00051716 0.00042521 0.00000189 0.00000083 -0.00000346" />
+                    <joint name="tianji_joint6_0" axis="0 0 1" range="-1.0472 1.0472" actuatorfrcrange="-18 18" />
+                    <geom mesh="link6_l" material="white" class="visual" />
+                    <geom name="tianji_link6_collision_0" mesh="link6_l" class="collision" />
+                    <body name="tianji_link7_0" quat="1 1 -1 1">
+                      <inertial pos="-0.00009108 -0.03153255 0.00889371" mass="0.68606"
+                                fullinertia="0.00173687 0.00089035 0.00139406 -0.00000345 -0.00000116 0.0003068" />
+                      <joint name="tianji_joint7_0" axis="0 0 1" range="-1.5708 1.5708" actuatorfrcrange="-18 18" />
+                      <geom mesh="link7_l" material="white" class="visual" />
+                      <geom name="tianji_link7_collision_0" mesh="link7_l" class="collision" />
+                      <body name="tf1_0" pos="0 -0.06 0" euler="-1.5708 0 0">
+                        <site name="EE_0" pos="0 0 0" rgba="1 0 0 1" />
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- Arm 1 (Right) -->
+    <body name="base_1" pos="0 -0.1 1.2" euler="1.5708 0 0" childclass="tianji">
+      <geom type="cylinder" size="0.002 0.1" rgba="1 0 0 1" pos="0.1 0 0" euler="0 1.57079 0" class="visual" />
+      <geom type="cylinder" size="0.002 0.1" rgba="0 1 0 1" pos="0 0.1 0" euler="1.57079 0 0" class="visual" />
+      <geom type="cylinder" size="0.002 0.1" rgba="0 0 1 1" pos="0 0 0.1" euler="0 0 0" class="visual" />
+      <body name="tianji_base_1">
+        <inertial pos="0.00032267 4.798e-05 0.04066353" mass="1.1962"
+                  fullinertia="0.00107329 0.00107003 0.00127315 -1.68e-06 -1.05e-05 -3.43e-06" />
+        <geom mesh="base_r" material="white" class="visual" />
+        <geom name="tianji_base_collision_1" mesh="base_r" class="collision" />
+        <body name="tianji_link1_1" pos="0 0 0.1745">
+          <site name="shoulderSite_1" pos="0 0 0" rgba="1 0 0 1" />
+          <inertial pos="0.00002347 0.0055715 -0.03075998" mass="1.9705"
+                    fullinertia="0.00492293 0.00526513 0.00188107 0.0000055 0.00000193 0.00033232" />
+          <joint name="tianji_joint1_1" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-108 108" />
+          <geom mesh="link1_r" material="white" class="visual" />
+          <geom name="tianji_link1_collision_1" mesh="link1_r" class="collision" />
+          <body name="tianji_link2_1" quat="1 1 0 0">
+            <inertial pos="0.00013483 0.0617046 0.00950639" mass="2.24398"
+                      fullinertia="0.01194933 0.00361581 0.01098356 0.00000336 0.00000091 -0.00132804" />
+            <joint name="tianji_joint2_1" axis="0 0 1" range="-2.0944 2.0944" actuatorfrcrange="-108 108" />
+            <geom mesh="link2_r" material="white" class="visual" />
+            <geom name="tianji_link2_collision_1" mesh="link2_r" class="collision" />
+            <body name="tianji_link3_1" pos="0 0.287 0" quat="1 -1 0 0">
+              <inertial pos="0.00968562 0.00246599 -0.04627302" mass="1.9242"
+                        fullinertia="0.00718224 0.00762563 0.00178597 0.00004413 0.00089552 0.00022096" />
+              <joint name="tianji_joint3_1" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-66 66" />
+              <geom mesh="link3_r" material="white" class="visual" />
+              <geom name="tianji_link3_collision_1" mesh="link3_r" class="collision" />
+              <body name="tianji_link4_1" pos="0.018 0 0" quat="0 0 -1 1">
+                <site name="elbowSite_1" pos="0 0 0" rgba="1 0 0 1" />
+                <inertial pos="0.00850411 -0.04718223 0.00941509" mass="1.6085"
+                          fullinertia="0.0058048 0.00223807 0.0053306 -0.00066669 -0.00012722 0.00070523" />
+                <joint name="tianji_joint4_1" axis="0 0 1" range="-2.5307 1.0472" actuatorfrcrange="-66 66" />
+                <geom mesh="link4_r" material="white" class="visual" />
+                <geom name="tianji_link4_collision_1" mesh="link4_r" class="collision" />
+                <body name="tianji_link5_1" pos="0.018 -0.314 0" quat="0 0 -1 1">
+                  <inertial pos="-0.00051127 -0.00101064 -0.11271739" mass="2.0883"
+                            fullinertia="0.00626603 0.00564387 0.00243632 0.00004009 -0.00005338 0.00006193" />
+                  <joint name="tianji_joint5_1" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-18 18" />
+                  <geom mesh="link5_r" material="white" class="visual" />
+                  <geom name="tianji_link5_collision_1" mesh="link5_r" class="collision" />
+                  <body name="tianji_link6_1" quat="1 1 -1 1">
+                    <site name="wristSite_1" pos="0 0 0" rgba="1 0 0 1" />
+                    <inertial pos="0.00032659 -0.00531336 0.00030182" mass="0.72496"
+                              fullinertia="0.0004604 0.00051716 0.00042521 -0.00000189 -0.00000083 -0.00000346" />
+                    <joint name="tianji_joint6_1" axis="0 0 1" range="-1.0472 1.0472" actuatorfrcrange="-18 18" />
+                    <geom mesh="link6_r" material="white" class="visual" />
+                    <geom name="tianji_link6_collision_1" mesh="link6_r" class="collision" />
+                    <body name="tianji_link7_1" quat="1 1 -1 1">
+                      <inertial pos="-0.00009108 -0.03153255 0.00889371" mass="0.68606"
+                                fullinertia="0.00173687 0.00089035 0.00139406 -0.00000345 -0.00000116 0.0003068" />
+                      <joint name="tianji_joint7_1" axis="0 0 1" range="-1.5708 1.5708" actuatorfrcrange="-18 18" />
+                      <geom mesh="link7_r" material="white" class="visual" />
+                      <geom name="tianji_link7_collision_1" mesh="link7_r" class="collision" />
+                      <body name="tf1_1" pos="0 -0.06 0" euler="-1.5708 0 0">
+                        <site name="EE_1" pos="0 0 0" rgba="1 0 0 1" />
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <!-- Arm 0 (Left) -->
+    <position class="tianji" name="lj1_0" joint="tianji_joint1_0" kp="4500" kv="450" />
+    <position class="tianji" name="lj2_0" joint="tianji_joint2_0" kp="4500" kv="450" />
+    <position class="tianji" name="lj3_0" joint="tianji_joint3_0" kp="3500" kv="350" />
+    <position class="tianji" name="lj4_0" joint="tianji_joint4_0" kp="3500" kv="350" />
+    <position class="tianji" name="lj5_0" joint="tianji_joint5_0" kp="2000" kv="200" />
+    <position class="tianji" name="lj6_0" joint="tianji_joint6_0" kp="2000" kv="200" />
+    <position class="tianji" name="lj7_0" joint="tianji_joint7_0" kp="2000" kv="200" />
+    <!-- Arm 1 (Right) -->
+    <position class="tianji" name="lj1_1" joint="tianji_joint1_1" kp="4500" kv="450" />
+    <position class="tianji" name="lj2_1" joint="tianji_joint2_1" kp="4500" kv="450" />
+    <position class="tianji" name="lj3_1" joint="tianji_joint3_1" kp="3500" kv="350" />
+    <position class="tianji" name="lj4_1" joint="tianji_joint4_1" kp="3500" kv="350" />
+    <position class="tianji" name="lj5_1" joint="tianji_joint5_1" kp="2000" kv="200" />
+    <position class="tianji" name="lj6_1" joint="tianji_joint6_1" kp="2000" kv="200" />
+    <position class="tianji" name="lj7_1" joint="tianji_joint7_1" kp="2000" kv="200" />
+  </actuator>
+
+  <sensor>
+    <!-- Arm 0 (Left) sensors -->
+    <framepos name="eePos_0" objtype="site" objname="EE_0" />
+    <framequat name="eeQuat_0" objtype="site" objname="EE_0" />
+    <framelinvel name="eeLinVel_0" objtype="site" objname="EE_0" />
+    <frameangvel name="eeAngVel_0" objtype="site" objname="EE_0" />
+    <jointpos name="tianji_joint1_pos_0" joint="tianji_joint1_0" />
+    <jointpos name="tianji_joint2_pos_0" joint="tianji_joint2_0" />
+    <jointpos name="tianji_joint3_pos_0" joint="tianji_joint3_0" />
+    <jointpos name="tianji_joint4_pos_0" joint="tianji_joint4_0" />
+    <jointpos name="tianji_joint5_pos_0" joint="tianji_joint5_0" />
+    <jointpos name="tianji_joint6_pos_0" joint="tianji_joint6_0" />
+    <jointpos name="tianji_joint7_pos_0" joint="tianji_joint7_0" />
+    <jointvel name="tianji_joint1_vel_0" joint="tianji_joint1_0" />
+    <jointvel name="tianji_joint2_vel_0" joint="tianji_joint2_0" />
+    <jointvel name="tianji_joint3_vel_0" joint="tianji_joint3_0" />
+    <jointvel name="tianji_joint4_vel_0" joint="tianji_joint4_0" />
+    <jointvel name="tianji_joint5_vel_0" joint="tianji_joint5_0" />
+    <jointvel name="tianji_joint6_vel_0" joint="tianji_joint6_0" />
+    <jointvel name="tianji_joint7_vel_0" joint="tianji_joint7_0" />
+    <actuatorfrc name="lj1_frc_0" actuator="lj1_0" />
+    <actuatorfrc name="lj2_frc_0" actuator="lj2_0" />
+    <actuatorfrc name="lj3_frc_0" actuator="lj3_0" />
+    <actuatorfrc name="lj4_frc_0" actuator="lj4_0" />
+    <actuatorfrc name="lj5_frc_0" actuator="lj5_0" />
+    <actuatorfrc name="lj6_frc_0" actuator="lj6_0" />
+    <actuatorfrc name="lj7_frc_0" actuator="lj7_0" />
+    <!-- Arm 1 (Right) sensors -->
+    <framepos name="eePos_1" objtype="site" objname="EE_1" />
+    <framequat name="eeQuat_1" objtype="site" objname="EE_1" />
+    <framelinvel name="eeLinVel_1" objtype="site" objname="EE_1" />
+    <frameangvel name="eeAngVel_1" objtype="site" objname="EE_1" />
+    <jointpos name="tianji_joint1_pos_1" joint="tianji_joint1_1" />
+    <jointpos name="tianji_joint2_pos_1" joint="tianji_joint2_1" />
+    <jointpos name="tianji_joint3_pos_1" joint="tianji_joint3_1" />
+    <jointpos name="tianji_joint4_pos_1" joint="tianji_joint4_1" />
+    <jointpos name="tianji_joint5_pos_1" joint="tianji_joint5_1" />
+    <jointpos name="tianji_joint6_pos_1" joint="tianji_joint6_1" />
+    <jointpos name="tianji_joint7_pos_1" joint="tianji_joint7_1" />
+    <jointvel name="tianji_joint1_vel_1" joint="tianji_joint1_1" />
+    <jointvel name="tianji_joint2_vel_1" joint="tianji_joint2_1" />
+    <jointvel name="tianji_joint3_vel_1" joint="tianji_joint3_1" />
+    <jointvel name="tianji_joint4_vel_1" joint="tianji_joint4_1" />
+    <jointvel name="tianji_joint5_vel_1" joint="tianji_joint5_1" />
+    <jointvel name="tianji_joint6_vel_1" joint="tianji_joint6_1" />
+    <jointvel name="tianji_joint7_vel_1" joint="tianji_joint7_1" />
+    <actuatorfrc name="lj1_frc_1" actuator="lj1_1" />
+    <actuatorfrc name="lj2_frc_1" actuator="lj2_1" />
+    <actuatorfrc name="lj3_frc_1" actuator="lj3_1" />
+    <actuatorfrc name="lj4_frc_1" actuator="lj4_1" />
+    <actuatorfrc name="lj5_frc_1" actuator="lj5_1" />
+    <actuatorfrc name="lj6_frc_1" actuator="lj6_1" />
+    <actuatorfrc name="lj7_frc_1" actuator="lj7_1" />
+  </sensor>
+
+  <keyframe>
+    <!-- qpos: j1-7_0, j1-7_1 (14 total) -->
+    <!-- ctrl: lj1-7_0, lj1-7_1 (14 total) -->
+    <key name="home" qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+    <key name="standby1" qpos="0 0 0 -1.0 0 0 0 0 0 0 -1.0 0 0 0" ctrl="0 0 0 -1.0 0 0 0 0 0 0 -1.0 0 0 0" />
+    <key name="standby2" qpos="0 0 0 -1.0 0 0 0 0 0 0 -1.0 0 0 0" ctrl="0 0 0 -1.0 0 0 0 0 0 0 -1.0 0 0 0" />
+  </keyframe>
+
+</mujoco>

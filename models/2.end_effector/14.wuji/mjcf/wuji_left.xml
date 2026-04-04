@@ -1,0 +1,21 @@
+<mujoco model="wuji_left">
+  <compiler angle="radian" meshdir="../assets/left/" balanceinertia="true" />
+
+  <option integrator="implicitfast" impratio="10" cone="elliptic" />
+
+  <include file="wuji_defaults.xml" />
+  <include file="wuji_left_assets.xml" />
+
+  <worldbody>
+    <body name="left_palm_link" pos="0 0 0">
+      <include file="wuji_left_links.xml" />
+    </body>
+  </worldbody>
+
+  <include file="wuji_left_actuators.xml" />
+  <include file="wuji_left_contacts.xml" />
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+  </keyframe>
+</mujoco>

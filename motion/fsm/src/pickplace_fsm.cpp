@@ -175,10 +175,10 @@ void PickPlaceFsm::generatePrePoses() {
 }
 
 bool PickPlaceFsm::createTrajectory(const data::Pose &start, const data::Pose &end) {
-  ctx_.currentTrajectory = std::make_unique<EEPoseTrajGen>(ctx_.dt);
-  double velLimit = 4.0 * ctx_.limits.velMax;
-  double accLimit = 2.0 * ctx_.limits.accMax;
-  ctx_.currentTrajectory->setTcpLimits(velLimit, accLimit);
+  EEPoseTrajLimits limits;
+  limits.tcpSpeedMax = 4.0 * ctx_.limits.velMax;
+  limits.tcpAccMax   = 2.0 * ctx_.limits.accMax;
+  ctx_.currentTrajectory = std::make_unique<EEPoseTrajGen>(ctx_.dt, limits);
   ctx_.currentTrajectory->setStartState(start.pos, start.quat);
   ctx_.currentTrajectory->setTargetState(end.pos, end.quat);
   ctx_.currentTrajectory->update();

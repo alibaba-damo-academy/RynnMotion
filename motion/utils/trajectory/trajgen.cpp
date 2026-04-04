@@ -1,13 +1,19 @@
 #include "trajgen.hpp"
 
-EEPoseTrajGen::EEPoseTrajGen(double dt) :
-    TrajGen<4>(dt) {
-  maxTcpSpeed_ = std::numeric_limits<double>::max();
-  maxTcpAcc_ = std::numeric_limits<double>::max();
+EEPoseTrajGen::EEPoseTrajGen(double dt)
+    : EEPoseTrajGen(dt, EEPoseTrajLimits{}) {}
 
-  input_.max_velocity << 2.0, 2.0, 2.0, 20.0;      // [x, y, z, angle] - 10x scaling for angle
-  input_.max_acceleration << 5.0, 5.0, 5.0, 50.0;  // [x, y, z, angle] - 10x scaling for angle
-  input_.max_jerk << 20.0, 20.0, 20.0, 200.0;      // [x, y, z, angle] - 10x scaling for angle
+EEPoseTrajGen::EEPoseTrajGen(double dt, const EEPoseTrajLimits &limits)
+    : TrajGen<4>(dt), angularScale_(limits.saturationAngularScale) {
+  maxTcpSpeed_ = limits.tcpSpeedMax;
+  maxTcpAcc_ = limits.tcpAccMax;
+
+  input_.max_velocity << limits.linearVelMax, limits.linearVelMax, limits.linearVelMax,
+      limits.linearVelMax * limits.angularScale;
+  input_.max_acceleration << limits.linearAccMax, limits.linearAccMax, limits.linearAccMax,
+      limits.linearAccMax * limits.angularScale;
+  input_.max_jerk << limits.linearJerkMax, limits.linearJerkMax, limits.linearJerkMax,
+      limits.linearJerkMax * limits.angularScale;
 
   currQuat_ = Eigen::Quaterniond::Identity();
   targetQuat_ = Eigen::Quaterniond::Identity();
@@ -57,8 +63,14 @@ void EEPoseTrajGen::setTargetState(const Eigen::Vector3d &pos1, const Eigen::Qua
                                    const Eigen::Vector4d &acc) {
   targetQuat_ = quat1;
 
+  /*
   // Calculate action quaternion and extract angle-axis
   Eigen::Quaterniond actionQuat = currQuat_.inverse() * quat1;
+  Eigen::AngleAxisd actionAxisAngle(actionQuat);
+  actionAxis_ = actionAxisAngle.axis();
+  totalActionAngle_ = actionAxisAngle.angle();
+  */
+  Eigen::Quaterniond actionQuat = targetQuat_ * currQuat_.inverse(); // cal delta quat in base frame
   Eigen::AngleAxisd actionAxisAngle(actionQuat);
   actionAxis_ = actionAxisAngle.axis();
   totalActionAngle_ = actionAxisAngle.angle();
@@ -78,6 +90,7 @@ std::pair<Eigen::Vector3d, Eigen::Quaterniond> EEPoseTrajGen::getCurrPose() cons
   // Get current position from 4DOF output (first 3 components)
   Eigen::Vector3d pos = output_.new_position.head<3>();
 
+  /*
   // Get current angle from 4DOF output (4th component)
   double currentAngle = output_.new_position(3);
 
@@ -87,7 +100,9 @@ std::pair<Eigen::Vector3d, Eigen::Quaterniond> EEPoseTrajGen::getCurrPose() cons
 
   // Apply action to original quaternion
   Eigen::Quaterniond quat = currQuat_ * actionQuat;
+  */
 
+  Eigen::Quaterniond quat = currQuat_;
   return std::make_pair(pos, quat);
 }
 
@@ -99,21 +114,38 @@ Eigen::Vector3d EEPoseTrajGen::getCurrAcc() const {
   return output_.new_acceleration.head<3>();
 }
 
+Eigen::Vector3d EEPoseTrajGen::getCurrAngularVel() const {
+  return output_.new_velocity(3) * actionAxis_;
+}
+
+Eigen::Vector3d EEPoseTrajGen::getCurrAngularAcc() const {
+  return output_.new_acceleration(3) * actionAxis_;
+}
+
 Result EEPoseTrajGen::update() {
+  Eigen::Quaterniond quat = currQuat_;
+
   Result result = TrajGen<4>::update();
+
+  // update current quaternion based on output angle
+  Eigen::Quaterniond delta_quat = targetQuat_ * quat.inverse();
+  Eigen::AngleAxisd angle_axis(delta_quat);
+  input_.target_position(3) = angle_axis.angle();
+  
+  angle_axis.angle() = output_.new_position(3);
+  Eigen::Quaterniond eeQuat_cmd = Eigen::Quaterniond(angle_axis) * quat;
+  currQuat_ = eeQuat_cmd;
+  input_.current_position(3) = 0.0;
+  output_.new_position(3) = 0.0;
+
   return result;
 }
 
 void EEPoseTrajGen::applySaturation() {
-  // Always ensure angular axis has reasonable limits relative to linear axes
-  // The constructor sets defaults: vel=[2,2,2,1], acc=[5,5,5,5], jerk=[20,20,20,20]
-  // But angular should have higher limits to not constrain rotational motion
-  
-  // Set reasonable angular limits (10x scaling factor)
-  double angular_vel_scale = 10.0;
-  double angular_acc_scale = 10.0;
-  double angular_jerk_scale = 10.0;
-  
+  double angular_vel_scale = angularScale_;
+  double angular_acc_scale = angularScale_;
+  double angular_jerk_scale = angularScale_;
+
   if (maxTcpSpeed_ < std::numeric_limits<double>::max()) {
     // Set TCP speed limit for first 3 axes (x, y, z)
     input_.max_velocity.head<3>().setConstant(maxTcpSpeed_);
@@ -123,7 +155,7 @@ void EEPoseTrajGen::applySaturation() {
     // Use default linear velocity but scaled angular velocity
     input_.max_velocity(3) = input_.max_velocity(0) * angular_vel_scale;
   }
-  
+
   if (maxTcpAcc_ < std::numeric_limits<double>::max()) {
     // Set TCP acceleration limit for first 3 axes (x, y, z)
     input_.max_acceleration.head<3>().setConstant(maxTcpAcc_);
@@ -133,8 +165,21 @@ void EEPoseTrajGen::applySaturation() {
     // Use default linear acceleration but scaled angular acceleration
     input_.max_acceleration(3) = input_.max_acceleration(0) * angular_acc_scale;
   }
-  
+
   // Always set reasonable jerk limits for angular motion
   // Use the current linear jerk limit as base
   input_.max_jerk(3) = input_.max_jerk(0) * angular_jerk_scale;
+
+  // Clamp target velocity and acceleration
+  for (size_t i = 0; i < 4; ++i) {
+    if (std::abs(this->input_.target_velocity[i]) > this->input_.max_velocity[i]) {
+      this->input_.target_velocity[i] = std::clamp(this->input_.target_velocity[i],
+                                                   -this->input_.max_velocity[i], this->input_.max_velocity[i]);
+    }
+    // Acceleration clamping
+    if (std::abs(this->input_.target_acceleration[i]) > this->input_.max_acceleration[i]) {
+      this->input_.target_acceleration[i] = std::clamp(this->input_.target_acceleration[i],
+                                                       -this->input_.max_acceleration[i], this->input_.max_acceleration[i]);
+    }
+  }
 }

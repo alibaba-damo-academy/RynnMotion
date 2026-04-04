@@ -1,0 +1,19 @@
+<mujoco model="sharpa_wave_right">
+  <compiler angle="radian" meshdir="../assets/right/" fusestatic="false" />
+
+  <option integrator="implicitfast" impratio="10" cone="elliptic" />
+
+  <include file="sharpa_wave_defaults.xml" />
+  <include file="sharpa_wave_right_assets.xml" />
+
+  <worldbody>
+    <include file="sharpa_wave_right_links.xml" />
+  </worldbody>
+
+  <include file="sharpa_wave_right_actuators.xml" />
+  <include file="sharpa_wave_right_contacts.xml" />
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" ctrl="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+  </keyframe>
+</mujoco>

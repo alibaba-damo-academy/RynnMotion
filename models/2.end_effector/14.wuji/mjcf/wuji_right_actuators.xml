@@ -1,0 +1,24 @@
+<mujoco>
+  <actuator>
+    <position name="wuji_f1j1" joint="finger1_joint1" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f1j2" joint="finger1_joint2" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f1j3" joint="finger1_joint3" ctrlrange="-1.57 1.57" kp="1" forcerange="-1.5 1.5" />
+    <position name="wuji_f1j4" joint="finger1_joint4" ctrlrange="-1.57 1.57" kp="0.8" forcerange="-1 1" />
+    <position name="wuji_f2j1" joint="finger2_joint1" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f2j2" joint="finger2_joint2" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f2j3" joint="finger2_joint3" ctrlrange="-1.57 1.57" kp="1" forcerange="-1.5 1.5" />
+    <position name="wuji_f2j4" joint="finger2_joint4" ctrlrange="-1.57 1.57" kp="0.8" forcerange="-1 1" />
+    <position name="wuji_f3j1" joint="finger3_joint1" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f3j2" joint="finger3_joint2" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f3j3" joint="finger3_joint3" ctrlrange="-1.57 1.57" kp="1" forcerange="-1.5 1.5" />
+    <position name="wuji_f3j4" joint="finger3_joint4" ctrlrange="-1.57 1.57" kp="0.8" forcerange="-1 1" />
+    <position name="wuji_f4j1" joint="finger4_joint1" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f4j2" joint="finger4_joint2" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f4j3" joint="finger4_joint3" ctrlrange="-1.57 1.57" kp="1" forcerange="-1.5 1.5" />
+    <position name="wuji_f4j4" joint="finger4_joint4" ctrlrange="-1.57 1.57" kp="0.8" forcerange="-1 1" />
+    <position name="wuji_f5j1" joint="finger5_joint1" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f5j2" joint="finger5_joint2" ctrlrange="-1.57 1.57" kp="2" forcerange="-3 3" />
+    <position name="wuji_f5j3" joint="finger5_joint3" ctrlrange="-1.57 1.57" kp="1" forcerange="-1.5 1.5" />
+    <position name="wuji_f5j4" joint="finger5_joint4" ctrlrange="-1.57 1.57" kp="0.8" forcerange="-1 1" />
+  </actuator>
+</mujoco>

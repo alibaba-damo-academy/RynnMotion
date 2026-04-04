@@ -1,0 +1,45 @@
+<mujoco model="dual_tianji scene">
+  <include file="../mjcf/dual_tianji_robot.xml" />
+
+  <statistic center="0 0 0.5" extent="1.2" meansize="0.05" />
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+    <global azimuth="135" elevation="-20" />
+    <quality shadowsize="8192" />
+  </visual>
+
+  <asset>
+    <mesh file="../../../environments/tablelegs.obj" />
+    <mesh file="../../../environments/tabletop.obj" />
+
+    <texture type="2d" name="groundplane" builtin="flat" mark="edge" rgb1="0.1 0.1 0.1" rgb2="0.3 0.5 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+    <texture type="2d" file="../../../environments/small_meta_table_diffuse.png" />
+
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2" />
+    <material name="table" texture="small_meta_table_diffuse" />
+  </asset>
+
+  <worldbody>
+    <!-- World origin markers -->
+    <geom type="cylinder" size="0.002 0.05" rgba="1 0 0 1" pos="0.05 0 0" euler="0 1.57079 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.05" rgba="0 1 0 1" pos="0 0.05 0" euler="1.57079 0 0" class="visual" />
+    <geom type="cylinder" size="0.002 0.05" rgba="0 0 1 1" pos="0 0 0.05" euler="0 0 0" class="visual" />
+
+    <!-- Lighting -->
+    <light pos="0 0.1 2.5" />
+
+    <!-- Floor -->
+    <geom name="floor" size="10 10 0.05" type="plane" material="groundplane" />
+    <site name="worldref" />
+
+    <!-- Table -->
+    <geom mesh="tabletop" material="table" class="visual" />
+    <geom mesh="tablelegs" material="table" class="visual" />
+    <geom name="table" pos="0 0 0.65" size="0.61 0.37 0.1" type="box" class="collision" />
+
+    <!-- Cameras -->
+    <camera name="overhead_cam" focal="1.93e-3 1.93e-3" resolution="1280 720" sensorsize="3896e-6 2140e-6" pos="-1.5 0 2" euler="0 -1 -1.57079" />
+  </worldbody>
+
+</mujoco>

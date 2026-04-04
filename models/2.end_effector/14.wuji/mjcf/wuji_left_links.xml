@@ -1,0 +1,134 @@
+<body name="left_palm_link" pos="0 0 0">
+  <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_palm_link"/>
+  <geom class="collision" mesh="left_palm_link_collision"/>
+  <body name="left_finger1_link1" pos="0.0085244 -0.020575 0.028712" quat="0.881629 0.118908 -0.18344 -0.41826">
+    <inertial pos="0.0077866 -0.0015915 0.0021115" quat="0.0725907 0.409871 0.0968367 0.904079" mass="0.0075" diaginertia="4.71239e-07 4.51521e-07 3.0738e-07"/>
+    <joint name="left_finger1_joint1" pos="0 0 0" axis="0 0 1" range="-0.0448 1.6508" actuatorfrcrange="-0.6 0.6"/>
+    <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger1_link1"/>
+    <geom class="collision" mesh="left_finger1_link1_collision"/>
+    <body name="left_finger1_link2" pos="0.014132 -0.0047549 0.0060191" quat="0.616975 -0.726254 0.085657 -0.290793">
+      <inertial pos="0.015665 0.0011444 2.8617e-05" quat="-0.0919293 0.698622 -0.0965336 0.702964" mass="0.0248" diaginertia="4.9026e-06 4.7837e-06 1.18441e-06"/>
+      <joint name="left_finger1_joint2" pos="0 0 0" axis="0 0 -1" range="-0.1659 0.9339" actuatorfrcrange="-0.6 0.6"/>
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger1_link2"/>
+      <geom class="collision" mesh="left_finger1_link2_collision"/>
+      <body name="left_finger1_link3" pos="0.034664 0.00018873 0.0009916" quat="0.577822 0.815748 -0.0212383 -0.0150032">
+        <inertial pos="0.013057 -0.0011233 1.7104e-05" quat="0.494553 0.494388 0.506207 0.504729" mass="0.0165" diaginertia="3.17356e-06 3.1014e-06 9.78765e-07"/>
+        <joint name="left_finger1_joint3" pos="0 0 0" axis="0 0 1" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger1_link3"/>
+        <geom class="collision" mesh="left_finger1_link3_collision"/>
+        <body name="left_finger1_link4" pos="0.0295 0 0.00025125">
+          <inertial pos="0.00727837 0.00432412 -0.000386483" quat="0.454267 0.544246 -0.436752 0.553792" mass="0.0205" diaginertia="4.2831e-06 3.77159e-06 1.58969e-06"/>
+          <joint name="left_finger1_joint4" pos="0 0 0" axis="0 0 1" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger1_link4"/>
+          <geom class="collision" mesh="left_finger1_link4_collision"/>
+          <geom pos="0.0283 -0.0010446 -0.00024656" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger1_tip_link"/>
+          <geom pos="0.0283 -0.0010446 -0.00024656" quat="1 0 0 0" class="collision" mesh="left_finger1_tip_link_collision"/>
+        </body>
+      </body>
+    </body>
+  </body>
+  <body name="left_finger2_link1" pos="-0.0058701 -0.029434 0.091917" quat="0.623021 0.0209033 -0.0622932 0.779441">
+    <inertial pos="8.5597e-09 0.0013292 0.00031986" quat="0.660907 0.251399 -0.251399 0.660907" mass="0.0032" diaginertia="9.68521e-08 6.6291e-08 5.00669e-08"/>
+    <joint name="left_finger2_joint1" pos="0 0 0" axis="1 0 0" range="-0.32695 1.636" actuatorfrcrange="-1 1"/>
+    <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger2_link1"/>
+    <geom class="collision" mesh="left_finger2_link1_collision"/>
+    <body name="left_finger2_link2" pos="0 -0.0022 0.004" quat="0.499998 0.5 -0.5 0.500002">
+      <inertial pos="0.020911 4.1956e-07 -0.0061576" quat="0.506775 0.493083 0.492221 0.507708" mass="0.033" diaginertia="1.1709e-05 1.16756e-05 1.62655e-06"/>
+      <joint name="left_finger2_joint2" pos="0 0 0" axis="0 0 -1" range="-0.495 0.495" actuatorfrcrange="-0.2 0.2"/>
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger2_link2"/>
+      <geom class="collision" mesh="left_finger2_link2_collision"/>
+      <body name="left_finger2_link3" pos="0.043618 0 -0.00475" quat="0.707212 0.707002 0 0">
+        <inertial pos="0.015762 -0.0011212 4.4346e-06" quat="0.507821 0.508803 0.491682 0.491412" mass="0.0165" diaginertia="4.14996e-07 4.0546e-07 1.25144e-07"/>
+        <joint name="left_finger2_joint3" pos="0 0 0" axis="0 0 1" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger2_link3"/>
+        <geom class="collision" mesh="left_finger2_link3_collision"/>
+        <body name="left_finger2_link4" pos="0.0295 0 0">
+          <inertial pos="0.00307359 0.00513561 -0.00020745" quat="0.417291 0.592781 -0.361674 0.586235" mass="0.018" diaginertia="3.53232e-06 3.4693e-06 9.72597e-07"/>
+          <joint name="left_finger2_joint4" pos="0 0 0" axis="0 0 1" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger2_link4"/>
+          <geom class="collision" mesh="left_finger2_link4_collision"/>
+          <geom pos="0.0267 -0.00105 0" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger2_tip_link"/>
+          <geom pos="0.0267 -0.00105 0" quat="1 0 0 0" class="collision" mesh="left_finger2_tip_link_collision"/>
+        </body>
+      </body>
+    </body>
+  </body>
+  <body name="left_finger3_link1" pos="-0.01046 -0.0074615 0.089544" quat="0.706645 -0.0308347 -0.0308521 0.706222">
+    <inertial pos="8.8518e-09 0.0013292 0.00031987" quat="0.660907 0.251399 -0.251399 0.660907" mass="0.0032" diaginertia="9.68521e-08 6.6291e-08 5.00669e-08"/>
+    <joint name="left_finger3_joint1" pos="0 0 0" axis="1 0 0" range="-0.32695 1.63595" actuatorfrcrange="-1 1"/>
+    <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger3_link1"/>
+    <geom class="collision" mesh="left_finger3_link1_collision"/>
+    <body name="left_finger3_link2" pos="0 -0.0022 0.004" quat="0.499998 0.5 -0.5 0.500002">
+      <inertial pos="0.020911 4.1751e-07 -0.0061576" quat="0.506787 0.493071 0.492232 0.507696" mass="0.033" diaginertia="1.1709e-05 1.16756e-05 1.62655e-06"/>
+      <joint name="left_finger3_joint2" pos="0 0 0" axis="0 0 -1" range="-0.495 0.495" actuatorfrcrange="-0.2 0.2"/>
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger3_link2"/>
+      <geom class="collision" mesh="left_finger3_link2_collision"/>
+      <body name="left_finger3_link3" pos="0.043618 0 -0.00475" quat="0.707212 0.707002 0 0">
+        <inertial pos="0.015762 -0.0011212 4.4348e-06" quat="0.507822 0.508802 0.491683 0.491412" mass="0.0165" diaginertia="3.23694e-06 3.1626e-06 9.76126e-07"/>
+        <joint name="left_finger3_joint3" pos="0 0 0" axis="0 0 1" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger3_link3"/>
+        <geom class="collision" mesh="left_finger3_link3_collision"/>
+        <body name="left_finger3_link4" pos="0.0295 0 0">
+          <inertial pos="0.00307316 0.00513873 0.000127932" quat="0.385935 0.595353 -0.392931 0.58499" mass="0.018" diaginertia="3.53208e-06 3.46963e-06 9.72672e-07"/>
+          <joint name="left_finger3_joint4" pos="0 0 0" axis="0 0 1" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger3_link4"/>
+          <geom class="collision" mesh="left_finger3_link4_collision"/>
+          <geom pos="0.0267 -0.0010501 0" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger3_tip_link"/>
+          <geom pos="0.0267 -0.0010501 0" quat="1 0 0 0" class="collision" mesh="left_finger3_tip_link_collision"/>
+        </body>
+      </body>
+    </body>
+  </body>
+  <body name="left_finger4_link1" pos="-0.0076649 0.013712 0.084429" quat="0.72351 -0.0612989 0.00389903 0.687576">
+    <inertial pos="8.6118e-09 0.0013292 0.00031987" quat="0.660907 0.251399 -0.251399 0.660907" mass="0.0032" diaginertia="9.68521e-08 6.6291e-08 5.00669e-08"/>
+    <joint name="left_finger4_joint1" pos="0 0 0" axis="1 0 0" range="-0.32695 1.63595" actuatorfrcrange="-1 1"/>
+    <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger4_link1"/>
+    <geom class="collision" mesh="left_finger4_link1_collision"/>
+    <body name="left_finger4_link2" pos="0 -0.0022 0.004" quat="0.499998 0.5 -0.5 0.500002">
+      <inertial pos="0.020911 4.1777e-07 -0.0061576" quat="0.506786 0.493072 0.492232 0.507697" mass="0.033" diaginertia="1.1709e-05 1.16756e-05 1.62655e-06"/>
+      <joint name="left_finger4_joint2" pos="0 0 0" axis="0 0 -1" range="-0.495 0.495" actuatorfrcrange="-0.2 0.2"/>
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger4_link2"/>
+      <geom class="collision" mesh="left_finger4_link2_collision"/>
+      <body name="left_finger4_link3" pos="0.043618 0 -0.00475" quat="0.707212 0.707002 0 0">
+        <inertial pos="0.015762 -0.0011212 4.435e-06" quat="0.507822 0.508802 0.491683 0.491411" mass="0.0165" diaginertia="3.23694e-06 3.1626e-06 9.76126e-07"/>
+        <joint name="left_finger4_joint3" pos="0 0 0" axis="0 0 1" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger4_link3"/>
+        <geom class="collision" mesh="left_finger4_link3_collision"/>
+        <body name="left_finger4_link4" pos="0.0295 0 0">
+          <inertial pos="0.00307362 0.00486421 -0.0017588" quat="0.541688 0.550505 -0.237025 0.589354" mass="0.018" diaginertia="3.54001e-06 3.45779e-06 9.64397e-07"/>
+          <joint name="left_finger4_joint4" pos="0 0 0" axis="0 0 1" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger4_link4"/>
+          <geom class="collision" mesh="left_finger4_link4_collision"/>
+          <geom pos="0.0267 -0.0010573 0" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger4_tip_link"/>
+          <geom pos="0.0267 -0.0010573 0" quat="1 0 0 0" class="collision" mesh="left_finger4_tip_link_collision"/>
+        </body>
+      </body>
+    </body>
+  </body>
+  <body name="left_finger5_link1" pos="-0.0022687 0.034001 0.074281" quat="0.75916 -0.0973277 0.0431286 0.64214">
+    <inertial pos="8.147e-09 0.0013292 0.00031987" quat="0.660908 0.251398 -0.251398 0.660908" mass="0.0032" diaginertia="9.68511e-08 6.6291e-08 5.00679e-08"/>
+    <joint name="left_finger5_joint1" pos="0 0 0" axis="1 0 0" range="-0.32695 1.636" actuatorfrcrange="-1 1"/>
+    <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger5_link1"/>
+    <geom class="collision" mesh="left_finger5_link1_collision"/>
+    <body name="left_finger5_link2" pos="0 -0.0022 0.004" quat="0.499987 0.500013 -0.499989 0.500011">
+      <inertial pos="0.020911 4.2003e-07 -0.0061576" quat="0.506786 0.493072 0.492231 0.507697" mass="0.033" diaginertia="1.1709e-05 1.16756e-05 1.62655e-06"/>
+      <joint name="left_finger5_joint2" pos="0 0 0" axis="0 0 -1" range="-0.495 0.495" actuatorfrcrange="-0.2 0.2"/>
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger5_link2"/>
+      <geom class="collision" mesh="left_finger5_link2_collision"/>
+      <body name="left_finger5_link3" pos="0.043618 0 -0.00475" quat="0.707212 0.707002 0 0">
+        <inertial pos="0.015762 -0.0011212 4.4351e-06" quat="0.507822 0.508802 0.491683 0.491412" mass="0.0165" diaginertia="3.23694e-06 3.1626e-06 9.76126e-07"/>
+        <joint name="left_finger5_joint3" pos="0 0 0" axis="0 0 1" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger5_link3"/>
+        <geom class="collision" mesh="left_finger5_link3_collision"/>
+        <body name="left_finger5_link4" pos="0.0295 0 0">
+          <inertial pos="0.0030736 0.00513298 -0.000269801" quat="0.423083 0.592097 -0.355901 0.586307" mass="0.018" diaginertia="3.53251e-06 3.46922e-06 9.72517e-07"/>
+          <joint name="left_finger5_joint4" pos="0 0 0" axis="0 0 1" range="-0.4932 1.6272" actuatorfrcrange="-0.3 0.3"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger5_link4"/>
+          <geom class="collision" mesh="left_finger5_link4_collision"/>
+          <geom pos="0.0267 -0.0010582 0" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.89804 0.91765 0.92941 1" mesh="left_finger5_tip_link"/>
+          <geom pos="0.0267 -0.0010582 0" quat="1 0 0 0" class="collision" mesh="left_finger5_tip_link_collision"/>
+        </body>
+      </body>
+    </body>
+  </body>
+</body>

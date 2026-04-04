@@ -1,0 +1,145 @@
+<mujoco model="dual_tianji">
+  <compiler angle="radian" />
+
+  <default>
+    <default class="tianji">
+      <joint armature="0.1" damping="1" />
+      <position inheritrange="1" />
+      <default class="visual">
+        <geom type="mesh" group="2" contype="0" conaffinity="0" />
+      </default>
+      <site size="0.001" rgba="0.5 0.5 0.5 0.3" group="4" />
+    </default>
+  </default>
+
+  <asset>
+    <material name="white" rgba="1 1 1 1" />
+    <material name="off_white" rgba="0.901961 0.921569 0.929412 1" />
+    <material name="black" rgba="0.2 0.2 0.2 1" />
+    <material name="metal" rgba="0.58 0.58 0.58 1" />
+    <material name="gray" rgba="0.863156 0.863156 0.863157 1" />
+  </asset>
+
+  <worldbody>
+    <body name="dual_base">
+      <inertial pos="0 0 0" mass="0.001" diaginertia="0.001 0.001 0.001" />
+
+      <!-- Arm 0 (Left) -->
+      <body name="base_0" pos="0 0.1 1.2" euler="-1.5708 0 0" childclass="tianji">
+        <body name="tianji_base_0">
+          <body name="tianji_link1_0" pos="0 0 0.1745">
+            <inertial pos="0.00002347 0.0055715 -0.03075998" mass="1.9705"
+                      fullinertia="0.00492293 0.00526513 0.00188107 0.0000055 0.00000193 0.00033232" />
+            <joint name="tianji_joint1_0" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-108 108" />
+            <body name="tianji_link2_0" quat="1 1 0 0">
+              <inertial pos="0.00013483 0.0617046 0.00950639" mass="2.24398"
+                        fullinertia="0.01194933 0.00361581 0.01098356 0.00000336 0.00000091 -0.00132804" />
+              <joint name="tianji_joint2_0" axis="0 0 1" range="-2.0944 2.0944" actuatorfrcrange="-108 108" />
+              <body name="tianji_link3_0" pos="0 0.287 0" quat="1 -1 0 0">
+                <inertial pos="0.00968562 0.00246599 -0.04627302" mass="1.9242"
+                          fullinertia="0.00718224 0.00762563 0.00178597 0.00004413 0.00089552 0.00022096" />
+                <joint name="tianji_joint3_0" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-66 66" />
+                <body name="tianji_link4_0" pos="0.018 0 0" quat="0 0 -1 1">
+                  <site name="elbowSite_0" pos="0 0 0" rgba="1 0 0 1" />
+                  <inertial pos="0.00850411 -0.04718223 0.00941509" mass="1.6085"
+                            fullinertia="0.0058048 0.00223807 0.0053306 -0.00066669 -0.00012722 0.00070523" />
+                  <joint name="tianji_joint4_0" axis="0 0 1" range="-2.5307 1.0472" actuatorfrcrange="-66 66" />
+                  <body name="tianji_link5_0" pos="0.018 -0.314 0" quat="0 0 -1 1">
+                    <inertial pos="0.00051127 0.00101064 -0.11271739" mass="2.0883"
+                              fullinertia="0.00626603 0.00564387 0.00243632 0.00004009 0.00005338 -0.00006193" />
+                    <joint name="tianji_joint5_0" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-18 18" />
+                    <body name="tianji_link6_0" quat="1 1 -1 1">
+                      <inertial pos="0.00032659 0.00531336 -0.00030182" mass="0.72496"
+                                fullinertia="0.0004604 0.00051716 0.00042521 0.00000189 0.00000083 -0.00000346" />
+                      <joint name="tianji_joint6_0" axis="0 0 1" range="-1.0472 1.0472" actuatorfrcrange="-18 18" />
+                      <body name="tianji_link7_0" quat="1 1 -1 1">
+                        <inertial pos="-0.00009108 -0.03153255 0.00889371" mass="0.68606"
+                                  fullinertia="0.00173687 0.00089035 0.00139406 -0.00000345 -0.00000116 0.0003068" />
+                        <joint name="tianji_joint7_0" axis="0 0 1" range="-1.5708 1.5708" actuatorfrcrange="-18 18" />
+
+                        <site name="EE_0" pos="0 -0.06 0" euler="-1.5708 0 0" rgba="1 0 0 1" />
+
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- Arm 1 (Right) -->
+      <body name="base_1" pos="0 -0.1 1.2" euler="1.5708 0 0" childclass="tianji">
+        <body name="tianji_base_1">
+          <body name="tianji_link1_1" pos="0 0 0.1745">
+            <inertial pos="0.00002347 0.0055715 -0.03075998" mass="1.9705"
+                      fullinertia="0.00492293 0.00526513 0.00188107 0.0000055 0.00000193 0.00033232" />
+            <joint name="tianji_joint1_1" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-108 108" />
+            <body name="tianji_link2_1" quat="1 1 0 0">
+              <inertial pos="0.00013483 0.0617046 0.00950639" mass="2.24398"
+                        fullinertia="0.01194933 0.00361581 0.01098356 0.00000336 0.00000091 -0.00132804" />
+              <joint name="tianji_joint2_1" axis="0 0 1" range="-2.0944 2.0944" actuatorfrcrange="-108 108" />
+              <body name="tianji_link3_1" pos="0 0.287 0" quat="1 -1 0 0">
+                <inertial pos="0.00968562 0.00246599 -0.04627302" mass="1.9242"
+                          fullinertia="0.00718224 0.00762563 0.00178597 0.00004413 0.00089552 0.00022096" />
+                <joint name="tianji_joint3_1" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-66 66" />
+                <body name="tianji_link4_1" pos="0.018 0 0" quat="0 0 -1 1">
+                  <site name="elbowSite_1" pos="0 0 0" rgba="1 0 0 1" />
+                  <inertial pos="0.00850411 -0.04718223 0.00941509" mass="1.6085"
+                            fullinertia="0.0058048 0.00223807 0.0053306 -0.00066669 -0.00012722 0.00070523" />
+                  <joint name="tianji_joint4_1" axis="0 0 1" range="-2.5307 1.0472" actuatorfrcrange="-66 66" />
+                  <body name="tianji_link5_1" pos="0.018 -0.314 0" quat="0 0 -1 1">
+                    <inertial pos="-0.00051127 -0.00101064 -0.11271739" mass="2.0883"
+                              fullinertia="0.00626603 0.00564387 0.00243632 0.00004009 -0.00005338 0.00006193" />
+                    <joint name="tianji_joint5_1" axis="0 0 1" range="-3.1067 3.1067" actuatorfrcrange="-18 18" />
+                    <body name="tianji_link6_1" quat="1 1 -1 1">
+                      <inertial pos="0.00032659 -0.00531336 0.00030182" mass="0.72496"
+                                fullinertia="0.0004604 0.00051716 0.00042521 -0.00000189 -0.00000083 -0.00000346" />
+                      <joint name="tianji_joint6_1" axis="0 0 1" range="-1.0472 1.0472" actuatorfrcrange="-18 18" />
+                      <body name="tianji_link7_1" quat="1 1 -1 1">
+                        <inertial pos="-0.00009108 -0.03153255 0.00889371" mass="0.68606"
+                                  fullinertia="0.00173687 0.00089035 0.00139406 -0.00000345 -0.00000116 0.0003068" />
+                        <joint name="tianji_joint7_1" axis="0 0 1" range="-1.5708 1.5708" actuatorfrcrange="-18 18" />
+
+                        <site name="EE_1" pos="0 -0.06 0" euler="-1.5708 0 0" rgba="1 0 0 1" />
+
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>    <!-- Close dual_base -->
+  </worldbody>
+
+  <actuator>
+    <!-- Arm 0 (Left) Actuators -->
+    <position class="tianji" name="lj1_0" joint="tianji_joint1_0" kp="4500" kv="450" />
+    <position class="tianji" name="lj2_0" joint="tianji_joint2_0" kp="4500" kv="450" />
+    <position class="tianji" name="lj3_0" joint="tianji_joint3_0" kp="3500" kv="350" />
+    <position class="tianji" name="lj4_0" joint="tianji_joint4_0" kp="3500" kv="350" />
+    <position class="tianji" name="lj5_0" joint="tianji_joint5_0" kp="2000" kv="200" />
+    <position class="tianji" name="lj6_0" joint="tianji_joint6_0" kp="2000" kv="200" />
+    <position class="tianji" name="lj7_0" joint="tianji_joint7_0" kp="2000" kv="200" />
+
+    <!-- Arm 1 (Right) Actuators -->
+    <position class="tianji" name="lj1_1" joint="tianji_joint1_1" kp="4500" kv="450" />
+    <position class="tianji" name="lj2_1" joint="tianji_joint2_1" kp="4500" kv="450" />
+    <position class="tianji" name="lj3_1" joint="tianji_joint3_1" kp="3500" kv="350" />
+    <position class="tianji" name="lj4_1" joint="tianji_joint4_1" kp="3500" kv="350" />
+    <position class="tianji" name="lj5_1" joint="tianji_joint5_1" kp="2000" kv="200" />
+    <position class="tianji" name="lj6_1" joint="tianji_joint6_1" kp="2000" kv="200" />
+    <position class="tianji" name="lj7_1" joint="tianji_joint7_1" kp="2000" kv="200" />
+  </actuator>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+    <key name="standby1" qpos="0 0 0 -1.0 0 0 0 0 0 0 -1.0 0 0 0" />
+    <key name="standby2" qpos="0 0 0 -1.0 0 0 0 0 0 0 -1.0 0 0 0" />
+  </keyframe>
+
+</mujoco>

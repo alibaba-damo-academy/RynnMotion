@@ -21,6 +21,7 @@ set(SOURCE_FILES
     module/teleopfollow/teleop_follow.cpp
     module/teleopfollow/fr3_teleopfollow.cpp
     module/joint/fr3_jointmove.cpp
+    module/joint/rizon_joint_move.cpp
     interface/interface_base.cpp
     fsm/src/motion_fsm.cpp
     runtime/scene_manager.cpp
@@ -48,6 +49,9 @@ if(CROSS_COMPILE)
 else()
     message(STATUS "libmotion, Native compilation")
     add_library(${LIBRARY_NAME} SHARED ${SOURCE_FILES})
+    if(APPLE)
+        mujoco_fix_rpath(${LIBRARY_NAME})
+    endif()
 
     if(BUILD_DEPLOY)
         add_library(${LIBRARY_NAME}_static STATIC ${SOURCE_FILES})

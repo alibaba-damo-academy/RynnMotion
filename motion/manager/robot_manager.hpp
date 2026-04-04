@@ -13,6 +13,12 @@ typedef struct mjModel_ mjModel;
 
 namespace rynn {
 
+struct SensorInfo {
+  std::string name;
+  int index;
+  int dim;
+};
+
 /**
  * @brief Enumerates the MuJoCo actuator control modes
  */
@@ -109,6 +115,41 @@ public:
   int getNumSites() const;
   bool hasSites() const;
 
+  // Sensor info (from MJCF, detected by MjcfParser)
+  std::vector<SensorInfo> getForceSensors() const;
+  std::vector<SensorInfo> getTorqueSensors() const;
+  std::vector<SensorInfo> getGyroSensors() const;
+  std::vector<SensorInfo> getAccelerometerSensors() const;
+  std::vector<SensorInfo> getRangefinderSensors() const;
+  std::vector<SensorInfo> getFramePosSensors() const;
+  std::vector<SensorInfo> getFrameQuatSensors() const;
+  std::vector<SensorInfo> getTouchSensors() const;
+  void setSensors(const std::vector<SensorInfo> &force,
+                  const std::vector<SensorInfo> &torque,
+                  const std::vector<SensorInfo> &gyro,
+                  const std::vector<SensorInfo> &accel,
+                  const std::vector<SensorInfo> &rangefinder,
+                  const std::vector<SensorInfo> &framePos,
+                  const std::vector<SensorInfo> &frameQuat,
+                  const std::vector<SensorInfo> &touch = {});
+
+  bool isDexHand() const;
+  void setIsDexHand(bool isDexHand);
+
+  // Camera info (from MJCF, detected by MjcfParser)
+  int getNumCameras() const;
+  std::vector<std::string> getCameraNames() const;
+  void setCameraNames(const std::vector<std::string> &cameraNames);
+
+  // Joint/actuator names (from MJCF, detected by MjcfParser)
+  std::vector<std::string> getJointNames() const;
+  std::vector<std::string> getEENames() const;
+  void setActuatorNames(const std::vector<std::string> &jointNames,
+                        const std::vector<std::string> &eeNames);
+
+  // Keyframe names getter (existing _keyframeNames)
+  std::vector<std::string> getKeyframeNames() const;
+
   // Phase 5: All static conversion methods REMOVED
   // Use RobotDiscovery::getInstance().getRobotInfo() instead
 
@@ -143,6 +184,24 @@ private:
 
   // Site names (from MJCF, extracted via MuJoCo API)
   std::vector<std::string> _siteNames;
+
+  // Sensor info (from MJCF)
+  std::vector<SensorInfo> _forceSensors;
+  std::vector<SensorInfo> _torqueSensors;
+  std::vector<SensorInfo> _gyroSensors;
+  std::vector<SensorInfo> _accelSensors;
+  std::vector<SensorInfo> _rangefinderSensors;
+  std::vector<SensorInfo> _framePosSensors;
+  std::vector<SensorInfo> _frameQuatSensors;
+  std::vector<SensorInfo> _touchSensors;
+  bool _isDexHand{false};
+
+  // Camera names (from MJCF)
+  std::vector<std::string> _cameraNames;
+
+  // Actuator names (from MJCF)
+  std::vector<std::string> _jointNames;
+  std::vector<std::string> _eeNames;
 };
 
 } // namespace rynn

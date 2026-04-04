@@ -1,0 +1,57 @@
+<mujoco>
+  <compiler meshdir="../assets/left/" />
+  <asset>
+    <mesh name="left_palm_link" content_type="model/stl" file="palm_link.STL"/>
+    <mesh name="left_palm_link_collision" content_type="model/stl" file="palm_link_collision.STL"/>
+    <mesh name="left_finger1_link1" content_type="model/stl" file="finger1_link1.STL"/>
+    <mesh name="left_finger1_link1_collision" content_type="model/stl" file="finger1_link1_collision.STL"/>
+    <mesh name="left_finger1_link2" content_type="model/stl" file="finger1_link2.STL"/>
+    <mesh name="left_finger1_link2_collision" content_type="model/stl" file="finger1_link2_collision.STL"/>
+    <mesh name="left_finger1_link3" content_type="model/stl" file="finger1_link3.STL"/>
+    <mesh name="left_finger1_link3_collision" content_type="model/stl" file="finger1_link3_collision.STL"/>
+    <mesh name="left_finger1_link4" content_type="model/stl" file="finger1_link4.STL"/>
+    <mesh name="left_finger1_link4_collision" content_type="model/stl" file="finger1_link4_collision.STL"/>
+    <mesh name="left_finger1_tip_link" content_type="model/stl" file="finger1_tip_link.STL"/>
+    <mesh name="left_finger1_tip_link_collision" content_type="model/stl" file="finger1_tip_link_collision.STL"/>
+    <mesh name="left_finger2_link1" content_type="model/stl" file="finger2_link1.STL"/>
+    <mesh name="left_finger2_link1_collision" content_type="model/stl" file="finger2_link1_collision.STL"/>
+    <mesh name="left_finger2_link2" content_type="model/stl" file="finger2_link2.STL"/>
+    <mesh name="left_finger2_link2_collision" content_type="model/stl" file="finger2_link2_collision.STL"/>
+    <mesh name="left_finger2_link3" content_type="model/stl" file="finger2_link3.STL"/>
+    <mesh name="left_finger2_link3_collision" content_type="model/stl" file="finger2_link3_collision.STL"/>
+    <mesh name="left_finger2_link4" content_type="model/stl" file="finger2_link4.STL"/>
+    <mesh name="left_finger2_link4_collision" content_type="model/stl" file="finger2_link4_collision.STL"/>
+    <mesh name="left_finger2_tip_link" content_type="model/stl" file="finger2_tip_link.STL"/>
+    <mesh name="left_finger2_tip_link_collision" content_type="model/stl" file="finger2_tip_link_collision.STL"/>
+    <mesh name="left_finger3_link1" content_type="model/stl" file="finger3_link1.STL"/>
+    <mesh name="left_finger3_link1_collision" content_type="model/stl" file="finger3_link1_collision.STL"/>
+    <mesh name="left_finger3_link2" content_type="model/stl" file="finger3_link2.STL"/>
+    <mesh name="left_finger3_link2_collision" content_type="model/stl" file="finger3_link2_collision.STL"/>
+    <mesh name="left_finger3_link3" content_type="model/stl" file="finger3_link3.STL"/>
+    <mesh name="left_finger3_link3_collision" content_type="model/stl" file="finger3_link3_collision.STL"/>
+    <mesh name="left_finger3_link4" content_type="model/stl" file="finger3_link4.STL"/>
+    <mesh name="left_finger3_link4_collision" content_type="model/stl" file="finger3_link4_collision.STL"/>
+    <mesh name="left_finger3_tip_link" content_type="model/stl" file="finger3_tip_link.STL"/>
+    <mesh name="left_finger3_tip_link_collision" content_type="model/stl" file="finger3_tip_link_collision.STL"/>
+    <mesh name="left_finger4_link1" content_type="model/stl" file="finger4_link1.STL"/>
+    <mesh name="left_finger4_link1_collision" content_type="model/stl" file="finger4_link1_collision.STL"/>
+    <mesh name="left_finger4_link2" content_type="model/stl" file="finger4_link2.STL"/>
+    <mesh name="left_finger4_link2_collision" content_type="model/stl" file="finger4_link2_collision.STL"/>
+    <mesh name="left_finger4_link3" content_type="model/stl" file="finger4_link3.STL"/>
+    <mesh name="left_finger4_link3_collision" content_type="model/stl" file="finger4_link3_collision.STL"/>
+    <mesh name="left_finger4_link4" content_type="model/stl" file="finger4_link4.STL"/>
+    <mesh name="left_finger4_link4_collision" content_type="model/stl" file="finger4_link4_collision.STL"/>
+    <mesh name="left_finger4_tip_link" content_type="model/stl" file="finger4_tip_link.STL"/>
+    <mesh name="left_finger4_tip_link_collision" content_type="model/stl" file="finger4_tip_link_collision.STL"/>
+    <mesh name="left_finger5_link1" content_type="model/stl" file="finger5_link1.STL"/>
+    <mesh name="left_finger5_link1_collision" content_type="model/stl" file="finger5_link1_collision.STL"/>
+    <mesh name="left_finger5_link2" content_type="model/stl" file="finger5_link2.STL"/>
+    <mesh name="left_finger5_link2_collision" content_type="model/stl" file="finger5_link2_collision.STL"/>
+    <mesh name="left_finger5_link3" content_type="model/stl" file="finger5_link3.STL"/>
+    <mesh name="left_finger5_link3_collision" content_type="model/stl" file="finger5_link3_collision.STL"/>
+    <mesh name="left_finger5_link4" content_type="model/stl" file="finger5_link4.STL"/>
+    <mesh name="left_finger5_link4_collision" content_type="model/stl" file="finger5_link4_collision.STL"/>
+    <mesh name="left_finger5_tip_link" content_type="model/stl" file="finger5_tip_link.STL"/>
+    <mesh name="left_finger5_tip_link_collision" content_type="model/stl" file="finger5_tip_link_collision.STL"/>
+  </asset>
+</mujoco>

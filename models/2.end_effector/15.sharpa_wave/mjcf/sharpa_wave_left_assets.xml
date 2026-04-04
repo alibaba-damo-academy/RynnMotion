@@ -1,0 +1,29 @@
+<mujoco>
+  <compiler meshdir="../assets/left/" />
+  <asset>
+    <mesh name="left_hand_C_MC_visual" file="left_hand_C_MC_visual_.STL"/>
+    <mesh name="left_hand_C_MC" file="left_hand_C_MC.STL"/>
+    <mesh name="left_thumb_CMC_VL_visual" file="left_thumb_CMC_VL.STL"/>
+    <mesh name="left_thumb_MC_visual" file="left_thumb_MC_visual.STL"/>
+    <mesh name="left_thumb_MC" file="left_thumb_MC.STL"/>
+    <mesh name="left_thumb_MCP_VL_visual" file="left_thumb_MCP_VL_visual.STL"/>
+    <mesh name="left_thumb_PP_visual" file="left_thumb_PP_visual.STL"/>
+    <mesh name="left_thumb_PP" file="left_thumb_PP.STL"/>
+    <mesh name="left_thumb_DP_visual" file="left_thumb_DP_visual.STL"/>
+    <mesh name="left_thumb_DP" file="left_thumb_DP.STL"/>
+    <mesh name="left_thumb_elastomer_surface" file="thumb_elastomer_surface.STL"/>
+    <mesh name="left_thumb_elastomer" file="thumb_elastomer.STL"/>
+    <mesh name="left_MCP_VL_visual" file="left_MCP_VL_visual.STL"/>
+    <mesh name="left_MCP_VL" file="MCP_VL.STL"/>
+    <mesh name="left_PP_visual" file="left_PP_visual.STL"/>
+    <mesh name="left_PP" file="left_PP.STL"/>
+    <mesh name="left_MP_visual" file="left_MP_visual.STL"/>
+    <mesh name="left_MP" file="left_MP.STL"/>
+    <mesh name="left_DP_visual" file="left_DP_visual.STL"/>
+    <mesh name="left_DP" file="left_DP.STL"/>
+    <mesh name="left_elastomer_surface" file="elastomer_surface.STL"/>
+    <mesh name="left_elastomer" file="elastomer.STL"/>
+    <mesh name="left_pinky_MC_visual" file="left_pinky_MC_visual.STL"/>
+    <mesh name="left_pinky_MC" file="left_pinky_MC.STL"/>
+  </asset>
+</mujoco>

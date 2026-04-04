@@ -1,0 +1,28 @@
+<mujoco>
+  <contact>
+    <exclude body1="left_palm_link" body2="left_finger1_link1"/>
+    <exclude body1="left_palm_link" body2="left_finger2_link1"/>
+    <exclude body1="left_palm_link" body2="left_finger3_link1"/>
+    <exclude body1="left_palm_link" body2="left_finger4_link1"/>
+    <exclude body1="left_palm_link" body2="left_finger5_link1"/>
+    <exclude body1="left_palm_link" body2="left_finger2_link2"/>
+    <exclude body1="left_palm_link" body2="left_finger3_link2"/>
+    <exclude body1="left_palm_link" body2="left_finger4_link2"/>
+    <exclude body1="left_palm_link" body2="left_finger5_link2"/>
+    <exclude body1="left_finger1_link1" body2="left_finger1_link2"/>
+    <exclude body1="left_finger1_link2" body2="left_finger1_link3"/>
+    <exclude body1="left_finger1_link3" body2="left_finger1_link4"/>
+    <exclude body1="left_finger2_link1" body2="left_finger2_link2"/>
+    <exclude body1="left_finger2_link2" body2="left_finger2_link3"/>
+    <exclude body1="left_finger2_link3" body2="left_finger2_link4"/>
+    <exclude body1="left_finger3_link1" body2="left_finger3_link2"/>
+    <exclude body1="left_finger3_link2" body2="left_finger3_link3"/>
+    <exclude body1="left_finger3_link3" body2="left_finger3_link4"/>
+    <exclude body1="left_finger4_link1" body2="left_finger4_link2"/>
+    <exclude body1="left_finger4_link2" body2="left_finger4_link3"/>
+    <exclude body1="left_finger4_link3" body2="left_finger4_link4"/>
+    <exclude body1="left_finger5_link1" body2="left_finger5_link2"/>
+    <exclude body1="left_finger5_link2" body2="left_finger5_link3"/>
+    <exclude body1="left_finger5_link3" body2="left_finger5_link4"/>
+  </contact>
+</mujoco>

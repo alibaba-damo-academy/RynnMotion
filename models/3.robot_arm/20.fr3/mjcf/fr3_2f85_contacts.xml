@@ -1,0 +1,12 @@
+<mujoco model="fr3_2f85_contacts">
+
+  <contact>
+    <!-- FR3 arm contact exclusions -->
+    <exclude body1="fr3_link5" body2="fr3_link7"/>
+    <exclude body1="fr3_link6" body2="fr3_link7"/>
+    <exclude body1="fr3_link5" body2="fr3_link6"/>
+    <exclude body1="fr3_link7" body2="base_mount"/>
+    <exclude body1="fr3_link7" body2="gripper_base"/>
+  </contact>
+
+</mujoco>

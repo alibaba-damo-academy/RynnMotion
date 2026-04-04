@@ -11,6 +11,33 @@
 
 using namespace ruckig;
 
+namespace trajgen {
+constexpr double kUnconstrainedLimit = 1e3;
+constexpr double kDefaultLinearVelLimit  = 2.0;
+constexpr double kDefaultLinearAccLimit  = 5.0;
+constexpr double kDefaultLinearJerkLimit = 20.0;
+constexpr double kDefaultAngularScale           = 10.0;
+constexpr double kDefaultSaturationAngularScale = 6.0;
+} // namespace trajgen
+
+struct JointTrajLimits {
+  Eigen::VectorXd velMax;
+  Eigen::VectorXd accMax;
+  Eigen::VectorXd jerkMax;
+  Eigen::VectorXd posUpper;
+  Eigen::VectorXd posLower;
+};
+
+struct EEPoseTrajLimits {
+  double linearVelMax  = trajgen::kDefaultLinearVelLimit;
+  double linearAccMax  = trajgen::kDefaultLinearAccLimit;
+  double linearJerkMax = trajgen::kDefaultLinearJerkLimit;
+  double angularScale  = trajgen::kDefaultAngularScale;
+  double saturationAngularScale = trajgen::kDefaultSaturationAngularScale;
+  double tcpSpeedMax   = std::numeric_limits<double>::max();
+  double tcpAccMax     = std::numeric_limits<double>::max();
+};
+
 enum class JointConstraintMode {
   PositionVelocity,
   PositionVelocityAcc,
@@ -82,11 +109,33 @@ class JointTrajGen : public TrajGen<DOFs> {
 public:
   explicit JointTrajGen(double dt) :
       TrajGen<DOFs>(dt) {
-    qUpperLimits_.setConstant(1e3);
-    qLowerLimits_.setConstant(-1e3);
-    qdMax_.setConstant(1e3);
-    qddMax_.setConstant(1e3);
-    qdddMax_.setConstant(1e3);
+    qUpperLimits_.setConstant(trajgen::kUnconstrainedLimit);
+    qLowerLimits_.setConstant(-trajgen::kUnconstrainedLimit);
+    qdMax_.setConstant(trajgen::kUnconstrainedLimit);
+    qddMax_.setConstant(trajgen::kUnconstrainedLimit);
+    qdddMax_.setConstant(trajgen::kUnconstrainedLimit);
+  }
+
+  JointTrajGen(double dt, const JointTrajLimits &limits) :
+      TrajGen<DOFs>(dt) {
+    qUpperLimits_.setConstant(trajgen::kUnconstrainedLimit);
+    qLowerLimits_.setConstant(-trajgen::kUnconstrainedLimit);
+    qdMax_.setConstant(trajgen::kUnconstrainedLimit);
+    qddMax_.setConstant(trajgen::kUnconstrainedLimit);
+    qdddMax_.setConstant(trajgen::kUnconstrainedLimit);
+
+    if (limits.velMax.size() == static_cast<int>(DOFs)) {
+      if (limits.accMax.size() == static_cast<int>(DOFs) && limits.jerkMax.size() == static_cast<int>(DOFs)) {
+        setJointMotionLimits(limits.velMax, limits.accMax, limits.jerkMax);
+      } else if (limits.accMax.size() == static_cast<int>(DOFs)) {
+        setJointMotionLimits(limits.velMax, limits.accMax);
+      } else {
+        setJointMotionLimits(limits.velMax);
+      }
+    }
+    if (limits.posUpper.size() == static_cast<int>(DOFs) && limits.posLower.size() == static_cast<int>(DOFs)) {
+      setJointPosLimits(limits.posUpper, limits.posLower);
+    }
   }
 
   void setStartState(const Eigen::VectorXd &pos,
@@ -177,6 +226,7 @@ private:
 class EEPoseTrajGen : public TrajGen<4> {
 public:
   explicit EEPoseTrajGen(double dt);
+  EEPoseTrajGen(double dt, const EEPoseTrajLimits &limits);
 
   // Bring base class methods into scope to avoid hiding warnings
   using TrajGen<4>::setStartState;
@@ -227,6 +277,14 @@ public:
   /// @return Current linear acceleration
   Eigen::Vector3d getCurrAcc() const;
 
+  /// @brief Get current angular velocity
+  /// @return Current angular velocity
+  Eigen::Vector3d getCurrAngularVel() const;
+
+  /// @brief Get current angular acceleration
+  /// @return Current angular acceleration
+  Eigen::Vector3d getCurrAngularAcc() const;
+
   Result update();
 
 protected:
@@ -235,6 +293,7 @@ protected:
 private:
   double maxTcpSpeed_;
   double maxTcpAcc_;
+  double angularScale_;
 
   Eigen::Quaterniond currQuat_;
   Eigen::Quaterniond targetQuat_;
@@ -266,6 +325,7 @@ Result TrajGen<DOFs>::update() {
   if (result != Result::Working && result != Result::Finished) {
     auto originalTargetAcc = input_.target_acceleration;
     input_.target_acceleration.setZero();
+    input_.target_velocity.setZero();
 
     result = otg_->update(input_, output_);
 
@@ -341,10 +401,10 @@ void JointTrajGen<DOFs>::setJointMotionLimits(const Eigen::VectorXd &qdMax) {
 
   this->input_.max_velocity = qdMax;
 
-  this->input_.max_acceleration.setConstant(1e3);
-  this->input_.max_jerk.setConstant(1e3);
-  qddMax_.setConstant(1e3);
-  qdddMax_.setConstant(1e3);
+  this->input_.max_acceleration.setConstant(trajgen::kUnconstrainedLimit);
+  this->input_.max_jerk.setConstant(trajgen::kUnconstrainedLimit);
+  qddMax_.setConstant(trajgen::kUnconstrainedLimit);
+  qdddMax_.setConstant(trajgen::kUnconstrainedLimit);
 
   constraintMode_ = JointConstraintMode::PositionVelocity;
 }
@@ -360,8 +420,8 @@ void JointTrajGen<DOFs>::setJointMotionLimits(const Eigen::VectorXd &qdMax, cons
   this->input_.max_velocity = qdMax;
   this->input_.max_acceleration = qddMax;
 
-  this->input_.max_jerk.setConstant(1e3);
-  qdddMax_.setConstant(1e3);
+  this->input_.max_jerk.setConstant(trajgen::kUnconstrainedLimit);
+  qdddMax_.setConstant(trajgen::kUnconstrainedLimit);
 
   constraintMode_ = JointConstraintMode::PositionVelocityAcc;
 }
@@ -400,22 +460,22 @@ void JointTrajGen<DOFs>::setJointPosLimits(const Eigen::VectorXd &qUpperLimits,
 template <size_t DOFs>
 void JointTrajGen<DOFs>::clearJointLimits() {
   constraintMode_ = JointConstraintMode::PositionVelocity;
-  qUpperLimits_.setConstant(1e3);
-  qLowerLimits_.setConstant(-1e3);
-  qdMax_.setConstant(1e3);
-  qddMax_.setConstant(1e3);
-  qdddMax_.setConstant(1e3);
+  qUpperLimits_.setConstant(trajgen::kUnconstrainedLimit);
+  qLowerLimits_.setConstant(-trajgen::kUnconstrainedLimit);
+  qdMax_.setConstant(trajgen::kUnconstrainedLimit);
+  qddMax_.setConstant(trajgen::kUnconstrainedLimit);
+  qdddMax_.setConstant(trajgen::kUnconstrainedLimit);
 
   // Reset Ruckig limits to defaults
-  this->input_.max_velocity.setConstant(1e3);
-  this->input_.max_acceleration.setConstant(1e3);
-  this->input_.max_jerk.setConstant(1e3);
+  this->input_.max_velocity.setConstant(trajgen::kUnconstrainedLimit);
+  this->input_.max_acceleration.setConstant(trajgen::kUnconstrainedLimit);
+  this->input_.max_jerk.setConstant(trajgen::kUnconstrainedLimit);
 }
 
 template <size_t DOFs>
 void JointTrajGen<DOFs>::clearPositionLimits() {
-  qUpperLimits_.setConstant(1e3);
-  qLowerLimits_.setConstant(-1e3);
+  qUpperLimits_.setConstant(trajgen::kUnconstrainedLimit);
+  qLowerLimits_.setConstant(-trajgen::kUnconstrainedLimit);
   // Note: Don't change constraintMode_ here as velocity/acceleration limits might still be set
 }
 

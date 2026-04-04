@@ -1,0 +1,28 @@
+<mujoco>
+  <contact>
+    <exclude body1="left_hand_C_MC" body2="left_thumb_CMC_VL"/>
+    <exclude body1="left_hand_C_MC" body2="left_thumb_MC"/>
+    <exclude body1="left_hand_C_MC" body2="left_index_MCP_VL"/>
+    <exclude body1="left_hand_C_MC" body2="left_middle_MCP_VL"/>
+    <exclude body1="left_hand_C_MC" body2="left_ring_MCP_VL"/>
+    <exclude body1="left_hand_C_MC" body2="left_pinky_MC"/>
+    <exclude body1="left_thumb_MC" body2="left_thumb_MCP_VL"/>
+    <exclude body1="left_thumb_MC" body2="left_thumb_PP"/>
+    <exclude body1="left_thumb_MCP_VL" body2="left_thumb_PP"/>
+    <exclude body1="left_thumb_PP" body2="left_thumb_DP"/>
+    <exclude body1="left_index_MCP_VL" body2="left_index_PP"/>
+    <exclude body1="left_index_PP" body2="left_index_MP"/>
+    <exclude body1="left_index_MP" body2="left_index_DP"/>
+    <exclude body1="left_middle_MCP_VL" body2="left_middle_PP"/>
+    <exclude body1="left_middle_PP" body2="left_middle_MP"/>
+    <exclude body1="left_middle_MP" body2="left_middle_DP"/>
+    <exclude body1="left_ring_MCP_VL" body2="left_ring_PP"/>
+    <exclude body1="left_ring_PP" body2="left_ring_MP"/>
+    <exclude body1="left_ring_MP" body2="left_ring_DP"/>
+    <exclude body1="left_pinky_MC" body2="left_pinky_MCP_VL"/>
+    <exclude body1="left_pinky_MC" body2="left_pinky_PP"/>
+    <exclude body1="left_pinky_MCP_VL" body2="left_pinky_PP"/>
+    <exclude body1="left_pinky_PP" body2="left_pinky_MP"/>
+    <exclude body1="left_pinky_MP" body2="left_pinky_DP"/>
+  </contact>
+</mujoco>
