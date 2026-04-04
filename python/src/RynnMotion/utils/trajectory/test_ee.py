@@ -14,7 +14,7 @@ import os
 # Add the python directory to the path to import our modules
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from utils.trajectory.trajgen import EEPoseTrajGen
+from utils.trajectory.trajgen import EEPoseTrajGen, EEPoseTrajLimits
 
 
 def ee_trajgen_test1():
@@ -243,14 +243,65 @@ def ee_trajgen_test2():
     print()
 
 
+def ee_trajgen_test3_config_struct():
+    """Test 3: EEPoseTrajGen with EEPoseTrajLimits config"""
+    print("=== Test 3: EEPoseTrajGen with EEPoseTrajLimits config ===")
+
+    limits = EEPoseTrajLimits(tcp_speed_max=1.0, tcp_acc_max=3.0)
+    ee_traj = EEPoseTrajGen(0.002, limits)
+
+    ee_pos0 = np.array([0.5, 0.2, 0.8])
+    rpy0 = np.array([-0.5, -0.8, 0.2])
+    ee_quat0 = R.from_euler('xyz', rpy0)
+
+    ee_pos1 = np.array([1.2, -2.3, 2.1])
+    rpy1 = np.array([0.5, 0.8, 1.5])
+    ee_quat1 = R.from_euler('xyz', rpy1)
+
+    ee_traj.set_start_state(ee_pos0, ee_quat0)
+    ee_traj.set_target_state(ee_pos1, ee_quat1)
+
+    print(f"TCP speed limit (from config): {limits.tcp_speed_max} m/s")
+    print(f"TCP acc limit (from config): {limits.tcp_acc_max} m/s²")
+
+    step = 0
+    result = 0
+    max_observed_speed = 0.0
+
+    while result == 0:
+        result = ee_traj.update()
+        tcp_speed = ee_traj.get_curr_tcp_speed()
+        max_observed_speed = max(max_observed_speed, tcp_speed)
+        ee_traj.pass_to_input()
+        step += 1
+        if step > 10000:
+            print("Safety break: Maximum steps reached")
+            break
+
+    final_pos, final_quat = ee_traj.get_curr_pose()
+
+    print(f"Max observed TCP speed: {max_observed_speed:.3f} m/s (limit: {limits.tcp_speed_max} m/s)")
+    print(f"Final position: [{', '.join(f'{x:.3f}' for x in final_pos)}] m")
+    print(f"Total steps: {step}")
+
+    # Note: Per-axis Ruckig limits don't directly constrain the 3D speed norm,
+    # so observed speed can exceed the configured limit by ~15-20%.
+    if max_observed_speed <= limits.tcp_speed_max * 1.25:
+        print("PASS: TCP speed within expected range")
+    else:
+        print("FAIL: TCP speed greatly exceeded configured limit")
+    print()
+
+
 def main():
     """Main function to run all EE trajectory tests."""
     print("=== EEPoseTrajGen Testing ===")
     print("Testing end-effector pose trajectory generation with TCP constraints\n")
-    
+
     ee_trajgen_test1()
     ee_trajgen_test2()
-    
+    ee_trajgen_test3_config_struct()
+
     print("=== All EE trajectory tests completed ===")
     print("\nTest results exported as CSV files:")
     print("- ee_data.csv")

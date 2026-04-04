@@ -71,6 +71,16 @@ if(APPLE)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -L${CMAKE_OSX_SYSROOT}/usr/lib" CACHE STRING "" FORCE)
 
     set(NATIVE_HINTS /opt/homebrew/lib)
+    list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
+    execute_process(
+        COMMAND brew --prefix yaml-cpp
+        OUTPUT_VARIABLE _BREW_YAML_CPP_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    if(_BREW_YAML_CPP_PREFIX)
+        list(APPEND CMAKE_PREFIX_PATH "${_BREW_YAML_CPP_PREFIX}")
+    endif()
 else()
     set(NATIVE_HINTS /usr/local/lib)
 endif()

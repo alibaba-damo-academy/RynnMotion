@@ -5,9 +5,40 @@ with various constraints and boundary conditions, based on the Ruckig library.
 """
 
 import numpy as np
+from dataclasses import dataclass
+from typing import Optional
 from scipy.spatial.transform import Rotation as R
 from enum import Enum
 import ruckig
+
+UNCONSTRAINED_LIMIT = 1e3
+DEFAULT_LINEAR_VEL_LIMIT  = 2.0
+DEFAULT_LINEAR_ACC_LIMIT  = 5.0
+DEFAULT_LINEAR_JERK_LIMIT = 20.0
+DEFAULT_ANGULAR_SCALE     = 1.0
+
+
+@dataclass
+class JointTrajLimits:
+    """Configuration for joint trajectory generation limits."""
+
+    vel_max: np.ndarray
+    acc_max: Optional[np.ndarray] = None
+    jerk_max: Optional[np.ndarray] = None
+    pos_upper: Optional[np.ndarray] = None
+    pos_lower: Optional[np.ndarray] = None
+
+
+@dataclass
+class EEPoseTrajLimits:
+    """Configuration for end-effector trajectory generation limits."""
+
+    linear_vel_max: float = DEFAULT_LINEAR_VEL_LIMIT
+    linear_acc_max: float = DEFAULT_LINEAR_ACC_LIMIT
+    linear_jerk_max: float = DEFAULT_LINEAR_JERK_LIMIT
+    angular_scale: float = DEFAULT_ANGULAR_SCALE
+    tcp_speed_max: float = float('inf')
+    tcp_acc_max: float = float('inf')
 
 
 class TrajGen:
@@ -39,9 +70,9 @@ class TrajGen:
         self.input.target_position = [0.0] * dof
         self.input.target_velocity = [0.0] * dof
         self.input.target_acceleration = [0.0] * dof
-        self.input.max_velocity = [1e3] * dof
-        self.input.max_acceleration = [1e3] * dof
-        self.input.max_jerk = [1e3] * dof
+        self.input.max_velocity = [UNCONSTRAINED_LIMIT] * dof
+        self.input.max_acceleration = [UNCONSTRAINED_LIMIT] * dof
+        self.input.max_jerk = [UNCONSTRAINED_LIMIT] * dof
         
         # History
         self.last_target_pos = np.zeros(dof)
@@ -192,22 +223,36 @@ class JointTrajGen(TrajGen):
     Joint-space trajectory generation with joint limits, based on Ruckig.
     """
     
-    def __init__(self, dof, dt):
+    def __init__(self, dof, dt, limits: Optional[JointTrajLimits] = None):
         """
         Initialize joint trajectory generator.
-        
+
         Args:
             dof (int): Number of degrees of freedom
             dt (float): Time step in seconds
+            limits (JointTrajLimits, optional): Configuration limits
         """
         super().__init__(dof, dt)
-        
+
         # Initialize with default values
-        self.q_upper_limits = np.ones(dof) * 1e3
-        self.q_lower_limits = np.ones(dof) * -1e3
-        self.qd_max = np.ones(dof) * 1e3
-        self.qdd_max = np.ones(dof) * 1e3
-        self.qddd_max = np.ones(dof) * 1e3
+        self.q_upper_limits = np.ones(dof) * UNCONSTRAINED_LIMIT
+        self.q_lower_limits = np.ones(dof) * -UNCONSTRAINED_LIMIT
+        self.qd_max = np.ones(dof) * UNCONSTRAINED_LIMIT
+        self.qdd_max = np.ones(dof) * UNCONSTRAINED_LIMIT
+        self.qddd_max = np.ones(dof) * UNCONSTRAINED_LIMIT
+
+        if limits is not None:
+            if limits.vel_max is not None and len(limits.vel_max) == dof:
+                if limits.acc_max is not None and len(limits.acc_max) == dof \
+                        and limits.jerk_max is not None and len(limits.jerk_max) == dof:
+                    self.set_joint_motion_limits(limits.vel_max, limits.acc_max, limits.jerk_max)
+                elif limits.acc_max is not None and len(limits.acc_max) == dof:
+                    self.set_joint_motion_limits(limits.vel_max, limits.acc_max)
+                else:
+                    self.set_joint_motion_limits(limits.vel_max)
+            if limits.pos_upper is not None and limits.pos_lower is not None \
+                    and len(limits.pos_upper) == dof and len(limits.pos_lower) == dof:
+                self.set_joint_pos_limits(limits.pos_upper, limits.pos_lower)
     
     def set_start_state(self, pos, vel=None, acc=None):
         """
@@ -252,16 +297,16 @@ class JointTrajGen(TrajGen):
             self.qdd_max = np.array(qdd_max)
             self.input.max_acceleration = qdd_max.tolist()
         else:
-            self.input.max_acceleration = [1e3] * self.dof
-            self.qdd_max = np.ones(self.dof) * 1e3
-            
+            self.input.max_acceleration = [UNCONSTRAINED_LIMIT] * self.dof
+            self.qdd_max = np.ones(self.dof) * UNCONSTRAINED_LIMIT
+
         if qddd_max is not None:
             assert len(qddd_max) == self.dof, f"Jerk limit size {len(qddd_max)} does not match DOF {self.dof}"
             self.qddd_max = np.array(qddd_max)
             self.input.max_jerk = qddd_max.tolist()
         else:
-            self.input.max_jerk = [1e3] * self.dof
-            self.qddd_max = np.ones(self.dof) * 1e3
+            self.input.max_jerk = [UNCONSTRAINED_LIMIT] * self.dof
+            self.qddd_max = np.ones(self.dof) * UNCONSTRAINED_LIMIT
         
     
     def set_joint_pos_limits(self, q_upper_limits, q_lower_limits):
@@ -282,21 +327,21 @@ class JointTrajGen(TrajGen):
     
     def clear_joint_limits(self):
         """Clear all joint limits."""
-        self.q_upper_limits = np.ones(self.dof) * 1e3
-        self.q_lower_limits = np.ones(self.dof) * -1e3
-        self.qd_max = np.ones(self.dof) * 1e3
-        self.qdd_max = np.ones(self.dof) * 1e3
-        self.qddd_max = np.ones(self.dof) * 1e3
-        
+        self.q_upper_limits = np.ones(self.dof) * UNCONSTRAINED_LIMIT
+        self.q_lower_limits = np.ones(self.dof) * -UNCONSTRAINED_LIMIT
+        self.qd_max = np.ones(self.dof) * UNCONSTRAINED_LIMIT
+        self.qdd_max = np.ones(self.dof) * UNCONSTRAINED_LIMIT
+        self.qddd_max = np.ones(self.dof) * UNCONSTRAINED_LIMIT
+
         # Reset Ruckig limits to defaults
-        self.input.max_velocity = [1e3] * self.dof
-        self.input.max_acceleration = [1e3] * self.dof
-        self.input.max_jerk = [1e3] * self.dof
-    
+        self.input.max_velocity = [UNCONSTRAINED_LIMIT] * self.dof
+        self.input.max_acceleration = [UNCONSTRAINED_LIMIT] * self.dof
+        self.input.max_jerk = [UNCONSTRAINED_LIMIT] * self.dof
+
     def clear_position_limits(self):
         """Clear position limits only."""
-        self.q_upper_limits = np.ones(self.dof) * 1e3
-        self.q_lower_limits = np.ones(self.dof) * -1e3
+        self.q_upper_limits = np.ones(self.dof) * UNCONSTRAINED_LIMIT
+        self.q_lower_limits = np.ones(self.dof) * -UNCONSTRAINED_LIMIT
     
     def apply_saturation(self):
         """Apply joint limits saturation."""
@@ -357,24 +402,32 @@ class EEPoseTrajGen(TrajGen):
     End-effector pose trajectory generation with TCP constraints, based on Ruckig.
     """
     
-    def __init__(self, dt):
+    def __init__(self, dt, limits: Optional[EEPoseTrajLimits] = None):
         """
         Initialize EE pose trajectory generator.
-        
+
         Args:
             dt (float): Time step in seconds
+            limits (EEPoseTrajLimits, optional): Configuration limits
         """
         # 4 DOF for end-effector (x, y, z, angle)
         super().__init__(4, dt)
-        
-        # Default limits for EE
-        self.input.max_velocity = [2.0, 2.0, 2.0, 1.0]      # [x, y, z, angle]
-        self.input.max_acceleration = [5.0, 5.0, 5.0, 5.0]  # [x, y, z, angle]
-        self.input.max_jerk = [20.0, 20.0, 20.0, 20.0]      # [x, y, z, angle]
-        
-        self.max_tcp_speed = float('inf')
-        self.max_tcp_acc = float('inf')
-        
+
+        if limits is None:
+            limits = EEPoseTrajLimits()
+
+        # Set limits from config
+        v = limits.linear_vel_max
+        a = limits.linear_acc_max
+        j = limits.linear_jerk_max
+        s = limits.angular_scale
+        self.input.max_velocity = [v, v, v, v * s]
+        self.input.max_acceleration = [a, a, a, a * s]
+        self.input.max_jerk = [j, j, j, j * s]
+
+        self.max_tcp_speed = limits.tcp_speed_max
+        self.max_tcp_acc = limits.tcp_acc_max
+
         self.curr_quat = R.from_quat([0, 0, 0, 1])  # Identity quaternion [x, y, z, w]
         self.target_quat = R.from_quat([0, 0, 0, 1])
         self.action_axis = np.array([0, 0, 1])

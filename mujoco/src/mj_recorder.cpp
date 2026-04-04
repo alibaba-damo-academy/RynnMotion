@@ -10,6 +10,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "mj_interface.hpp"
+#include "robot_context.hpp"
 
 namespace mujoco {
 
@@ -65,6 +66,14 @@ void MujocoRecorder::loadRecorderConfig() {
   std::cout << "[Recorder] Data format: " << dataFormatToString(config_.dataFormat) << std::endl;
 }
 
+std::map<std::string, data::CameraConfig> MujocoRecorder::buildCameraConfigMap() const {
+  std::map<std::string, data::CameraConfig> map;
+  for (const auto &cam : cameraConfigs_) {
+    map[cam.name] = cam;
+  }
+  return map;
+}
+
 void MujocoRecorder::initRecorder() {
   loadRecorderConfig();
 
@@ -80,33 +89,27 @@ void MujocoRecorder::initRecorder() {
   auto *robotManager = mj_.robotManager.get();
   if (robotManager) {
     config_.robotType = "robot";
-    int mdof = robotManager->getMotionDOF();
-    int numEE = robotManager->getNumEndEffectors();
+    mdof_ = robotManager->getMotionDOF();
+    adof_ = robotManager->getActionDOF();
+    numEE_ = robotManager->getNumEndEffectors();
+    eeNames_ = robotManager->getEENames();
 
-    features_["observation.state"] = {"float32", {mdof}, {}};
-    features_["observation.velocity"] = {"float32", {mdof}, {}};
-    features_["observation.torque"] = {"float32", {mdof}, {}};
-    features_["action"] = {"float32", {mdof}, {}};
-    features_["action.velocity"] = {"float32", {mdof}, {}};
-    features_["action.torque"] = {"float32", {mdof}, {}};
+    rynn::RobotContext ctx(*robotManager);
 
-    if (numEE > 0) {
-      features_["observation.ee_pos"] = {"float32", {numEE * 3}, {}};
-      features_["observation.ee_quat"] = {"float32", {numEE * 4}, {}};
-      features_["observation.gripper"] = {"float32", {numEE}, {}};
-      features_["action.ee_pos"] = {"float32", {numEE * 3}, {}};
-      features_["action.ee_quat"] = {"float32", {numEE * 4}, {}};
-      features_["action.gripper"] = {"float32", {numEE}, {}};
+    std::map<std::string, std::tuple<int, int, int>> camConfigs;
+    for (const auto &cam : cameraConfigs_) {
+      camConfigs[cam.name] = {cam.height, cam.width, 3};
     }
 
-    features_["timestamp"] = {"float64", {1}, {}};
-    features_["frame_index"] = {"int64", {1}, {}};
-    features_["episode_index"] = {"int64", {1}, {}};
+    features_ = ctx.getRecordingFeatures(camConfigs, config_.recordVideo);
+  } else {
+    for (const auto &cam : cameraConfigs_) {
+      std::string key = "observation.images." + cam.name;
+      features_[key] = {"video", {cam.height, cam.width, 3}, {"height", "width", "channels"}};
+    }
   }
 
   for (const auto &cam : cameraConfigs_) {
-    std::string key = "observation.images." + cam.name;
-    features_[key] = {"video", {cam.height, cam.width, 3}, {}};
     imageBuffers_[cam.name] = {};
   }
 
@@ -184,8 +187,18 @@ void MujocoRecorder::writeInfoJson() {
       if (i > 0) ofs << ", ";
       ofs << info.shape[i];
     }
-    ofs << "]\n";
-    ofs << "    }";
+    ofs << "]";
+
+    if (!info.names.empty()) {
+      ofs << ",\n      \"names\": [";
+      for (size_t i = 0; i < info.names.size(); ++i) {
+        if (i > 0) ofs << ", ";
+        ofs << "\"" << info.names[i] << "\"";
+      }
+      ofs << "]";
+    }
+
+    ofs << "\n    }";
   }
 
   ofs << "\n  }\n";
@@ -234,14 +247,19 @@ void MujocoRecorder::recordFrame(const data::RuntimeData &runtimeData,
   frame.qdCmd = runtimeData.qdCmd;
   frame.qtauCmd = runtimeData.qtauCmd;
 
+  // Build 7D EE poses from bodyStates (pos, qx, qy, qz, qw)
   for (const auto &state : runtimeData.bodyStates) {
-    frame.eePoses.push_back(state.pos);
-    frame.eeQuats.push_back(state.quat);
+    Eigen::Matrix<double, 7, 1> pose;
+    pose << state.pos.x(), state.pos.y(), state.pos.z(),
+            state.quat.x(), state.quat.y(), state.quat.z(), state.quat.w();
+    frame.eePose7d.push_back(pose);
   }
 
   for (const auto &plan : runtimeData.bodyPlans) {
-    frame.eePosCmd.push_back(plan.pos);
-    frame.eeQuatCmd.push_back(plan.quat);
+    Eigen::Matrix<double, 7, 1> pose;
+    pose << plan.pos.x(), plan.pos.y(), plan.pos.z(),
+            plan.quat.x(), plan.quat.y(), plan.quat.z(), plan.quat.w();
+    frame.eePoseCmd7d.push_back(pose);
   }
 
   for (const auto &gripper : runtimeData.gripperFeedbacks) {
@@ -251,6 +269,31 @@ void MujocoRecorder::recordFrame(const data::RuntimeData &runtimeData,
   for (const auto &gripper : runtimeData.gripperCommands) {
     frame.gripperCommands.push_back(gripper.posCmd);
   }
+
+  // Extract sensor data from RuntimeData
+  for (size_t i = 0; i < runtimeData.ftSensors.size(); ++i) {
+    const auto &ft = runtimeData.ftSensors[i];
+    if (!ft.name.empty()) {
+      std::string forceKey = "observation.sensor.force." + ft.name;
+      frame.sensorData[forceKey] = ft.force;
+
+      std::string torqueKey = "observation.sensor.torque." + ft.name;
+      frame.sensorData[torqueKey] = ft.torque;
+    }
+  }
+
+  for (size_t i = 0; i < runtimeData.imuSensors.size(); ++i) {
+    const auto &imu = runtimeData.imuSensors[i];
+    if (!imu.name.empty()) {
+      std::string gyroKey = "observation.sensor.gyro." + imu.name;
+      frame.sensorData[gyroKey] = imu.angVel;
+
+      std::string accelKey = "observation.sensor.accel." + imu.name;
+      frame.sensorData[accelKey] = imu.linAcc;
+    }
+  }
+
+  frame.taskIndex = taskToIndex_.count(currentTask_) ? taskToIndex_[currentTask_] : 0;
 
   frameBuffer_.push_back(frame);
 
@@ -310,99 +353,132 @@ void MujocoRecorder::writeEpisodeData() {
   }
 
   int mdof = frameBuffer_[0].qFb.size();
-  size_t numEE = frameBuffer_[0].eePoses.size();
 
   if (mdof == 0) {
     dataWriter_->close();
     return;
   }
 
+  // Joint state vectors
   std::vector<Eigen::VectorXd> qFbVecs, qdFbVecs, qtauFbVecs;
   std::vector<Eigen::VectorXd> qCmdVecs, qdCmdVecs, qtauCmdVecs;
-  std::vector<double> eePosObs, eeQuatObs;
-  std::vector<double> eePosCmd, eeQuatCmd;
-  std::vector<double> gripperObs, gripperCmd;
+
+  // Action = joints + grippers concatenated
+  std::vector<Eigen::VectorXd> actionVecs;
+
+  // Gripper
+  std::vector<double> gripperObs;
+
+  // EE poses: per-EE 7D vectors
+  std::map<std::string, std::vector<double>> eePoseObsMap;
+  std::map<std::string, std::vector<double>> eePoseCmdMap;
+
+  // Sensor data accumulation
+  std::map<std::string, std::vector<double>> sensorDataMap;
+
+  // Metadata
   std::vector<double> timestamps;
-  std::vector<int64_t> frameIndices, episodeIndices;
+  std::vector<int64_t> frameIndices, episodeIndices, globalIndices, taskIndices;
 
   for (const auto &frame : frameBuffer_) {
     qFbVecs.push_back(frame.qFb);
     qdFbVecs.push_back(frame.qdFb);
     qtauFbVecs.push_back(frame.qtauFb);
-    qCmdVecs.push_back(frame.qCmd);
     qdCmdVecs.push_back(frame.qdCmd);
     qtauCmdVecs.push_back(frame.qtauCmd);
 
-    for (const auto &pos : frame.eePoses) {
-      eePosObs.push_back(pos.x());
-      eePosObs.push_back(pos.y());
-      eePosObs.push_back(pos.z());
+    // Build action vector: qCmd + gripperCommands
+    int actionDim = mdof + static_cast<int>(frame.gripperCommands.size());
+    Eigen::VectorXd actionVec(actionDim);
+    actionVec.head(mdof) = frame.qCmd;
+    for (size_t g = 0; g < frame.gripperCommands.size(); ++g) {
+      actionVec[mdof + g] = frame.gripperCommands[g];
     }
-    for (const auto &quat : frame.eeQuats) {
-      eeQuatObs.push_back(quat.x());
-      eeQuatObs.push_back(quat.y());
-      eeQuatObs.push_back(quat.z());
-      eeQuatObs.push_back(quat.w());
-    }
+    actionVecs.push_back(actionVec);
 
-    for (const auto &pos : frame.eePosCmd) {
-      eePosCmd.push_back(pos.x());
-      eePosCmd.push_back(pos.y());
-      eePosCmd.push_back(pos.z());
-    }
-    for (const auto &quat : frame.eeQuatCmd) {
-      eeQuatCmd.push_back(quat.x());
-      eeQuatCmd.push_back(quat.y());
-      eeQuatCmd.push_back(quat.z());
-      eeQuatCmd.push_back(quat.w());
-    }
-
+    // Gripper feedback
     for (double g : frame.gripperPositions) {
       gripperObs.push_back(g);
     }
 
-    for (double g : frame.gripperCommands) {
-      gripperCmd.push_back(g);
+    // EE poses (observation) - 7D per EE
+    for (size_t i = 0; i < frame.eePose7d.size(); ++i) {
+      std::string key;
+      if (numEE_ == 1) {
+        key = "observation.end_effector_pose";
+      } else {
+        std::string eeName = (i < eeNames_.size()) ? eeNames_[i] : "ee" + std::to_string(i);
+        key = "observation." + eeName + "_pose";
+      }
+      for (int j = 0; j < 7; ++j) {
+        eePoseObsMap[key].push_back(frame.eePose7d[i][j]);
+      }
+    }
+
+    // EE poses (action) - 7D per EE
+    for (size_t i = 0; i < frame.eePoseCmd7d.size(); ++i) {
+      std::string key;
+      if (numEE_ == 1) {
+        key = "action.end_effector_pose";
+      } else {
+        std::string eeName = (i < eeNames_.size()) ? eeNames_[i] : "ee" + std::to_string(i);
+        key = "action." + eeName + "_pose";
+      }
+      for (int j = 0; j < 7; ++j) {
+        eePoseCmdMap[key].push_back(frame.eePoseCmd7d[i][j]);
+      }
+    }
+
+    // Sensor data
+    for (const auto &[sensorKey, sensorVec] : frame.sensorData) {
+      for (int j = 0; j < sensorVec.size(); ++j) {
+        sensorDataMap[sensorKey].push_back(sensorVec[j]);
+      }
     }
 
     timestamps.push_back(frame.timestamp);
     frameIndices.push_back(frame.frameIndex);
     episodeIndices.push_back(currentEpisodeIndex_);
+    globalIndices.push_back(globalIndex_++);
+    taskIndices.push_back(frame.taskIndex);
   }
 
+  // Write joint state columns
   dataWriter_->writeEigenVectors("observation.state", qFbVecs);
   dataWriter_->writeEigenVectors("observation.velocity", qdFbVecs);
   dataWriter_->writeEigenVectors("observation.torque", qtauFbVecs);
-  dataWriter_->writeEigenVectors("action", qCmdVecs);
+  dataWriter_->writeEigenVectors("action", actionVecs);
   dataWriter_->writeEigenVectors("action.velocity", qdCmdVecs);
   dataWriter_->writeEigenVectors("action.torque", qtauCmdVecs);
 
-  if (numEE > 0) {
-    dataWriter_->writeDataset("observation.ee_pos", eePosObs,
-                              {numFrames, numEE * 3});
-    dataWriter_->writeDataset("observation.ee_quat", eeQuatObs,
-                              {numFrames, numEE * 4});
-    dataWriter_->writeDataset("observation.gripper", gripperObs,
-                              {numFrames, numEE});
+  // Write gripper state
+  if (!gripperObs.empty() && numEE_ > 0) {
+    dataWriter_->writeDataset("observation.state.gripper", gripperObs,
+                              {numFrames, static_cast<size_t>(numEE_)});
+  }
 
-    if (!eePosCmd.empty()) {
-      size_t numEECmd = frameBuffer_[0].eePosCmd.size();
-      dataWriter_->writeDataset("action.ee_pos", eePosCmd,
-                                {numFrames, numEECmd * 3});
-      dataWriter_->writeDataset("action.ee_quat", eeQuatCmd,
-                                {numFrames, numEECmd * 4});
-    }
+  // Write EE pose columns (7D per EE)
+  for (const auto &[key, data] : eePoseObsMap) {
+    dataWriter_->writeDataset(key, data, {numFrames, 7});
+  }
+  for (const auto &[key, data] : eePoseCmdMap) {
+    dataWriter_->writeDataset(key, data, {numFrames, 7});
+  }
 
-    if (!gripperCmd.empty()) {
-      size_t numGripper = frameBuffer_[0].gripperCommands.size();
-      dataWriter_->writeDataset("action.gripper", gripperCmd,
-                                {numFrames, numGripper});
+  // Write sensor columns
+  for (const auto &[key, data] : sensorDataMap) {
+    size_t dim = data.size() / numFrames;
+    if (dim > 0) {
+      dataWriter_->writeDataset(key, data, {numFrames, dim});
     }
   }
 
+  // Write metadata columns
   dataWriter_->writeDataset("timestamp", timestamps, {numFrames});
   dataWriter_->writeDataset("frame_index", frameIndices, {numFrames});
   dataWriter_->writeDataset("episode_index", episodeIndices, {numFrames});
+  dataWriter_->writeDataset("index", globalIndices, {numFrames});
+  dataWriter_->writeDataset("task_index", taskIndices, {numFrames});
 
   dataWriter_->close();
 }

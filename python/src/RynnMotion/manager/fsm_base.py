@@ -22,6 +22,7 @@ def register_fsm_factory_func(fsm_name):
 
     def decorator(factory_func):
         REGISTERED_FSM_FACTORY_FUNCS[fsm_name] = factory_func
+        return factory_func
 
     return decorator
 
@@ -111,7 +112,7 @@ class RobotStateMachine(StateMachine):
         # Here you would implement the logic to move the robot to its standby position.
         actuator_dofs = self.robot_model.get_actuator_num()
         gripper_dofs = self.robot_model.get_gripper_num()
-        ee_num = self.robot_model.get_ee_num()
+        ee_num = self.robot_model.get_ee_num() or self.robot_model.get_ee_site_num()
         sites_num = self.robot_model.get_site_num()
         self.standby_positions = RobotCommand()
         self.standby_positions.init_from_dofs(
@@ -122,7 +123,9 @@ class RobotStateMachine(StateMachine):
             num_sites=int(sites_num),
             chunk_size=int(1),
         )
-        standby_joint_pos = self.robot_model.get_qStandby("left")
+        standby_joint_pos = self.robot_model.get_full_q_standby(
+            0
+        )  # get_q_standby only motion dofs
         standby_dofs = len(standby_joint_pos)
         self.standby_positions.work_mode = 0
         self.standby_positions.seq = 0
@@ -141,11 +144,13 @@ class RobotStateMachine(StateMachine):
 
     def on_enter_standby(self):
         self.clear_fsm_timer()
+        self.trajgen.process_parameters_update("goto_standby")
         self.logger.info("Entering STANDBY state - go to standby position")
         sys.stdout.flush()
 
     def on_enter_running(self):
         self.clear_fsm_timer()
+        self.trajgen.process_parameters_update("run")
         self.logger.info("Entering RUNNING state - System active")
         sys.stdout.flush()
 

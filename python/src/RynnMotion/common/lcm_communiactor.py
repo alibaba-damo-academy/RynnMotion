@@ -12,13 +12,12 @@ import threading
 import logging
 import lcm
 import numpy as np
-import sys
 from pathlib import Path
 
 from RynnMotion.common.communicator_base import (
-    CommunicatorBase,
     register_communicator_factory_func,
 )
+from RynnMotion.common.keyboard_communicator import KeyboardCommunicatorBase
 
 # Use absolute imports from RynnMotion package
 from RynnMotion.common.lcm.lcmMotion.act_command import act_command
@@ -41,7 +40,7 @@ def lcm_communicator_factory(robot_model, communicator_config: dict, logger=None
     return LCMCommunicator(robot_model, communicator_config, logger)
 
 
-class LCMCommunicator(CommunicatorBase):
+class LCMCommunicator(KeyboardCommunicatorBase):
     """
     Handles all LCM communication for robot control.
 
@@ -108,8 +107,11 @@ class LCMCommunicator(CommunicatorBase):
             self.lcm_instance = lcm.LCM()
             self.lcm_instance.subscribe("rcp_robotmotion", self.handle_policy_commands)
             self.lcm_instance.subscribe("rcp_request_feedback", self.handle_requests)
-            self.logger.info("✓ LCM communication ready")
+
+            self.start_keyboard_listener()
+
             self.connected = True
+            self.logger.info("✓ LCM communication ready")
             return True
         except Exception as e:
             self.logger.warning(f"⚠ LCM setup failed: {e}")
@@ -119,6 +121,8 @@ class LCMCommunicator(CommunicatorBase):
 
     def disconnect(self):
         """Disconnect LCM."""
+        self.stop_keyboard_listener()
+
         if self.lcm_instance:
             self.lcm_instance = None
             self.connected = False
@@ -217,12 +221,12 @@ class LCMCommunicator(CommunicatorBase):
         msg.utime = int(time.time() * 1000000)
         msg.seq = self.feedback_sequence_number
 
-        msg.numJoint = robot_state.joint_number
-        msg.qFb = robot_state.joint_positions[: msg.numJoint].tolist()
-        msg.qdFb = robot_state.joint_velocities[: msg.numJoint].tolist()
+        msg.numJoint = robot_state.num_joints
+        msg.qFb = robot_state.joint_pos[: msg.numJoint]
+        msg.qdFb = robot_state.joint_vel[: msg.numJoint]
 
-        msg.numGripper = robot_state.gripper_number
-        msg.gripperPosFb = robot_state.gripper_positions[: msg.numGripper].tolist()
+        msg.numGripper = robot_state.num_grippers
+        msg.gripperPosFb = robot_state.gripper_pos[: msg.numGripper]
 
         """
         msg.numPose = robot_state.ee_pose_number
@@ -257,10 +261,6 @@ class LCMCommunicator(CommunicatorBase):
             return True
         return False
 
-    def request_robot_feedback(self, joint_positions):
-        """Handle robot feedback request with current joint positions."""
-        self.publish_robot_feedback(joint_positions)
-
     def _process_trajectory(self):
         """Process a new trajectory chunk."""
         new_chunk = self.current_ACT_command
@@ -271,7 +271,7 @@ class LCMCommunicator(CommunicatorBase):
         num_joint = int(getattr(new_chunk, "numJoint", 0))
         num_gripper = int(getattr(new_chunk, "numGripper", 0))
         # try to find end-effector count field in message (tolerant)
-        num_ee = 0 if new_chunk.numEEpose is None else 1
+        num_ee = 0 if new_chunk.numEEpose is None else new_chunk.numEEpose
 
         for i in range(new_chunk.chunkSize):
             # joints
@@ -288,6 +288,7 @@ class LCMCommunicator(CommunicatorBase):
             if i < len(self.robot_command.trajectory):
                 self.robot_command.trajectory[i].gripper_pos = list(g_cur)
 
+            """
             # end-effector poses (pos + quat). create Pose list if possible
             ee_list = []
             if num_ee > 0:
@@ -314,6 +315,7 @@ class LCMCommunicator(CommunicatorBase):
                     ee_list.append(Pose(pos=pos_slice, quat=quat_slice))
             if i < len(self.robot_command.trajectory):
                 self.robot_command.trajectory[i].ee_pose = ee_list
+            """
 
     def process_subscribe_command(self):
         """Process incoming LCM messages (non-blocking)."""
@@ -326,7 +328,8 @@ class LCMCommunicator(CommunicatorBase):
                 self._process_trajectory()
                 new_command = True
                 self.ACT_command_received = False
-        return self.robot_command, new_command
+            return self.robot_command, new_command
+        return None, new_command
 
     def process_publish_robot_state(self, robot_state):
         """Handle LCM feedback publishing."""
@@ -334,8 +337,8 @@ class LCMCommunicator(CommunicatorBase):
             return
 
         # Handle robot feedback requests
-        if self.check_robot_feedback_request():
-            self.publish_robot_feedback(robot_state)
+        # if self.check_robot_feedback_request():
+        self.publish_robot_feedback(robot_state)
 
         # Handle state feedback requests
         if self.check_state_feedback_request():
@@ -346,9 +349,3 @@ class LCMCommunicator(CommunicatorBase):
         if trajgen_state:
             self.act_status_index = state_feedback.kSuccess
             self.publish_state_feedback()
-
-    def process_task_command(self):
-        """Process task command from LCM."""
-        if self.gohome_requested:
-            return "go_standby"
-        return "run"

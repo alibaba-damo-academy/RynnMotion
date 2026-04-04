@@ -28,10 +28,9 @@ void MujocoActuator::initActuatorSystem() {
 
   int nActuators = mdof_ + numEE_ * adof_;
 
-  std::cout << "Actuator validation: nu=" << nActuators << ", mdof=" << mdof_
+  DEBUG_LOG("Actuator validation: nu=" << nActuators << ", mdof=" << mdof_
             << ", adof=" << adof_ << ", numEE=" << numEE_
-            << ", nu==mdof+numEE*adof " << (nActuators == mdof_ + numEE_ * adof_ ? "✓" : "✗")
-            << std::endl;
+            << ", nu==mdof+numEE*adof " << (nActuators == mdof_ + numEE_ * adof_ ? "OK" : "FAIL"));
 
   auto simKp = robotManager.getSimKp();
   auto simKd = robotManager.getSimKd();
@@ -153,12 +152,11 @@ void MujocoActuator::initJointSensors() {
 
   if (useSensorFeedback_) {
     if (allFound) {
-      std::cout << "✓ Sensor feedback enabled: " << mdof_ << " joints with pos/vel/frc sensors" << std::endl;
-      // Print detailed sensor addresses for verification
+      DEBUG_LOG("Sensor feedback enabled: " << mdof_ << " joints with pos/vel/frc sensors");
       for (int j = 0; j < mdof_; j++) {
-        std::cout << "  Joint " << j << ": sensordata[pos=" << jointPosSensorAdr_[j]
+        DEBUG_LOG("  Joint " << j << ": sensordata[pos=" << jointPosSensorAdr_[j]
                   << ", vel=" << jointVelSensorAdr_[j]
-                  << ", frc=" << jointFrcSensorAdr_[j] << "]" << std::endl;
+                  << ", frc=" << jointFrcSensorAdr_[j] << "]");
       }
     } else {
       std::cerr << "[MujocoActuator] Warning: Not all joint sensors found (pos:" << foundPos
@@ -399,7 +397,7 @@ void MujocoActuator::validateMapping() {
     }
   }
 
-  std::cout << "✓ Actuator mapping validation passed" << std::endl;
+  DEBUG_LOG("Actuator mapping validation passed");
 }
 
 void MujocoActuator::printMapping() {

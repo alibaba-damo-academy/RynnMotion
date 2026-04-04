@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include "feature_info.hpp"
 #include "image_buffer.hpp"
 #include "mj_data_writer.hpp"
 #include "mj_video_encoder.hpp"
@@ -45,12 +46,6 @@ struct RecorderConfig {
   DataFormat dataFormat{DataFormat::None};
 };
 
-struct FeatureInfo {
-  std::string dtype;
-  std::vector<int> shape;
-  std::vector<std::string> names;
-};
-
 struct EpisodeFrame {
   double timestamp;
   int frameIndex;
@@ -65,17 +60,21 @@ struct EpisodeFrame {
   Eigen::VectorXd qdCmd;
   Eigen::VectorXd qtauCmd;
 
-  // EE feedback (from bodyStates)
-  std::vector<Eigen::Vector3d> eePoses;
-  std::vector<Eigen::Quaterniond> eeQuats;
+  // EE feedback as 7D vectors (x, y, z, qx, qy, qz, qw)
+  std::vector<Eigen::Matrix<double, 7, 1>> eePose7d;
 
-  // EE commands (from bodyPlans)
-  std::vector<Eigen::Vector3d> eePosCmd;
-  std::vector<Eigen::Quaterniond> eeQuatCmd;
+  // EE commands as 7D vectors (x, y, z, qx, qy, qz, qw)
+  std::vector<Eigen::Matrix<double, 7, 1>> eePoseCmd7d;
 
   // Gripper
   std::vector<double> gripperPositions;  // feedback
   std::vector<double> gripperCommands;   // commands
+
+  // Sensor data: key -> values
+  std::map<std::string, Eigen::VectorXd> sensorData;
+
+  // Metadata
+  int64_t taskIndex{0};
 };
 
 class MujocoInterface;
@@ -120,6 +119,8 @@ private:
   std::string getDataFilePath(int episodeIndex) const;
   std::string getVideoFilePath(int episodeIndex, const std::string &cameraKey) const;
 
+  std::map<std::string, data::CameraConfig> buildCameraConfigMap() const;
+
   MujocoInterface &mj_;
 
   RecorderConfig config_;
@@ -128,14 +129,21 @@ private:
 
   std::vector<EpisodeFrame> frameBuffer_;
   std::map<std::string, std::vector<data::ImageFrame>> imageBuffers_;
-  std::map<std::string, FeatureInfo> features_;
+  rynn::FeatureMap features_;
   std::map<std::string, int> taskToIndex_;
+
+  // EE names cache for per-EE feature key generation
+  std::vector<std::string> eeNames_;
+  int numEE_{0};
+  int mdof_{0};
+  int adof_{0};
 
   bool isRecording_{false};
   int currentEpisodeIndex_{0};
   int totalFrames_{0};
   int totalEpisodes_{0};
   int totalTasks_{0};
+  int64_t globalIndex_{0};
   std::string currentTask_;
 
   std::vector<data::CameraConfig> cameraConfigs_;

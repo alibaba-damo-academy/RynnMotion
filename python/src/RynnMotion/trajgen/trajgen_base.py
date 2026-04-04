@@ -24,6 +24,7 @@ def register_generator_factory_func(generator_name):
 
     def decorator(factory_func):
         REGISTERED_TRAJECTORY_GENERATOR_FACTORY_FUNCS[generator_name] = factory_func
+        return factory_func
 
     return decorator
 
@@ -47,7 +48,7 @@ def generator_factory(
     return generator_class(generator_config, robot_model, communicator, logger)
 
 
-class TrajectoryGeneratorBase(object):
+class TrajectoryGeneratorBase(ABC):
     """
     trajectory generator base class.
     """
@@ -74,7 +75,15 @@ class TrajectoryGeneratorBase(object):
         self._load_robot_model(robot_model)
         self.generator_config = generator_config
 
+        # Total actuator DOFs (arm + gripper)
         self.act_dofs = self.robot_model.get_actuator_num()
+
+        # Arm/gripper DOF separation
+        self.arm_dofs = self.robot_model.get_motion_dof()
+        self.gripper_dofs = self.robot_model.get_action_dof()
+        self.joint_indices = self.robot_model.get_joint_indices()
+        self.ee_indices = self.robot_model.get_ee_indices()
+
         self.robot_command = RobotState()
         self.robot_command.num_joints = self.act_dofs
 
@@ -84,7 +93,10 @@ class TrajectoryGeneratorBase(object):
         self.robot_feedback = RobotState()
 
         self.logger.info("trajectory generator build successful")
-        self.logger.info(f"act dofs: {self.act_dofs}")
+        self.logger.info(
+            f"act_dofs: {self.act_dofs} (arm: {self.arm_dofs}, gripper: {self.gripper_dofs})"
+        )
+        self.logger.info(f"joint_indices: {self.joint_indices}, ee_indices: {self.ee_indices}")
 
     def _load_robot_model(self, robot_model):
         if robot_model is None:
@@ -104,6 +116,48 @@ class TrajectoryGeneratorBase(object):
                 raise AttributeError(f"robot_model must implement {method} method")
 
         self.robot_model = robot_model
+
+    # ========== Arm/gripper split helpers ==========
+
+    def split_arm_gripper(self, full_pos):
+        """Split full joint positions into arm and gripper components.
+
+        Args:
+            full_pos: Full joint positions list/array of length act_dofs.
+
+        Returns:
+            arm_pos: List of arm joint positions (length arm_dofs).
+            gripper_pos: List of gripper joint positions (length gripper_dofs).
+        """
+        arm_pos = [full_pos[i] for i in self.joint_indices]
+        gripper_pos = [full_pos[i] for i in self.ee_indices]
+        return arm_pos, gripper_pos
+
+    def merge_arm_gripper(self, arm_pos, gripper_pos, out=None):
+        """Merge arm and gripper positions into full joint position array.
+
+        Args:
+            arm_pos: Arm joint positions (length arm_dofs).
+            gripper_pos: Gripper joint positions (length gripper_dofs).
+            out: Optional output list to write into (length act_dofs).
+                 If None, returns a new list.
+
+        Returns:
+            full_pos: Merged joint positions (length act_dofs).
+        """
+        if out is None:
+            out = [0.0] * self.act_dofs
+        for i, idx in enumerate(self.joint_indices):
+            out[idx] = arm_pos[i]
+        for i, idx in enumerate(self.ee_indices):
+            out[idx] = gripper_pos[i]
+        return out
+
+    def process_parameters_update(self, parameters=None):
+        """
+        process parameters update
+        """
+        pass
 
     @abstractmethod
     def process_input_command(self, latest_command, new_command_flag):

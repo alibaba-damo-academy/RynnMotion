@@ -21,7 +21,7 @@ find_library(_QPOASES qpOASES HINTS ${_NATIVE_HINTS})
 find_library(_FCL fcl HINTS ${_NATIVE_HINTS})
 find_library(_LCM lcm HINTS ${_NATIVE_HINTS})
 find_library(_CCD ccd HINTS ${_NATIVE_HINTS})
-find_library(_RUCKIG ruckig HINTS ${_NATIVE_HINTS})
+find_library(_RUCKIG libruckig.a HINTS ${_NATIVE_HINTS})
 find_library(_PUGIXML pugixml HINTS ${_NATIVE_HINTS})
 
 include("${RYNN_ROOT}/cmake/FindMuJoCo.cmake")
@@ -40,9 +40,8 @@ if(NOT TARGET RynnMotion::motion)
     INTERFACE_INCLUDE_DIRECTORIES "${RYNN_ROOT}/common/data;${RYNN_ROOT}/common/lcm/lcmMotion;${RYNN_ROOT}/common/lcm/piperlcm;${RYNN_ROOT}/motion/interface;${RYNN_ROOT}/motion/fsm/include;${RYNN_ROOT}/motion/manager;${RYNN_ROOT}/motion/runtime;${RYNN_ROOT}/motion/module;${RYNN_ROOT}/motion/module/joint;${RYNN_ROOT}/motion/module/osc;${RYNN_ROOT}/motion/module/estimation;${RYNN_ROOT}/motion/module/planner;${RYNN_ROOT}/motion/module/teleopfollow;${RYNN_ROOT}/motion/utils/kinematics;${RYNN_ROOT}/motion/utils/dynamics;${RYNN_ROOT}/motion/utils/generator;${RYNN_ROOT}/motion/utils/trajectory;${RYNN_ROOT}/motion/utils/logger;${RYNN_ROOT}/motion/utils/curve;${RYNN_ROOT}/motion/utils/tools;${RYNN_ROOT}/models;${RYNN_INCLUDE_DIR}/robotDiscovery;${PINOCCHIO_INCLUDE_DIRS};${MUJOCO_INCLUDE_DIRS}"
     INTERFACE_COMPILE_DEFINITIONS "MODEL_DIR=\"${RYNN_ROOT}/models\";MOTION_DIR=\"${RYNN_ROOT}/motion\";PINOCCHIO_WITH_URDFDOM;PINOCCHIO_ENABLE_TEMPLATE_INSTANTIATION"
     INTERFACE_LINK_DIRECTORIES "${_PINO_PATHS}"
-    INTERFACE_LINK_LIBRARIES "${RYNN_LIB_DIR}/libutility.a;${RYNN_LIB_DIR}/libmanager.a;${MUJOCO_LIBRARY};${_QPOASES};${_FCL};${_CCD};${_LCM};yaml-cpp;${_PUGIXML};${_RUCKIG};pinocchio_default;pinocchio_parsers;Boost::filesystem;urdfdom_sensor;urdfdom_model;urdfdom_world;Eigen3::Eigen;pthread"
+    INTERFACE_LINK_LIBRARIES "${RYNN_LIB_DIR}/libutility.a;${RYNN_LIB_DIR}/libmanager.a;${MUJOCO_LIBRARY};${_QPOASES};${_FCL};${_CCD};${_LCM};yaml-cpp::yaml-cpp;${_PUGIXML};${_RUCKIG};pinocchio_default;pinocchio_parsers;Boost::filesystem;urdfdom_sensor;urdfdom_model;urdfdom_world;Eigen3::Eigen;pthread"
     INTERFACE_COMPILE_OPTIONS "-Wno-deprecated-declarations"
   )
 endif()
 
-check_required_components(RynnMotion)

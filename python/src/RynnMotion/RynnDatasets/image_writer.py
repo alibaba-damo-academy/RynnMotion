@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 import multiprocessing
 import queue
 import threading
@@ -21,6 +22,8 @@ from pathlib import Path
 import numpy as np
 import PIL.Image
 import torch
+
+logger = logging.getLogger(__name__)
 
 
 def safe_stop_image_writer(func):
@@ -68,7 +71,7 @@ def image_array_to_pil_image(image_array: np.ndarray, range_check: bool = True) 
     return PIL.Image.fromarray(image_array)
 
 
-def write_image(image: np.ndarray | PIL.Image.Image, fpath: Path):
+def write_image(image: np.ndarray | PIL.Image.Image, fpath: Path, compress_level: int = 6):
     try:
         if isinstance(image, np.ndarray):
             img = image_array_to_pil_image(image)
@@ -76,20 +79,28 @@ def write_image(image: np.ndarray | PIL.Image.Image, fpath: Path):
             img = image
         else:
             raise TypeError(f"Unsupported image type: {type(image)}")
-        img.save(fpath)
+        img.save(fpath, compress_level=compress_level)
     except Exception as e:
-        print(f"Error writing image {fpath}: {e}")
+        logger.error(f"Error writing image {fpath}: {e}")
 
 
 def worker_thread_loop(queue: queue.Queue):
+    thread_name = threading.current_thread().name
     while True:
-        item = queue.get()
-        if item is None:
+        try:
+            item = queue.get()
+            if item is None:
+                queue.task_done()
+                break
+            image_array, fpath, compress_level = item
+            write_image(image_array, fpath, compress_level=compress_level)
             queue.task_done()
-            break
-        image_array, fpath = item
-        write_image(image_array, fpath)
-        queue.task_done()
+        except Exception as e:
+            logger.error(f"Image writer thread {thread_name} error: {e}")
+            try:
+                queue.task_done()
+            except ValueError:
+                pass
 
 
 def worker_process(queue: queue.Queue, num_threads: int):
@@ -146,11 +157,11 @@ class AsyncImageWriter:
                 p.start()
                 self.processes.append(p)
 
-    def save_image(self, image: torch.Tensor | np.ndarray | PIL.Image.Image, fpath: Path):
+    def save_image(self, image: torch.Tensor | np.ndarray | PIL.Image.Image, fpath: Path, compress_level: int = 6):
         if isinstance(image, torch.Tensor):
             # Convert tensor to numpy array to minimize main process time
             image = image.cpu().numpy()
-        self.queue.put((image, fpath))
+        self.queue.put((image, fpath, compress_level))
 
     def wait_until_done(self):
         self.queue.join()

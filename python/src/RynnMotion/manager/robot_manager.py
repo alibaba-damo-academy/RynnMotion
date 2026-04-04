@@ -14,7 +14,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import logging
 
-from RynnMotion.manager.mjcf_parser import MjcfParser, ActuatorMode
+from RynnMotion.manager.mjcf_parser import MjcfParser, ActuatorMode, SensorInfo
 from RynnMotion.algorithms.pin_kine import PinKine
 
 
@@ -37,6 +37,7 @@ class RobotManager(ABC):
         """
         self.logger = logger or logging.getLogger(__name__)
 
+        self._robot_model_config = robotmodel_config
         self._robot_name = robotmodel_config.get("robot_name", "")
         self._robot_control_freq = robotmodel_config.get("robot_control_freq", 100)
         self._robot_mjcf = robotmodel_config.get("robot_mjcf", "")
@@ -53,6 +54,7 @@ class RobotManager(ABC):
         self._mdof: int = self._robot_state["mdof"]
         self._adof: int = self._robot_state["adof"]
         self._num_ee: int = self._robot_state["num_ee"]
+        self._ee_site_num: int = self._robot_state.get("ee_site_num", 0)
         self._joint_indices: List[int] = self._robot_state["joint_indices"]
         self._ee_indices: List[int] = self._robot_state["ee_indices"]
         self._ee_joint_indices: List[int] = self._robot_state["ee_joint_indices"]
@@ -62,9 +64,15 @@ class RobotManager(ABC):
         self._actuator_modes = self._load_actuator_modes()
         self._actuator_gains = self._load_actuator_gains()
         self._keyframes = self._load_keyframes()
+        self._update_keyframes()
         self._site_names = self._load_site_names()
+        self._sensors = self._load_sensors()
+        self._camera_names = self._load_camera_names()
+        self._actuator_names = self._load_actuator_names()
 
-        self.logger.info("mdof: %d, adof: %d, num_ee: %d", self._mdof, self._adof, self._num_ee)
+        self.logger.info(
+            "mdof: %d, adof: %d, num_ee: %d", self._mdof, self._adof, self._num_ee
+        )
         self.logger.info("joint_indices: %s", self._joint_indices)
         self.logger.info("ee_indices: %s", self._ee_indices)
         self.logger.info("ee_joint_indices: %s", self._ee_joint_indices)
@@ -79,20 +87,32 @@ class RobotManager(ABC):
         try:
             return MjcfParser.extract_robot_state_dim(self._robot_mjcf)
         except Exception as e:
-            self.logger.error("Failed to extract robot state from %s: %s", self._robot_mjcf, e)
+            self.logger.error(
+                "Failed to extract robot state from %s: %s", self._robot_mjcf, e
+            )
             return None
 
     def _load_joint_limits(self) -> dict:
         """Load joint limits from MJCF file"""
         if not self._robot_mjcf:
-            return {"q_pos_min": np.array([]), "q_pos_max": np.array([]),
-                    "q_vel_max": np.array([]), "q_torque_max": np.array([])}
+            return {
+                "q_pos_min": np.array([]),
+                "q_pos_max": np.array([]),
+                "q_vel_max": np.array([]),
+                "q_torque_max": np.array([]),
+            }
         try:
-            return MjcfParser.extract_joint_limits(self._robot_mjcf, self._joint_indices)
+            return MjcfParser.extract_joint_limits(
+                self._robot_mjcf, self._joint_indices
+            )
         except Exception as e:
             self.logger.warning("Failed to load joint limits: %s", e)
-            return {"q_pos_min": np.zeros(self._mdof), "q_pos_max": np.zeros(self._mdof),
-                    "q_vel_max": np.zeros(self._mdof), "q_torque_max": np.zeros(self._mdof)}
+            return {
+                "q_pos_min": np.zeros(self._mdof),
+                "q_pos_max": np.zeros(self._mdof),
+                "q_vel_max": np.zeros(self._mdof),
+                "q_torque_max": np.zeros(self._mdof),
+            }
 
     def _load_actuator_modes(self) -> List[ActuatorMode]:
         """Load actuator modes from MJCF file"""
@@ -121,8 +141,52 @@ class RobotManager(ABC):
         try:
             return MjcfParser.extract_keyframes(self._robot_mjcf)
         except Exception as e:
-            self.logger.warning("Failed to load keyframes from %s: %s", self._robot_mjcf, e)
+            self.logger.warning(
+                "Failed to load keyframes from %s: %s", self._robot_mjcf, e
+            )
             return {"keyframes": [], "names": [], "nq": 0}
+
+    def _update_keyframes(self) -> None:
+        """Update keyframes dictionary.
+
+        Args:
+            keyframes: New keyframes dictionary.
+        """
+        home_position = self._robot_model_config.get("home_position", None)
+        if home_position is not None:
+            self.logger.info("Home position update by config file!")
+            if len(home_position) < self._mdof + self._adof:
+                self._keyframes["keyframes"][0][: len(home_position)] = np.array(
+                    home_position
+                )
+            else:
+                self._keyframes["keyframes"][0] = np.array(
+                    home_position[: self._mdof + self._adof]
+                )
+
+        standby1_position = self._robot_model_config.get("standby1_position", None)
+        if standby1_position is not None:
+            self.logger.info("Standby1 position update by config file!")
+            if len(standby1_position) < self._mdof + self._adof:
+                self._keyframes["keyframes"][1][: len(standby1_position)] = np.array(
+                    standby1_position
+                )
+            else:
+                self._keyframes["keyframes"][1] = np.array(
+                    standby1_position[: self._mdof + self._adof]
+                )
+
+        standby2_position = self._robot_model_config.get("standby2_position", None)
+        if standby2_position is not None:
+            self.logger.info("Standby2 position update by config file!")
+            if len(standby2_position) < self._mdof + self._adof:
+                self._keyframes["keyframes"][2][: len(standby2_position)] = np.array(
+                    standby2_position
+                )
+            else:
+                self._keyframes["keyframes"][2] = np.array(
+                    standby2_position[: self._mdof + self._adof]
+                )
 
     def _load_site_names(self) -> List[str]:
         """Load site names from MJCF file"""
@@ -133,6 +197,36 @@ class RobotManager(ABC):
         except Exception as e:
             self.logger.warning("Failed to load site names: %s", e)
             return []
+
+    def _load_sensors(self) -> Dict[str, List[SensorInfo]]:
+        """Load sensor info from MJCF file"""
+        if not self._robot_mjcf:
+            return {k: [] for k in ("force", "torque", "gyro", "accel", "rangefinder", "frame_pos", "frame_quat")}
+        try:
+            return MjcfParser.detect_sensors(self._robot_mjcf)
+        except Exception as e:
+            self.logger.warning("Failed to load sensors: %s", e)
+            return {k: [] for k in ("force", "torque", "gyro", "accel", "rangefinder", "frame_pos", "frame_quat")}
+
+    def _load_camera_names(self) -> List[str]:
+        """Load camera names from MJCF file"""
+        if not self._robot_mjcf:
+            return []
+        try:
+            return MjcfParser.detect_cameras(self._robot_mjcf)
+        except Exception as e:
+            self.logger.warning("Failed to load camera names: %s", e)
+            return []
+
+    def _load_actuator_names(self) -> Dict[str, List[str]]:
+        """Load actuator names from MJCF file"""
+        if not self._robot_mjcf:
+            return {"joint_names": [], "ee_names": []}
+        try:
+            return MjcfParser.extract_actuator_names(self._robot_mjcf)
+        except Exception as e:
+            self.logger.warning("Failed to load actuator names: %s", e)
+            return {"joint_names": [], "ee_names": []}
 
     # ========== Core DOF methods (C++ aligned) ==========
 
@@ -215,6 +309,48 @@ class RobotManager(ABC):
         """Get number of sites"""
         return len(self._site_names)
 
+    # ========== Sensors (C++ aligned) ==========
+
+    def get_sensors(self) -> Dict[str, List[SensorInfo]]:
+        """Get all sensors categorized by type"""
+        return self._sensors
+
+    def get_force_sensors(self) -> List[SensorInfo]:
+        """Get force sensors"""
+        return self._sensors.get("force", [])
+
+    def get_torque_sensors(self) -> List[SensorInfo]:
+        """Get torque sensors"""
+        return self._sensors.get("torque", [])
+
+    def get_gyro_sensors(self) -> List[SensorInfo]:
+        """Get gyroscope sensors"""
+        return self._sensors.get("gyro", [])
+
+    def get_accel_sensors(self) -> List[SensorInfo]:
+        """Get accelerometer sensors"""
+        return self._sensors.get("accel", [])
+
+    # ========== Cameras (C++ aligned) ==========
+
+    def get_camera_names(self) -> List[str]:
+        """Get camera names from MJCF"""
+        return self._camera_names
+
+    def get_num_cameras(self) -> int:
+        """Get number of cameras"""
+        return len(self._camera_names)
+
+    # ========== Actuator names (C++ aligned) ==========
+
+    def get_joint_names(self) -> List[str]:
+        """Get joint actuator names (motion joints only)"""
+        return self._actuator_names.get("joint_names", [])
+
+    def get_ee_names(self) -> List[str]:
+        """Get end-effector actuator names (grippers)"""
+        return self._actuator_names.get("ee_names", [])
+
     # ========== Path getters ==========
 
     def get_robot_mjcf(self) -> str:
@@ -243,17 +379,22 @@ class RobotManager(ABC):
             motion_only: If True, return only motion DOF (exclude gripper). Default True.
         """
         keyframes = self._keyframes.get("keyframes", [])
+        joint_indices = self._joint_indices
         nq = self._keyframes.get("nq", 0)
         if index < len(keyframes):
             kf = keyframes[index]
             if motion_only:
-                return kf[:self._mdof]
+                return kf[joint_indices]  # kf[: self._mdof]
             return kf
         return np.zeros(self._mdof if motion_only else nq)
 
     def get_q_standby(self, index: int = 0) -> np.ndarray:
         """Get standby keyframe (0=standby1, 1=standby2). Returns motion DOF only."""
         return self.get_keyframe(1 + index, motion_only=True)
+
+    def get_full_q_standby(self, index: int = 0) -> np.ndarray:
+        """Get standby keyframe (0=standby1, 1=standby2). Returns full DOF including grippers."""
+        return self.get_keyframe(1 + index, motion_only=False)
 
     def get_q_home(self) -> np.ndarray:
         """Get home keyframe (keyframes[0]). Returns motion DOF only."""
@@ -268,6 +409,10 @@ class RobotManager(ABC):
     def get_ft_sensor_num(self) -> int:
         """Get number of force/torque sensors"""
         return self._robot_state.get("ft_sensor_num", 0)
+
+    def get_ee_site_num(self) -> int:
+        """Get number of end-effector sites (sites with 'ee' in name)"""
+        return self._ee_site_num
 
     def get_ee_site_idx(self) -> List[int]:
         """Get site indices for end-effectors"""

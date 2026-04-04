@@ -15,9 +15,8 @@ Example:
 """
 
 import mujoco as mj
-import mujoco.viewer
 import numpy as np
-from typing import Optional, Union, Dict, Any
+from typing import Optional, Dict, Any
 
 from RynnMotion.core.interface_base import (
     RobotInterfaceBase,
@@ -63,17 +62,16 @@ class MujocoRobotInterface(RobotInterfaceBase):
         # Initialize ALL resources to None FIRST (prevents GC malloc issues)
         self.mjModel: Optional[mj.MjModel] = None
         self.mjData: Optional[mj.MjData] = None
-        self.viewer: Optional[any] = None
+        self.viewer: Optional[Any] = None
         self.camera_renderer: Optional[mj.Renderer] = None
         self.video_writer: Optional[Any] = None
-
-        # Configuration
-        self.config_path = robot_config
-        self.config: Optional[Dict[str, Any]] = None
 
         # Timing (single frequency, no multi-threading)
         self.control_freq = robot_model.get_robot_control_freq()
         self.dt = 1.0 / self.control_freq
+        self.render_freq = 50  # Hz
+        self.render_step_interval = int(self.control_freq / self.render_freq)
+        self.render_count = 0
 
         # Camera settings
         self.camera_saving_mode: str = "none"
@@ -88,9 +86,6 @@ class MujocoRobotInterface(RobotInterfaceBase):
         self._camera_lookat: np.ndarray = np.array([0.0, 0.0, 0.0])
 
         self.load_mujoco_model(robot_model)
-
-        # Initialize
-        # self.init_interface()
 
     # NOTE: No __del__ method - let Python GC handle cleanup naturally
     # This avoids malloc corruption during interpreter shutdown
@@ -145,10 +140,12 @@ class MujocoRobotInterface(RobotInterfaceBase):
             # Map actuator to joint
             joint_id = self.mjModel.actuator_trnid[i, 0]
             qpos_idx = self.mjModel.jnt_qposadr[joint_id]
+            dof_idx = self.mjModel.jnt_dofadr[joint_id]
 
             self.robot_feedback.joint_pos[i] = self.mjData.qpos[qpos_idx]
-            self.robot_feedback.joint_vel[i] = self.mjData.qvel[qpos_idx]
-            self.robot_feedback.joint_torque[i] = self.mjData.actuator_force[qpos_idx]
+            self.robot_feedback.joint_vel[i] = self.mjData.qvel[dof_idx]
+            # self.robot_feedback.joint_torque[i] = self.mjData.actuator_force[qpos_idx]
+            self.robot_feedback.joint_torque[i] = self.mjData.actuator_force[i]
 
     def set_joint_commands(self):
         """
@@ -179,12 +176,23 @@ class MujocoRobotInterface(RobotInterfaceBase):
         """
         # Step physics
         mj.mj_step(self.mjModel, self.mjData)
+        self.render_count += 1
+        if self.render_count >= self.render_step_interval:
+            self.render_count = 0
+        else:
+            return
 
         # Render if enabled
         if render_flag:
             # Lazy viewer creation (compatible with ControllerBase)
             if self.viewer is None:
-                self.viewer = mujoco.viewer.launch_passive(self.mjModel, self.mjData)
+                self.viewer = mj.viewer.launch_passive(self.mjModel, self.mjData)
+                # Apply saved camera settings from set_camera()
+                if self.viewer and hasattr(self.viewer, "cam"):
+                    self.viewer.cam.distance = self._camera_distance
+                    self.viewer.cam.azimuth = self._camera_azimuth
+                    self.viewer.cam.elevation = self._camera_elevation
+                    self.viewer.cam.lookat[:] = self._camera_lookat
 
             # Update viewer if running
             if self.viewer and self.viewer.is_running():
@@ -192,43 +200,36 @@ class MujocoRobotInterface(RobotInterfaceBase):
 
     def disconnect(self):
         """
-        Clean shutdown - minimal cleanup, let Python GC handle MuJoCo objects.
+        Clean shutdown - close managed resources, let Python GC handle MuJoCo objects.
 
-        Following the pattern from examples/lekiwi.py and examples/xlerobot.py:
-        - Don't explicitly close viewer (causes malloc corruption)
-        - Don't explicitly close mjModel/mjData (let GC handle it)
-        - Only close resources we explicitly manage (video writer, camera renderer)
+        - Close video writer and camera renderer (resources we explicitly manage)
+        - Close viewer for clean shutdown
+        - Don't explicitly close mjModel/mjData (let GC handle them)
         """
-        # Prevent double-disconnect
-        if not getattr(self, "is_connected", False):
+        if not self.connected:
             return
 
         self.connected = False
 
-        # Only close resources we explicitly manage (not MuJoCo objects)
         try:
             if hasattr(self, "video_writer") and self.video_writer:
                 self.video_writer.release()
                 self.video_writer = None
         except Exception as e:
-            print(f"Warning: Error releasing video writer: {e}")
+            self.logger.warning(f"Error releasing video writer: {e}")
 
         try:
             if hasattr(self, "camera_renderer") and self.camera_renderer:
                 self.camera_renderer.close()
                 self.camera_renderer = None
         except Exception as e:
-            print(f"Warning: Error closing camera renderer: {e}")
+            self.logger.warning(f"Error closing camera renderer: {e}")
 
-        if self.viewer:
-            self.viewer.close()
+        # Don't call viewer.close() — let Python GC handle it to avoid segfault
+        self.viewer = None
 
-        # Don't close viewer - let Python GC handle it (avoids malloc corruption)
-        # Don't close mjModel/mjData - let Python GC handle them
+        self.logger.info("MuJoCo simulation disconnected")
 
-        print("✓ MuJoCo simulation disconnected")
-
-        # Call parent disconnect
         super().disconnect()
 
     def _get_time_source(self) -> str:
@@ -278,12 +279,12 @@ class MujocoRobotInterface(RobotInterfaceBase):
         Returns:
             True if viewer exists and is running, False otherwise
         """
-        if self.viewer:
-            try:
-                return self.viewer.is_running()
-            except:
-                return False
-        return True
+        if self.viewer is None:
+            return True
+        try:
+            return self.viewer.is_running()
+        except Exception:
+            return False
 
     # ========== Camera Control & Recording ==========
 
@@ -334,14 +335,14 @@ class MujocoRobotInterface(RobotInterfaceBase):
             self.camera_id = mj.mj_name2id(
                 self.mjModel, mj.mjtObj.mjOBJ_CAMERA, camera_name
             )
-        except:
-            print(f"Warning: Camera '{camera_name}' not found in model")
+        except Exception as e:
+            self.logger.warning(f"Camera '{camera_name}' not found in model: {e}")
             self.camera_saving_mode = "none"
             return
 
         # Create offscreen renderer
         self.camera_renderer = mj.Renderer(self.mjModel, height=height, width=width)
-        print(
+        self.logger.info(
             f"Camera recording initialized: mode={mode}, camera={camera_name}, {width}x{height}"
         )
 
@@ -380,5 +381,5 @@ class MujocoRobotInterface(RobotInterfaceBase):
             imageio.imwrite(filename, rgb_array)
             return True
         except ImportError:
-            print("Warning: imageio not installed, cannot save images")
+            self.logger.warning("imageio not installed, cannot save images")
             return False

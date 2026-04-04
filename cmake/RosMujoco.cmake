@@ -12,6 +12,14 @@ else()
     message(STATUS "rm_ros_interfaces not found - Building without RM robot support")
 endif()
 
+find_package(usscan_msgs QUIET)
+if(usscan_msgs_FOUND)
+    add_compile_definitions(USE_USSCAN_MSGS)
+    message(STATUS "Found usscan_msgs - Building with ultrasound scan support")
+else()
+    message(STATUS "usscan_msgs not found - Building without ultrasound scan support")
+endif()
+
 find_library(CCD_LIBRARY NAMES ccd REQUIRED)
 if(NOT CCD_LIBRARY)
     message(FATAL_ERROR "libccd library not found")
@@ -35,6 +43,24 @@ ament_target_dependencies(rosMujocoExe
 
 if(rm_ros_interfaces_FOUND)
     ament_target_dependencies(rosMujocoExe rm_ros_interfaces)
+endif()
+
+if(usscan_msgs_FOUND)
+    ament_target_dependencies(rosMujocoExe usscan_msgs)
+    # Add explicit include path for usscan_msgs (state_ids.hpp)
+    target_include_directories(rosMujocoExe PUBLIC
+        ${usscan_msgs_INCLUDE_DIRS}
+    )
+    # Add include path for usscan_fsm (reusing from RynnFlexiv)
+    target_include_directories(rosMujocoExe PUBLIC
+        ${CMAKE_SOURCE_DIR}/robots/RynnFlexiv/src
+    )
+    # Add usscan_fsm source file
+    target_sources(rosMujocoExe PRIVATE
+        ${CMAKE_SOURCE_DIR}/robots/RynnFlexiv/src/fsm/usscan_fsm.cpp
+    )
+    # Link fmt library (required by spdlog used in usscan_fsm)
+    target_link_libraries(rosMujocoExe fmt)
 endif()
 
 target_include_directories(rosMujocoExe PUBLIC ${MUJOCO_INCLUDE_DIRS})

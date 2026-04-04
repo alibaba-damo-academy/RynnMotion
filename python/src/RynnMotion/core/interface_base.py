@@ -26,6 +26,7 @@ def register_robotinterface_factory_func(robot_type):
 
     def decorator(factory_func):
         REGISTERED_ROBOT_INTERFACE_FACTORY_FUNCS[robot_type] = factory_func
+        return factory_func
 
     return decorator
 
@@ -39,9 +40,14 @@ def robotinterface_factory(robot_type, robot_model, robot_config, logger=None):
 
         config (BaseConfig instance): config object
     """
+    if robot_type not in REGISTERED_ROBOT_INTERFACE_FACTORY_FUNCS:
+        available = list(REGISTERED_ROBOT_INTERFACE_FACTORY_FUNCS.keys())
+        raise KeyError(
+            f"Unknown robot interface type '{robot_type}'. Available: {available}"
+        )
+
     robotinterface_class = REGISTERED_ROBOT_INTERFACE_FACTORY_FUNCS[robot_type]
 
-    # create algo instance
     return robotinterface_class(
         robot_model=robot_model, robot_config=robot_config, logger=logger
     )
@@ -62,7 +68,7 @@ class RobotInterfaceBase(ABC):
         """load robot config"""
 
         self.mdof = self.robot_model.get_actuator_num()
-        self.ee_num = self.robot_model.get_ee_num()
+        self.ee_num = self.robot_model.get_ee_num() or self.robot_model.get_ee_site_num()
         self.gripper_num = self.robot_model.get_gripper_num()
         self.site_num = self.robot_model.get_site_num()
         self.joint_state_num = self.robot_model.get_joint_state_num()
@@ -80,9 +86,9 @@ class RobotInterfaceBase(ABC):
 
         self.robot_command = RobotState()
         self.robot_command.num_joints = self.mdof
-        self.robot_feedback.num_end_effectors = self.ee_num
-        self.robot_feedback.num_grippers = self.gripper_num
-        self.robot_feedback.num_sites = self.site_num
+        self.robot_command.num_end_effectors = self.ee_num
+        self.robot_command.num_grippers = self.gripper_num
+        self.robot_command.num_sites = self.site_num
 
         self.logger.info(f"robot interface initialized:")
         self.logger.info(f"mdof: {self.mdof}")

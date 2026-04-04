@@ -4,16 +4,17 @@ import importlib.resources
 import json
 import logging
 from collections.abc import Iterator
-from itertools import accumulate
 from pathlib import Path
 from pprint import pformat
 from types import SimpleNamespace
 from typing import Any
 
 import datasets
-import jsonlines
 import numpy as np
 import packaging.version
+import pandas as pd
+import pyarrow.dataset as pa_ds
+import pyarrow.parquet as pq
 import torch
 from datasets.table import embed_table_storage
 from huggingface_hub import DatasetCard, DatasetCardData, HfApi
@@ -27,7 +28,6 @@ from .backward_compatibility import (
     BackwardCompatibilityError,
     ForwardCompatibilityError,
 )
-# Moved is_valid_numpy_dtype_string to this file to avoid redundant utils_simple.py
 
 
 def is_valid_numpy_dtype_string(dtype_str: str) -> bool:
@@ -38,16 +38,22 @@ def is_valid_numpy_dtype_string(dtype_str: str) -> bool:
     except (TypeError, ValueError):
         return False
 
-DEFAULT_CHUNK_SIZE = 1000  # Max number of episodes per chunk
+DEFAULT_CHUNK_SIZE = 1000  # Max number of files per chunk
+DEFAULT_DATA_FILE_SIZE_IN_MB = 100  # Max size per data file
+DEFAULT_VIDEO_FILE_SIZE_IN_MB = 200  # Max size per video file
 
 INFO_PATH = "meta/info.json"
-EPISODES_PATH = "meta/episodes.jsonl"
 STATS_PATH = "meta/stats.json"
-EPISODES_STATS_PATH = "meta/episodes_stats.jsonl"
-TASKS_PATH = "meta/tasks.jsonl"
 
-DEFAULT_VIDEO_PATH = "videos/chunk-{episode_chunk:03d}/{video_key}/episode_{episode_index:06d}.mp4"
-DEFAULT_PARQUET_PATH = "data/chunk-{episode_chunk:03d}/episode_{episode_index:06d}.parquet"
+EPISODES_DIR = "meta/episodes"
+DATA_DIR = "data"
+VIDEO_DIR = "videos"
+
+CHUNK_FILE_PATTERN = "chunk-{chunk_index:03d}/file-{file_index:03d}"
+DEFAULT_TASKS_PATH = "meta/tasks.parquet"
+DEFAULT_EPISODES_PATH = EPISODES_DIR + "/" + CHUNK_FILE_PATTERN + ".parquet"
+DEFAULT_DATA_PATH = DATA_DIR + "/" + CHUNK_FILE_PATTERN + ".parquet"
+DEFAULT_VIDEO_PATH = VIDEO_DIR + "/{video_key}/" + CHUNK_FILE_PATTERN + ".mp4"
 DEFAULT_IMAGE_PATH = "images/{image_key}/episode_{episode_index:06d}/frame_{frame_index:06d}.png"
 
 DATASET_CARD_TEMPLATE = """
@@ -147,21 +153,29 @@ def write_json(data: dict, fpath: Path) -> None:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 
-def load_jsonlines(fpath: Path) -> list[Any]:
-    with jsonlines.open(fpath, "r") as reader:
-        return list(reader)
+def update_chunk_file_indices(chunk_idx: int, file_idx: int, chunks_size: int) -> tuple[int, int]:
+    if file_idx == chunks_size - 1:
+        file_idx = 0
+        chunk_idx += 1
+    else:
+        file_idx += 1
+    return chunk_idx, file_idx
 
 
-def write_jsonlines(data: dict, fpath: Path) -> None:
-    fpath.parent.mkdir(exist_ok=True, parents=True)
-    with jsonlines.open(fpath, "w") as writer:
-        writer.write_all(data)
+def get_file_size_in_mb(file_path: Path) -> float:
+    return file_path.stat().st_size / (1024**2)
 
 
-def append_jsonlines(data: dict, fpath: Path) -> None:
-    fpath.parent.mkdir(exist_ok=True, parents=True)
-    with jsonlines.open(fpath, "a") as writer:
-        writer.write(data)
+def load_nested_dataset(
+    pq_dir: Path, features: datasets.Features | None = None, episodes: list[int] | None = None
+) -> datasets.Dataset:
+    """Load chunked parquet files from directory structure chunk-xxx/file-xxx.parquet."""
+    paths = sorted(pq_dir.glob("*/*.parquet"))
+    if len(paths) == 0:
+        raise FileNotFoundError(f"Provided directory does not contain any parquet file: {pq_dir}")
+
+    filters = pa_ds.field("episode_index").isin(episodes) if episodes is not None else None
+    return datasets.Dataset.from_parquet([str(path) for path in paths], filters=filters, features=features)
 
 
 def write_info(info: dict, local_dir: Path):
@@ -192,49 +206,22 @@ def load_stats(local_dir: Path) -> dict[str, dict[str, np.ndarray]]:
     return cast_stats_to_numpy(stats)
 
 
-def write_task(task_index: int, task: dict, local_dir: Path):
-    task_dict = {
-        "task_index": task_index,
-        "task": task,
-    }
-    append_jsonlines(task_dict, local_dir / TASKS_PATH)
+def write_tasks(tasks: pd.DataFrame, local_dir: Path) -> None:
+    path = local_dir / DEFAULT_TASKS_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tasks.to_parquet(path)
 
 
-def load_tasks(local_dir: Path) -> tuple[dict, dict]:
-    tasks = load_jsonlines(local_dir / TASKS_PATH)
-    tasks = {item["task_index"]: item["task"] for item in sorted(tasks, key=lambda x: x["task_index"])}
-    task_to_task_index = {task: task_index for task_index, task in tasks.items()}
-    return tasks, task_to_task_index
+def load_tasks(local_dir: Path) -> pd.DataFrame:
+    tasks = pd.read_parquet(local_dir / DEFAULT_TASKS_PATH)
+    tasks.index.name = "task"
+    return tasks
 
 
-def write_episode(episode: dict, local_dir: Path):
-    append_jsonlines(episode, local_dir / EPISODES_PATH)
-
-
-def load_episodes(local_dir: Path) -> dict:
-    episodes = load_jsonlines(local_dir / EPISODES_PATH)
-    return {item["episode_index"]: item for item in sorted(episodes, key=lambda x: x["episode_index"])}
-
-
-def write_episode_stats(episode_index: int, episode_stats: dict, local_dir: Path):
-    # We wrap episode_stats in a dictionary since `episode_stats["episode_index"]`
-    # is a dictionary of stats and not an integer.
-    episode_stats = {"episode_index": episode_index, "stats": serialize_dict(episode_stats)}
-    append_jsonlines(episode_stats, local_dir / EPISODES_STATS_PATH)
-
-
-def load_episodes_stats(local_dir: Path) -> dict:
-    episodes_stats = load_jsonlines(local_dir / EPISODES_STATS_PATH)
-    return {
-        item["episode_index"]: cast_stats_to_numpy(item["stats"])
-        for item in sorted(episodes_stats, key=lambda x: x["episode_index"])
-    }
-
-
-def backward_compatible_episodes_stats(
-    stats: dict[str, dict[str, np.ndarray]], episodes: list[int]
-) -> dict[str, dict[str, np.ndarray]]:
-    return dict.fromkeys(episodes, stats)
+def load_episodes(local_dir: Path) -> datasets.Dataset:
+    episodes = load_nested_dataset(local_dir / EPISODES_DIR)
+    episodes = episodes.select_columns([key for key in episodes.features if not key.startswith("stats/")])
+    return episodes
 
 
 def load_image_as_numpy(
@@ -293,8 +280,11 @@ def check_version_compatibility(
     )
     if v_check.major < v_current.major and enforce_breaking_major:
         raise BackwardCompatibilityError(repo_id, v_check)
-    elif v_check.minor < v_current.minor:
-        logging.warning(V21_MESSAGE.format(repo_id=repo_id, version=v_check))
+    elif v_check < v_current:
+        logging.warning(
+            f"Dataset {repo_id} is in {v_check} format. Current codebase is {v_current}. "
+            "Consider converting to the latest format."
+        )
 
 
 def get_repo_versions(repo_id: str) -> list[packaging.version.Version]:
@@ -394,6 +384,8 @@ def hw_to_dataset_features(
     joint_fts = {key: ftype for key, ftype in hw_features.items() if ftype is float}
     cam_fts = {key: shape for key, shape in hw_features.items() if isinstance(shape, tuple)}
     pose_fts = {key: shape for key, shape in hw_features.items() if isinstance(shape, list)}
+    # Dict-typed features: {"wrench": 6}, {"imu": 10}, {"depth": (H,W,1)}, {"tactile": 16}
+    dict_fts = {key: val for key, val in hw_features.items() if isinstance(val, dict)}
 
     if joint_fts and prefix == "action":
         features[prefix] = {
@@ -429,6 +421,48 @@ def hw_to_dataset_features(
             "shape": tuple(shape),  # Convert [7] to (7,)
             "names": pose_names,
         }
+
+    # Handle dict-typed sensor features (wrench, imu, depth, tactile)
+    for key, spec in dict_fts.items():
+        for sensor_kind, value in spec.items():
+            if sensor_kind == "wrench":
+                ndims = int(value)
+                wrench_names = ["fx", "fy", "fz", "tx", "ty", "tz"][:ndims]
+                features[f"{prefix}.state.wrench.{key}"] = {
+                    "dtype": "float32",
+                    "shape": (ndims,),
+                    "names": wrench_names,
+                }
+            elif sensor_kind == "imu":
+                ndims = int(value)
+                imu_names_map = {
+                    6: ["ax", "ay", "az", "gx", "gy", "gz"],
+                    9: ["ax", "ay", "az", "gx", "gy", "gz", "qx", "qy", "qz"],
+                    10: ["ax", "ay", "az", "gx", "gy", "gz", "qw", "qx", "qy", "qz"],
+                }
+                imu_names = imu_names_map.get(ndims, [f"dim_{i}" for i in range(ndims)])
+                features[f"{prefix}.state.imu.{key}"] = {
+                    "dtype": "float32",
+                    "shape": (ndims,),
+                    "names": imu_names,
+                }
+            elif sensor_kind == "depth":
+                if isinstance(value, (list, tuple)):
+                    shape = tuple(value)
+                else:
+                    shape = (int(value), int(value), 1)
+                features[f"{prefix}.images.depth_{key}"] = {
+                    "dtype": "video" if use_video else "image",
+                    "shape": shape,
+                    "names": ["height", "width", "channels"],
+                }
+            elif sensor_kind == "tactile":
+                ndims = int(value)
+                features[f"{prefix}.state.tactile.{key}"] = {
+                    "dtype": "float32",
+                    "shape": (ndims,),
+                    "names": [f"taxel_{i}" for i in range(ndims)],
+                }
 
     _validate_feature_names(features)
     return features
@@ -491,6 +525,9 @@ def create_empty_dataset_info(
     features: dict,
     use_videos: bool,
     robot_type: str | None = None,
+    chunks_size: int | None = None,
+    data_files_size_in_mb: int | None = None,
+    video_files_size_in_mb: int | None = None,
 ) -> dict:
     return {
         "codebase_version": codebase_version,
@@ -498,102 +535,17 @@ def create_empty_dataset_info(
         "total_episodes": 0,
         "total_frames": 0,
         "total_tasks": 0,
-        "total_videos": 0,
-        "total_chunks": 0,
-        "chunks_size": DEFAULT_CHUNK_SIZE,
+        "chunks_size": chunks_size or DEFAULT_CHUNK_SIZE,
+        "data_files_size_in_mb": data_files_size_in_mb or DEFAULT_DATA_FILE_SIZE_IN_MB,
+        "video_files_size_in_mb": video_files_size_in_mb or DEFAULT_VIDEO_FILE_SIZE_IN_MB,
         "fps": fps,
         "splits": {},
-        "data_path": DEFAULT_PARQUET_PATH,
+        "data_path": DEFAULT_DATA_PATH,
         "video_path": DEFAULT_VIDEO_PATH if use_videos else None,
         "features": features,
     }
 
 
-def get_episode_data_index(
-    episode_dicts: dict[dict], episodes: list[int] | None = None
-) -> dict[str, torch.Tensor]:
-    episode_lengths = {ep_idx: ep_dict["length"] for ep_idx, ep_dict in episode_dicts.items()}
-    if episodes is not None:
-        episode_lengths = {ep_idx: episode_lengths[ep_idx] for ep_idx in episodes}
-
-    cumulative_lengths = list(accumulate(episode_lengths.values()))
-    return {
-        "from": torch.LongTensor([0] + cumulative_lengths[:-1]),
-        "to": torch.LongTensor(cumulative_lengths),
-    }
-
-
-def check_timestamps_sync(
-    timestamps: np.ndarray,
-    episode_indices: np.ndarray,
-    episode_data_index: dict[str, np.ndarray],
-    fps: int,
-    tolerance_s: float,
-    raise_value_error: bool = True,
-) -> bool:
-    """
-    This check is to make sure that each timestamp is separated from the next by (1/fps) +/- tolerance
-    to account for possible numerical error.
-
-    Args:
-        timestamps (np.ndarray): Array of timestamps in seconds.
-        episode_indices (np.ndarray): Array indicating the episode index for each timestamp.
-        episode_data_index (dict[str, np.ndarray]): A dictionary that includes 'to',
-            which identifies indices for the end of each episode.
-        fps (int): Frames per second. Used to check the expected difference between consecutive timestamps.
-        tolerance_s (float): Allowed deviation from the expected (1/fps) difference.
-        raise_value_error (bool): Whether to raise a ValueError if the check fails.
-
-    Returns:
-        bool: True if all checked timestamp differences lie within tolerance, False otherwise.
-
-    Raises:
-        ValueError: If the check fails and `raise_value_error` is True.
-    """
-    if timestamps.shape != episode_indices.shape:
-        raise ValueError(
-            "timestamps and episode_indices should have the same shape. "
-            f"Found {timestamps.shape=} and {episode_indices.shape=}."
-        )
-
-    # Consecutive differences
-    diffs = np.diff(timestamps)
-    within_tolerance = np.abs(diffs - (1.0 / fps)) <= tolerance_s
-
-    # Mask to ignore differences at the boundaries between episodes
-    mask = np.ones(len(diffs), dtype=bool)
-    ignored_diffs = episode_data_index["to"][:-1] - 1  # indices at the end of each episode
-    mask[ignored_diffs] = False
-    filtered_within_tolerance = within_tolerance[mask]
-
-    # Check if all remaining diffs are within tolerance
-    if not np.all(filtered_within_tolerance):
-        # Track original indices before masking
-        original_indices = np.arange(len(diffs))
-        filtered_indices = original_indices[mask]
-        outside_tolerance_filtered_indices = np.nonzero(~filtered_within_tolerance)[0]
-        outside_tolerance_indices = filtered_indices[outside_tolerance_filtered_indices]
-
-        outside_tolerances = []
-        for idx in outside_tolerance_indices:
-            entry = {
-                "timestamps": [timestamps[idx], timestamps[idx + 1]],
-                "diff": diffs[idx],
-                "episode_index": episode_indices[idx].item()
-                if hasattr(episode_indices[idx], "item")
-                else episode_indices[idx],
-            }
-            outside_tolerances.append(entry)
-
-        if raise_value_error:
-            raise ValueError(
-                f"""One or several timestamps unexpectedly violate the tolerance inside episode range.
-                This might be due to synchronization issues during data collection.
-                \n{pformat(outside_tolerances)}"""
-            )
-        return False
-
-    return True
 
 
 def check_delta_timestamps(
@@ -691,7 +643,10 @@ def create_lerobot_dataset_card(
         ],
     )
 
-    card_template = (importlib.resources.files("lerobot.datasets") / "card_template.md").read_text()
+    try:
+        card_template = (importlib.resources.files("lerobot.datasets") / "card_template.md").read_text()
+    except (ModuleNotFoundError, FileNotFoundError):
+        card_template = DATASET_CARD_TEMPLATE.format(kwargs.get("dataset_structure", ""))
 
     return DatasetCard.from_template(
         card_data=card_data,
@@ -757,7 +712,8 @@ class IterableNamespace(SimpleNamespace):
 
 def validate_frame(frame: dict, features: dict):
     expected_features = set(features) - set(DEFAULT_FEATURES)
-    actual_features = set(frame)
+    # "task" and "timestamp" are handled separately in add_frame(), not in features
+    actual_features = set(frame) - {"task", "timestamp"}
 
     error_message = validate_features_presence(actual_features, expected_features)
 

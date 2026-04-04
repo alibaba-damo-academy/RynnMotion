@@ -114,7 +114,7 @@ The `setup_dependencies.sh` script installs:
 - **nlohmann/json** - JSON library
 
 **Physics & Kinematics:**
-- **MuJoCo** (3.5.0) - Physics simulation engine
+- **MuJoCo** (3.6.0) - Physics simulation engine
 - **Pinocchio** (3.7.0) - Rigid body dynamics library
 - **FCL** (Flexible Collision Library) - Collision detection
 
@@ -513,7 +513,7 @@ pkg-config --modversion eigen3      # Should show ≥3.3.0
 pkg-config --modversion pinocchio   # Should show 3.7.0
 
 # Check MuJoCo
-ls /usr/local/mujoco-3.5.0/  # Linux
+ls /usr/local/mujoco-3.6.0/  # Linux
 ls /opt/homebrew/Cellar/mujoco/  # macOS (Homebrew)
 
 # Check Python packages
@@ -570,11 +570,11 @@ ls /usr/local/include/mujoco/
 
 # If missing, reinstall MuJoCo
 cd /tmp
-wget https://github.com/google-deepmind/mujoco/releases/download/3.5.0/mujoco-3.5.0-linux-x86_64.tar.gz
-tar -xzf mujoco-3.5.0-linux-x86_64.tar.gz
-sudo mv mujoco-3.5.0 /usr/local/
-sudo ln -sf /usr/local/mujoco-3.5.0/include/mujoco /usr/local/include/
-sudo ln -sf /usr/local/mujoco-3.5.0/lib/libmujoco.so.3.5.0 /usr/local/lib/
+wget https://github.com/google-deepmind/mujoco/releases/download/3.6.0/mujoco-3.6.0-linux-x86_64.tar.gz
+tar -xzf mujoco-3.6.0-linux-x86_64.tar.gz
+sudo mv mujoco-3.6.0 /usr/local/
+sudo ln -sf /usr/local/mujoco-3.6.0/include/mujoco /usr/local/include/
+sudo ln -sf /usr/local/mujoco-3.6.0/lib/libmujoco.so.3.6.0 /usr/local/lib/
 
 # macOS:
 brew install mujoco
@@ -695,7 +695,7 @@ sudo make install
 
 1. Eigen (≥3.3.0)
 2. Boost (≥1.65)
-3. MuJoCo (3.5.0)
+3. MuJoCo (3.6.0)
 4. Pinocchio (3.7.0)
 5. yaml-cpp
 6. qpOASES
@@ -734,7 +734,7 @@ rm -rf RynnMotion/
 
 ```bash
 # Linux: Remove installed libraries
-sudo rm -rf /usr/local/mujoco-3.5.0
+sudo rm -rf /usr/local/mujoco-3.6.0
 sudo rm -rf /usr/local/include/pinocchio
 sudo rm -rf /usr/local/lib/libpinocchio*
 # ... (repeat for other libraries)

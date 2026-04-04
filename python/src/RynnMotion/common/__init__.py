@@ -9,6 +9,7 @@ from RynnMotion.common.communicator_base import (
     communicator_factory,
     CommunicatorBase,
 )
+from RynnMotion.common.keyboard_communicator import KeyboardCommunicatorBase
 
 from RynnMotion.common.lcm_communiactor import LCMCommunicator
 from RynnMotion.common.mock_communiactor import MockCommunicator

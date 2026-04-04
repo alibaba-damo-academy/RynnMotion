@@ -10,7 +10,10 @@ import os
 import sys
 from pathlib import Path
 from typing import Dict, Optional, Any
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 import yaml
 
 

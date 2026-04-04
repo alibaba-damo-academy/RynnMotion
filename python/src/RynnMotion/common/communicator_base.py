@@ -28,6 +28,7 @@ def register_communicator_factory_func(communicator_type):
 
     def decorator(factory_func):
         REGISTERED_COMMUNICATOR_FACTORY_FUNCS[communicator_type] = factory_func
+        return factory_func
 
     return decorator
 
@@ -72,7 +73,8 @@ class CommunicatorBase(ABC):
         self.actuator_dofs = robot_model.get_actuator_num()
         self.joint_state_dofs = robot_model.get_joint_state_num()
         self.gripper_dofs = robot_model.get_gripper_num()
-        self.ee_num = robot_model.get_ee_num()
+        self.gripper_joint_ids = robot_model.get_ee_indices()
+        self.ee_num = robot_model.get_ee_num() or robot_model.get_ee_site_num()
         self.sites_num = robot_model.get_site_num()
 
         # optional/extended counts (may not exist on all models)
@@ -119,7 +121,6 @@ class CommunicatorBase(ABC):
         """Subscribe to channel with callback."""
         pass
 
-    @abstractmethod
     def process_task_command(self):
         """Process task command."""
         pass

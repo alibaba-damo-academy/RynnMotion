@@ -9,8 +9,9 @@ Example:
 """
 
 import re
+from dataclasses import dataclass
 from enum import Enum
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import mujoco
@@ -18,6 +19,7 @@ import mujoco
 
 class ActuatorMode(Enum):
     """MuJoCo actuator control modes (matches C++ rynn::ActuatorMode)"""
+
     GENERAL = 0
     POSITION = 1
     VELOCITY = 2
@@ -28,6 +30,15 @@ class ActuatorMode(Enum):
     MUSCLE = 7
     ADHESION = 8
     PLUGIN = 9
+
+
+@dataclass
+class SensorInfo:
+    """Sensor metadata extracted from MJCF (matches C++ rynn::SensorInfo)."""
+
+    name: str
+    index: int  # Address in mjData.sensordata[]
+    dim: int  # Dimensionality (3 for force/torque/gyro/accel, 1 for rangefinder, etc.)
 
 
 # Gripper detection patterns (matches C++ mjcf_parser.cpp)
@@ -65,7 +76,9 @@ class MjcfParser:
         return False
 
     @staticmethod
-    def _compute_ee_parent_joints(joint_indices: List[int], ee_indices: List[int]) -> List[int]:
+    def _compute_ee_parent_joints(
+        joint_indices: List[int], ee_indices: List[int]
+    ) -> List[int]:
         """Compute parent joint actuator ID for each end-effector."""
         ee_joint_indices = []
         for ee_actuator_idx in ee_indices:
@@ -105,6 +118,7 @@ class MjcfParser:
 
                 'ft_sensor_num': int,
                 'site_num': int,
+                'ee_site_num': int,
                 'ee_site_idx': List[int],
                 'ee_site_name': List[str],
             }
@@ -138,10 +152,12 @@ class MjcfParser:
             else:
                 joint_indices.append(i)
 
-        ee_joint_indices = MjcfParser._compute_ee_parent_joints(joint_indices, ee_indices)
+        ee_joint_indices = MjcfParser._compute_ee_parent_joints(
+            joint_indices, ee_indices
+        )
 
         mdof = len(joint_indices)
-        adof = 1 if ee_indices else 0
+        adof = len(ee_indices)  # Each gripper is 1 DOF
         num_ee = len(ee_joint_indices)
 
         ee_site_idx = []
@@ -162,6 +178,7 @@ class MjcfParser:
             "ee_ranges": ee_ranges,
             "ft_sensor_num": ft_sensor_num,
             "site_num": site_num,
+            "ee_site_num": len(ee_site_idx),
             "ee_site_idx": ee_site_idx,
             "ee_site_name": ee_site_name,
         }
@@ -417,3 +434,119 @@ class MjcfParser:
     def extractSiteNames(mjcf_path: str) -> List[str]:
         """DEPRECATED: Use extract_site_names() instead"""
         return MjcfParser.extract_site_names(mjcf_path)
+
+    @staticmethod
+    def detect_sensors(mjcf_path: str) -> Dict[str, List[SensorInfo]]:
+        """Detect all sensors from MJCF file, categorized by type.
+
+        Matches C++ MjcfParser::detectSensors().
+
+        Args:
+            mjcf_path: Path to MJCF file.
+
+        Returns:
+            Dict mapping sensor type to list of SensorInfo:
+            {
+                'force': [...], 'torque': [...], 'gyro': [...],
+                'accel': [...], 'rangefinder': [...],
+                'frame_pos': [...], 'frame_quat': [...]
+            }
+        """
+        mj_model = mujoco.MjModel.from_xml_path(mjcf_path)
+
+        sensors: Dict[str, List[SensorInfo]] = {
+            "force": [],
+            "torque": [],
+            "gyro": [],
+            "accel": [],
+            "rangefinder": [],
+            "touch": [],
+            "frame_pos": [],
+            "frame_quat": [],
+        }
+
+        TYPE_MAP = {
+            mujoco.mjtSensor.mjSENS_FORCE: "force",
+            mujoco.mjtSensor.mjSENS_TORQUE: "torque",
+            mujoco.mjtSensor.mjSENS_GYRO: "gyro",
+            mujoco.mjtSensor.mjSENS_ACCELEROMETER: "accel",
+            mujoco.mjtSensor.mjSENS_RANGEFINDER: "rangefinder",
+            mujoco.mjtSensor.mjSENS_TOUCH: "touch",
+            mujoco.mjtSensor.mjSENS_FRAMEPOS: "frame_pos",
+            mujoco.mjtSensor.mjSENS_FRAMEQUAT: "frame_quat",
+        }
+
+        for i in range(mj_model.nsensor):
+            sensor_type = mj_model.sensor_type[i]
+            category = TYPE_MAP.get(sensor_type)
+            if category is None:
+                continue
+
+            name = mujoco.mj_id2name(mj_model, mujoco.mjtObj.mjOBJ_SENSOR, i)
+            if not name:
+                name = f"sensor_{i}"
+
+            info = SensorInfo(
+                name=name,
+                index=int(mj_model.sensor_adr[i]),
+                dim=int(mj_model.sensor_dim[i]),
+            )
+            sensors[category].append(info)
+
+        return sensors
+
+    @staticmethod
+    def detect_cameras(mjcf_path: str) -> List[str]:
+        """Detect all named cameras from MJCF file.
+
+        Matches C++ MjcfParser::detectCameras().
+
+        Args:
+            mjcf_path: Path to MJCF file.
+
+        Returns:
+            List of camera names (e.g. ['front', 'wrist']).
+        """
+        mj_model = mujoco.MjModel.from_xml_path(mjcf_path)
+        camera_names = []
+
+        for i in range(mj_model.ncam):
+            name = mujoco.mj_id2name(mj_model, mujoco.mjtObj.mjOBJ_CAMERA, i)
+            if name and name.strip():
+                camera_names.append(name)
+
+        return camera_names
+
+    @staticmethod
+    def extract_actuator_names(mjcf_path: str) -> Dict[str, List[str]]:
+        """Extract actuator names split into joint and EE groups.
+
+        Matches C++ MjcfParser::extractActuatorNames().
+        Depends on the same joint/EE classification as extract_robot_state_dim().
+
+        Args:
+            mjcf_path: Path to MJCF file.
+
+        Returns:
+            {
+                'joint_names': ['joint1', 'joint2', ...],
+                'ee_names': ['gripper', ...],
+            }
+        """
+        mj_model = mujoco.MjModel.from_xml_path(mjcf_path)
+        state = MjcfParser.extract_robot_state_dim(mjcf_path)
+
+        joint_names = []
+        for idx in state["joint_indices"]:
+            name = mujoco.mj_id2name(mj_model, mujoco.mjtObj.mjOBJ_ACTUATOR, idx)
+            joint_names.append(name if name else f"actuator_{idx}")
+
+        ee_names = []
+        for idx in state["ee_indices"]:
+            name = mujoco.mj_id2name(mj_model, mujoco.mjtObj.mjOBJ_ACTUATOR, idx)
+            ee_names.append(name if name else f"actuator_{idx}")
+
+        return {
+            "joint_names": joint_names,
+            "ee_names": ee_names,
+        }

@@ -1,0 +1,29 @@
+logging:
+  log_dir: ~/RynnRcplog/robotMotion
+  log_file: robotMotion.log
+robotmodel:
+  robot_name: fr3
+  robot_control_freq: 500
+  robot_mjcf: "../models/4.dual_arm/40.dual_fr3/scene/dual_fr3_scene.xml"
+  pino_mjcf: "../models/4.dual_arm/40.dual_fr3/mjcf/dual_fr3_pinocchio.xml"
+  gripper_independent: true
+  standby1_position: [0.0, 0.0, 0.0, -1.57, 0.0, 1.57, 0.0, 200, 0.0, 0.0, 0.0, -1.57, 0.0, 1.57, 0.0, 200]
+fsm:
+  fsm_type: "basic_fsm"
+communicator: 
+  type: "lcm"
+trajgen:
+  trajmodule: "tg_ruckig"
+  generator: 
+    joint_limit_lower: [ -2.7437, -1.5837, -2.9007, -2.8421, -2.8065, 0.8445, -3.0159, -2.7437, -1.5837, -2.9007, -2.8421, -2.8065, 0.8445, -3.0159 ]
+    joint_limit_upper: [ 2.7437 ,  1.5837,  2.9007, -0.5518,  2.8065, 4.2169,  3.0159, 2.7437 ,  1.5837,  2.9007, -0.5518,  2.8065, 4.2169,  3.0159 ]
+    soft_limit_margin: 0.1  # radians
+    joint_vel_limit: [ 6.28, 6.28, 6.28, 6.28, 6.28, 6.28, 6.28, 6.28, 6.28, 6.28, 6.28, 6.28, 6.28, 6.28 ]
+    joint_acc_limit: [ 62.8, 62.8, 62.8, 62.8, 62.8, 62.8, 62.8, 62.8, 62.8, 62.8, 62.8, 62.8, 62.8, 62.8 ]
+    joint_jerk_limit: [ 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0, 6280.0 ]
+    vel_limit_ratio: 0.5
+    low_ability_ratio: 0.2
+robotinterface:
+  robot_type: "mujoco"
+  controller:
+    mode: "pd"

@@ -1,6 +1,7 @@
 #include "mj_interface.hpp"
 
 #include <chrono>
+#include <stdexcept>
 #include <thread>
 
 #include "mjcf_parser.hpp"
@@ -207,8 +208,8 @@ void MujocoInterface::initMuJoCo() {
   _sceneMjcf = sceneManager->getSceneMJCF();
   mjModel_ = mj_loadXML(_sceneMjcf.c_str(), 0, error, 0);
   if (!mjModel_) {
-    std::cerr << "Could not load scene MJCF: " << _sceneMjcf << std::endl;
-    return;
+    throw std::runtime_error(
+        std::string("Could not load scene MJCF: ") + _sceneMjcf + "\n" + error);
   }
 
   mjData_ = mj_makeData(mjModel_);

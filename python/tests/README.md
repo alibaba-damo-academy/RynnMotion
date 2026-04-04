@@ -8,18 +8,20 @@ This directory contains the test suite for RynnMotion, organized to mirror the s
 tests/
 ├── test_algorithms/               # Tests for RynnMotion.algorithms
 │   ├── test_pin_kine.py           # PinKine kinematics tests (integrated with PRobotManager)
-│   └── ...                        # Future: pose_mapper, osc, etc.
+│   └── test_so101_policy_interpolator.py  # SO101 policy interpolator tests
 ├── test_base/                     # Tests for RynnMotion.base
 │   └── ...                        # Future: MuJoCo interface tests
 ├── test_controller/               # Tests for RynnMotion.controller
 │   └── ...                        # Future: controller tests
 ├── test_manager/                  # Tests for RynnMotion.manager
-│   ├── test_manager.py            # PRobotManager and PSceneManager tests
 │   └── test_mjcf_parser.py        # MjcfParser CLI test script
+├── test_recorder/                 # Tests for RynnMotion.RynnDatasets recorder
+│   └── test_recorder_pipeline.py  # Unified recorder pipeline tests
 ├── test_common/                   # Tests for RynnMotion.common
 │   └── ...                        # Future: common utilities tests
 ├── test_teleop/                   # Tests for RynnMotion.teleop
 │   └── ...                        # Future: teleoperation tests
+├── test_unified_pipeline.py       # Top-level unified pipeline integration test
 └── standalone/                    # Standalone tests (no RynnMotion dependencies)
     ├── test_pin_kine_standalone.py  # FK tests using local XML fixtures
     └── fixtures/                  # Robot MJCF files for standalone tests
@@ -35,7 +37,9 @@ tests/
 ### Integrated Tests
 Tests that use RynnMotion infrastructure (PRobotManager, PSceneManager):
 - `test_algorithms/test_pin_kine.py` - Tests PinKine with all robots via PRobotManager
-- `test_manager/test_manager.py` - Tests robot and scene managers
+- `test_algorithms/test_so101_policy_interpolator.py` - SO101 policy interpolator validation
+- `test_recorder/test_recorder_pipeline.py` - Unified recorder pipeline tests
+- `test_unified_pipeline.py` - Top-level unified pipeline integration test
 
 These tests validate the full integration with the project structure.
 
@@ -59,7 +63,9 @@ pytest tests/
 ### Run specific test module:
 ```bash
 pytest tests/test_algorithms/test_pin_kine.py -v
-pytest tests/test_manager/test_manager.py -v
+pytest tests/test_algorithms/test_so101_policy_interpolator.py -v
+pytest tests/test_recorder/test_recorder_pipeline.py -v
+pytest tests/test_unified_pipeline.py -v
 pytest tests/standalone/test_pin_kine_standalone.py -v
 ```
 
@@ -77,10 +83,10 @@ pytest tests/ --cov=RynnMotion --cov-report=html
 
 | Module | Tests | Coverage |
 |--------|-------|----------|
-| `test_algorithms/` | 30 tests | PinKine FK, multi-site, DOF validation |
-| `test_manager/` | 47 tests | PRobotManager, PSceneManager, integration |
+| `test_algorithms/` | 30+ tests | PinKine FK, multi-site, DOF validation, policy interpolator |
+| `test_manager/` | CLI scripts | MjcfParser configuration extraction |
+| `test_recorder/` | Pipeline tests | Unified recorder pipeline, RobotContext |
 | `standalone/` | 10 tests | Independent FK validation |
-| **Total** | **87 tests** | |
 
 ## Adding New Tests
 

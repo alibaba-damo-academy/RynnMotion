@@ -9,7 +9,7 @@ description = "Base classes for RynnMotion robot interfaces, controllers, and Mu
 authors = [{ name = "RynnMotion Team" }]
 license = { text = "MIT" }
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -27,7 +27,7 @@ dependencies = [
     "tqdm>=4.60.0",
     "mujoco>=3.3.0",
     "fsspec>=2023.1.0,<=2025.3.0",
-    "pin>=3.7.0",
+    "pin>=3.7.0; sys_platform != 'win32'",
     "pillow>=8.0.0",
     "build>=0.10.0",
     "lcm>=1.5.0",
@@ -36,6 +36,9 @@ dependencies = [
     "huggingface_hub>=0.20.0",
     "torch>=1.13.0",
     "packaging>=21.0",
+    "pandas>=2.0.0",
+    "pyarrow>=14.0.0",
+    "av>=12.0.0",
     "ruckig>=0.15.0",
     "mink>=1.0.0",
     "loop-rate-limiters>=0.1.0",
@@ -47,11 +50,15 @@ project_root = ".."
 models_root = "../models"
 config_root = "../config"
 
+[project.scripts]
+rynn-create-dataset = "RynnMotion.tools.mjcf_dataset:main"
+
 [project.optional-dependencies]
 full = ["draccus>=0.10.0"]
 dev = ["build>=0.10.0", "wheel>=0.38.0", "twine>=4.0.0", "pytest>=7.0.0"]
 
 [project.urls]
+# Homepage = "https://github.com/your-org/rynnmotion"
 Repository = "https://github.com/alibaba-damo-academy/RynnMotion"
 
 [tool.setuptools.packages.find]

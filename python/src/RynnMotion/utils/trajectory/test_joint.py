@@ -14,7 +14,7 @@ import os
 # Add the python directory to the path to import our modules
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from utils.trajectory.trajgen import JointTrajGen
+from utils.trajectory.trajgen import JointTrajGen, JointTrajLimits
 
 
 def joint_trajgen_test1():
@@ -288,15 +288,62 @@ def joint_trajgen_test3():
     print()
 
 
+def joint_trajgen_test4_config_struct():
+    """Test 4: JointTrajGen with JointTrajLimits config"""
+    print("=== Test 4: JointTrajGen with JointTrajLimits config ===")
+
+    limits = JointTrajLimits(vel_max=np.array([1.0, 1.0]), acc_max=np.array([2.0, 1.0]))
+    joint_traj = JointTrajGen(2, 0.05, limits)
+
+    q_pos0 = np.array([0.3, -0.6])
+    q_pos1 = np.array([2.0, -4.5])
+    q_upper_limits = np.ones(2) * 3.0
+    q_lower_limits = np.ones(2) * -3.0
+
+    joint_traj.set_joint_pos_limits(q_upper_limits, q_lower_limits)
+    joint_traj.set_start_state(q_pos0)
+    joint_traj.set_target_state(q_pos1)
+
+    print(f"From: [{', '.join(f'{x:.3f}' for x in q_pos0)}] rad")
+    print(f"To:   [{', '.join(f'{x:.3f}' for x in q_pos1)}] rad")
+    print(f"Vel limits (from config): [{', '.join(f'{x:.3f}' for x in limits.vel_max)}] rad/s")
+    print(f"Acc limits (from config): [{', '.join(f'{x:.3f}' for x in limits.acc_max)}] rad/s²")
+
+    step = 0
+    result = 0
+    max_observed_vel = np.zeros(2)
+
+    while result == 0:
+        result = joint_traj.update()
+        qd_ref = joint_traj.get_curr_vel()
+        for i in range(2):
+            max_observed_vel[i] = max(max_observed_vel[i], abs(qd_ref[i]))
+        joint_traj.pass_to_input()
+        step += 1
+        if step > 10000:
+            print("Safety break: Maximum steps reached")
+            break
+
+    final_joints = joint_traj.get_curr_pos()
+    print(f"Final joint positions: [{', '.join(f'{x:.3f}' for x in final_joints)}] rad")
+    print(f"Max observed velocities: [{', '.join(f'{x:.3f}' for x in max_observed_vel)}] rad/s")
+    print(f"Total steps: {step}")
+
+    passed = all(max_observed_vel[i] <= limits.vel_max[i] + 0.01 for i in range(2))
+    print(f"{'PASS' if passed else 'FAIL'}: Velocities within configured limits")
+    print()
+
+
 def main():
     """Main function to run all joint trajectory tests."""
     print("=== JointTrajGen Comprehensive Testing (Dynamic Version) ===")
     print("Testing different constraint scenarios for joint trajectory generation\n")
-    
+
     joint_trajgen_test1()
     joint_trajgen_test2()
     joint_trajgen_test3()
-    
+    joint_trajgen_test4_config_struct()
+
     print("=== All JointTrajGen tests completed ===")
     print("\nTest results exported as CSV files:")
     print("- joint1_data.csv")

@@ -16,8 +16,9 @@
 
 
 V21_MESSAGE = (
-    "This dataset was created with a codebase version older than v2.1. "
-    "To ensure compatibility, please upgrade to the latest version."
+    "The dataset you requested ({repo_id}) is in {version} format. "
+    "We introduced a new format since v3.0 which is not backward compatible with v2.1. "
+    "Please update your dataset using the conversion script."
 )
 
 

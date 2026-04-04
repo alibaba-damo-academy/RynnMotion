@@ -4,7 +4,7 @@
 
 ```bash
 cd ~/Documents/Damowork/RynnMotion/python
-source .venv/bin/activate
+source venv/bin/activate
 ```
 
 ## Motion Simulation
@@ -44,13 +44,13 @@ Press `q` to quit the monitor.
 **Terminal 1 - Simulation:**
 ```bash
 cd ~/Documents/Damowork/RynnMotion/python
-source .venv/bin/activate
+source venv/bin/activate
 python scripts/motion_sim_robot.py --config config/config_fr3.yaml
 ```
 
 **Terminal 2 - Data Monitor:**
 ```bash
 cd ~/Documents/Damowork/RynnMotion/python
-source .venv/bin/activate
+source venv/bin/activate
 python scripts/robot_state_monitor.py --config config/config_fr3.yaml
 ```

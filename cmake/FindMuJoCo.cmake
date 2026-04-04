@@ -1,4 +1,10 @@
-set(MUJOCO_VERSION_CANDIDATES "3.5.0" "3.4.0" "3.3.7" "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0")
+# macOS framework DMG 3.6.0 ships no plugin dylibs — STL decoder is a plugin in 3.6.0
+# and the DMG omits them. Prefer 3.5.0 on macOS where STL is built-in.
+if(APPLE)
+  set(MUJOCO_VERSION_CANDIDATES "3.5.0" "3.6.0" "3.4.0" "3.3.7" "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0")
+else()
+  set(MUJOCO_VERSION_CANDIDATES "3.6.0" "3.5.0" "3.4.0" "3.3.7" "3.3.5" "3.3.4" "3.3.3" "3.3.2" "3.3.1" "3.3.0")
+endif()
 
 function(find_mujoco)
     set(MUJOCO_DIR "" CACHE PATH "Path to MuJoCo installation")
@@ -42,7 +48,7 @@ function(find_mujoco)
             endforeach()
 
             if(NOT MUJOCO_DIR OR NOT EXISTS "${MUJOCO_DIR}")
-                set(MUJOCO_DIR "/usr/local/mujoco-3.5.0" CACHE PATH "Path to MuJoCo installation" FORCE)
+                set(MUJOCO_DIR "/usr/local/mujoco-3.6.0" CACHE PATH "Path to MuJoCo installation" FORCE)
                 message(WARNING "MuJoCo not found, using default path: ${MUJOCO_DIR}")
             endif()
         endif()
@@ -69,7 +75,7 @@ function(find_mujoco)
         endforeach()
 
         if(NOT MUJOCO_VERSION)
-            set(MUJOCO_VERSION "3.5.0" CACHE STRING "MuJoCo version" FORCE)
+            set(MUJOCO_VERSION "3.6.0" CACHE STRING "MuJoCo version" FORCE)
         endif()
     endif()
 
@@ -141,4 +147,49 @@ function(find_mujoco)
     set(MUJOCO_LIBRARY "${MUJOCO_LIBRARY}" PARENT_SCOPE)
     set(MUJOCO_VERSION "${MUJOCO_VERSION}" PARENT_SCOPE)
     set(MUJOCO_FOUND TRUE PARENT_SCOPE)
+endfunction()
+
+# On macOS, the library extracted from the framework DMG has install name
+# @rpath/mujoco.framework/... which causes dyld failures at runtime.
+# Auto-patch it to an absolute path at cmake configure time.
+if(APPLE AND MUJOCO_LIBRARY)
+    execute_process(
+        COMMAND otool -D "${MUJOCO_LIBRARY}"
+        OUTPUT_VARIABLE _MUJOCO_LIB_ID
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    if(_MUJOCO_LIB_ID MATCHES "@rpath")
+        execute_process(
+            COMMAND install_name_tool -id "${MUJOCO_LIBRARY}" "${MUJOCO_LIBRARY}"
+            ERROR_QUIET
+        )
+        message(STATUS "Patched MuJoCo install name -> ${MUJOCO_LIBRARY}")
+    endif()
+    # install_name_tool invalidates any existing code signature; macOS kills the process
+    # (SIGKILL / CODESIGNING / Invalid Page) when loading pages that don't match their hash.
+    # Re-sign with an ad-hoc signature after every cmake configure to keep it valid.
+    execute_process(
+        COMMAND codesign --force --sign - "${MUJOCO_LIBRARY}"
+        ERROR_QUIET
+    )
+endif()
+
+
+# Helper function: call mujoco_fix_rpath(<target>) after defining a target that links MuJoCo.
+# Adds a post-build command to rewrite the @rpath framework reference to an absolute path.
+function(mujoco_fix_rpath TARGET_NAME)
+    if(APPLE AND MUJOCO_LIBRARY)
+        get_filename_component(_MJ_LIB_NAME "${MUJOCO_LIBRARY}" NAME)
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND install_name_tool
+                -change "@rpath/mujoco.framework/Versions/A/${_MJ_LIB_NAME}"
+                "${MUJOCO_LIBRARY}"
+                "$<TARGET_FILE:${TARGET_NAME}>"
+                || true
+            COMMAND codesign --force --sign - "$<TARGET_FILE:${TARGET_NAME}>" || true
+            COMMENT "Fixing MuJoCo rpath and re-signing ${TARGET_NAME}"
+            VERBATIM
+        )
+    endif()
 endfunction()

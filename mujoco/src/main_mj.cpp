@@ -3,6 +3,12 @@
 #include <iostream>
 #include <string>
 
+#ifdef __APPLE__
+#include "mujoco.h"
+#else
+#include "mujoco/mujoco.h"
+#endif
+
 #include "debug_config.hpp"
 #include "discovery.hpp"
 #include "mj_interface.hpp"
@@ -184,7 +190,12 @@ int main(int argc, char *argv[]) {
     std::cerr << "Failed to load config file: " << e.what() << std::endl;
   }
 
-  auto mujocoSimulation = std::make_shared<mujoco::MujocoInterface>(config1, config2, robotNumber, sceneNumber);
-  mujocoSimulation->runApplication();
+  try {
+    auto mujocoSimulation = std::make_shared<mujoco::MujocoInterface>(config1, config2, robotNumber, sceneNumber);
+    mujocoSimulation->runApplication();
+  } catch (const std::exception &e) {
+    std::cerr << "Fatal: " << e.what() << std::endl;
+    return 1;
+  }
   return 0;
 }
