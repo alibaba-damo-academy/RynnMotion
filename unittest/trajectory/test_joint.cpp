@@ -335,6 +335,62 @@ void jointTrajgenTest3() {
   std::cout << std::endl;
 }
 
+void jointTrajgenTest4_ConfigStruct() {
+  std::cout << "=== Test 4: JointTrajGen with JointTrajLimits config ===" << std::endl;
+
+  JointTrajLimits limits;
+  limits.velMax = Eigen::VectorXd(2); limits.velMax << 1.0, 1.0;
+  limits.accMax = Eigen::VectorXd(2); limits.accMax << 2.0, 1.0;
+
+  JointTrajGen<2> JointTraj(0.05, limits);
+
+  Eigen::VectorXd qPos0(2), qPos1(2);
+  qPos0 << 0.3, -0.6;
+  qPos1 << 2.0, -4.5;
+
+  Eigen::VectorXd qUpperLimits(2), qLowerLimits(2);
+  qUpperLimits.setConstant(3.0);
+  qLowerLimits.setConstant(-3.0);
+  JointTraj.setJointPosLimits(qUpperLimits, qLowerLimits);
+
+  JointTraj.setStartState(qPos0);
+  JointTraj.setTargetState(qPos1);
+
+  std::cout << "From: [" << qPos0.transpose() << "] rad" << std::endl;
+  std::cout << "To:   [" << qPos1.transpose() << "] rad" << std::endl;
+  std::cout << "Vel limits (from config): [" << limits.velMax.transpose() << "] rad/s" << std::endl;
+  std::cout << "Acc limits (from config): [" << limits.accMax.transpose() << "] rad/s²" << std::endl;
+
+  int step = 0;
+  Result result;
+  Eigen::VectorXd maxObservedVel = Eigen::VectorXd::Zero(2);
+
+  do {
+    result = JointTraj.update();
+    auto qdRef = JointTraj.getCurrVel();
+    for (int i = 0; i < 2; ++i) {
+      maxObservedVel(i) = std::max(maxObservedVel(i), std::abs(qdRef(i)));
+    }
+    JointTraj.passToInput();
+    step++;
+  } while (result == Result::Working);
+
+  auto finalJoints = JointTraj.getCurrPos();
+  std::cout << "Final joint positions: [" << finalJoints.transpose() << "] rad" << std::endl;
+  std::cout << "Max observed velocities: [" << maxObservedVel.transpose() << "] rad/s" << std::endl;
+  std::cout << "Total steps: " << step << std::endl;
+
+  // Verify velocities respect configured limits
+  bool pass = true;
+  for (int i = 0; i < 2; ++i) {
+    if (maxObservedVel(i) > limits.velMax(i) + 0.01) {
+      pass = false;
+    }
+  }
+  std::cout << (pass ? "PASS" : "FAIL") << ": Velocities within configured limits" << std::endl;
+  std::cout << std::endl;
+}
+
 int main() {
   std::cout << "=== JointTrajGen Comprehensive Testing (Dynamic Version) ===" << std::endl;
   std::cout << "Testing different constraint scenarios for joint trajectory generation\n"
@@ -345,6 +401,8 @@ int main() {
   jointTrajgenTest2();
 
   jointTrajgenTest3();
+
+  jointTrajgenTest4_ConfigStruct();
 
   std::cout << "=== All JointTrajGen tests completed ===" << std::endl;
   std::cout << "\nTest results exported as CSV files:" << std::endl;

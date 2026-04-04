@@ -142,8 +142,9 @@ if(APPLE)
         BUILD_WITH_INSTALL_RPATH TRUE
     )
 
+    get_filename_component(MUJOCO_LIB_NAME ${MUJOCO_LIBRARY} NAME)
     add_custom_command(TARGET pinMjTest POST_BUILD
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fix_mujoco_mac.sh $<TARGET_FILE:pinMjTest> ${MUJOCO_LIBRARY}
+        COMMAND install_name_tool -change @rpath/mujoco.framework/Versions/A/${MUJOCO_LIB_NAME} ${MUJOCO_LIBRARY} $<TARGET_FILE:pinMjTest> || true
         COMMENT "Fixing MuJoCo library install name"
     )
 endif()

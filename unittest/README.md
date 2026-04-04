@@ -40,6 +40,9 @@ ctest --test-dir build -R fsm --output-on-failure
 ./build/unittest/fsm/simpleTick
 ./build/unittest/fsm/motionTick
 ./build/unittest/fsm/pickplaceTest
+./build/unittest/manager/test_discovery
+./build/unittest/manager/test_module_defaults
+./build/unittest/recorder/test_robot_context
 ```
 
 ## Standalone Build
@@ -90,7 +93,12 @@ unittest/
 ├── utility/            # Utility function tests
 ├── sketch/             # Path sketch tests
 ├── message/            # Message passing tests
-└── fsm/                # FSM state machine tests
+├── fsm/                # FSM state machine tests
+├── manager/            # Robot manager tests
+│   ├── test_discovery  # Robot discovery system test
+│   └── test_module_defaults  # Smart module chain selection test
+└── recorder/           # Recorder pipeline tests
+    └── test_robot_context    # RobotContext feature schema test
 ```
 
 ## Available Test Executables
@@ -130,3 +138,10 @@ unittest/
 - `simpleTick` - Basic FSM state transitions
 - `motionTick` - FsmManager integration test
 - `pickplaceTest` - PickPlace FSM sequence test
+
+**Manager:**
+- `test_discovery` - Robot discovery system test
+- `test_module_defaults` - Smart module chain selection test
+
+**Recorder:**
+- `test_robot_context` - RobotContext feature schema generation test

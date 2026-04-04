@@ -14,10 +14,8 @@ std::string moduleTypeToString(ModuleType type) {
   case ModuleType::OSC: return "OSC";
   case ModuleType::Fr3TeleopFollow: return "Fr3TeleopFollow";
   case ModuleType::Fr3JointMove: return "Fr3JointMove";
-  case ModuleType::DualRM75Planner: return "DualRM75Planner";
-  case ModuleType::Dual75Osc: return "Dual75Osc";
+  case ModuleType::RizonJointMove: return "RizonJointMove";
   case ModuleType::LeRobotPlanner: return "LeRobotPlanner";
-  case ModuleType::SingleEEPlanner: return "SingleEEPlanner";
   default: return "Unknown";
   }
 }
@@ -42,9 +40,9 @@ int main() {
   std::cout << "  Scene pattern          → Module chain" << std::endl;
   std::cout << "  " << std::string(60, '-') << std::endl;
   std::cout << "  default/empty          → JointMove" << std::endl;
-  std::cout << "  *tracking*             → Estimator + SingleEEPlanner + OSC" << std::endl;
-  std::cout << "  *pickplace*            → Estimator + SingleEEPlanner + OSC" << std::endl;
-  std::cout << "  *teleop*               → Estimator + SingleEEPlanner + Fr3TeleopFollow" << std::endl;
+  std::cout << "  *tracking*             → Estimator + Planner + OSC" << std::endl;
+  std::cout << "  *pickplace*            → Estimator + Planner + OSC" << std::endl;
+  std::cout << "  *usscan*               → RizonJointMove" << std::endl;
   std::cout << "  other                  → JointMove (fallback)" << std::endl;
   std::cout << std::endl;
 
@@ -69,11 +67,11 @@ int main() {
       if (lower == "default" || lower.empty()) {
         std::cout << " → JointMove";
       } else if (lower.find("tracking") != std::string::npos) {
-        std::cout << " → Estimator + SingleEEPlanner + OSC";
+        std::cout << " → Estimator + Planner + OSC";
       } else if (lower.find("pickplace") != std::string::npos) {
-        std::cout << " → Estimator + SingleEEPlanner + OSC";
-      } else if (lower.find("teleop") != std::string::npos) {
-        std::cout << " → Estimator + SingleEEPlanner + Fr3TeleopFollow";
+        std::cout << " → Estimator + Planner + OSC";
+      } else if (lower.find("usscan") != std::string::npos) {
+        std::cout << " → RizonJointMove";
       } else {
         std::cout << " → JointMove (fallback)";
       }

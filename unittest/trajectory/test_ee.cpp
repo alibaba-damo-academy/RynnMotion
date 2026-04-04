@@ -252,6 +252,63 @@ void eeTrajgenTest2() {
   std::cout << std::endl;
 }
 
+void eeTrajgenTest3_ConfigStruct() {
+  std::cout << "=== Test 3: EEPoseTrajGen with EEPoseTrajLimits config ===" << std::endl;
+
+  EEPoseTrajLimits limits;
+  limits.tcpSpeedMax = 1.0;
+  limits.tcpAccMax = 3.0;
+  EEPoseTrajGen eeTraj(0.002, limits);
+
+  Eigen::Vector3d eePos0(0.5, 0.2, 0.8);
+  Eigen::Vector3d rpy0(-0.5, -0.8, 0.2);
+  Eigen::Quaterniond eeQuat0 =
+      Eigen::AngleAxisd(rpy0(2), Eigen::Vector3d::UnitZ()) *
+      Eigen::AngleAxisd(rpy0(1), Eigen::Vector3d::UnitY()) *
+      Eigen::AngleAxisd(rpy0(0), Eigen::Vector3d::UnitX());
+
+  Eigen::Vector3d eePos1(1.2, -2.3, 2.1);
+  Eigen::Vector3d rpy1(0.5, 0.8, 1.5);
+  Eigen::Quaterniond eeQuat1 =
+      Eigen::AngleAxisd(rpy1(2), Eigen::Vector3d::UnitZ()) *
+      Eigen::AngleAxisd(rpy1(1), Eigen::Vector3d::UnitY()) *
+      Eigen::AngleAxisd(rpy1(0), Eigen::Vector3d::UnitX());
+
+  eeTraj.setStartState(eePos0, eeQuat0);
+  eeTraj.setTargetState(eePos1, eeQuat1);
+
+  std::cout << "TCP speed limit (from config): " << limits.tcpSpeedMax << " m/s" << std::endl;
+  std::cout << "TCP acc limit (from config): " << limits.tcpAccMax << " m/s²" << std::endl;
+
+  int step = 0;
+  Result result;
+  double maxObservedSpeed = 0.0;
+
+  do {
+    result = eeTraj.update();
+    double tcpSpeed = eeTraj.getCurrTcpSpeed();
+    maxObservedSpeed = std::max(maxObservedSpeed, tcpSpeed);
+    eeTraj.passToInput();
+    step++;
+  } while (result == Result::Working);
+
+  auto [finalPos, finalQuat] = eeTraj.getCurrPose();
+
+  std::cout << "Max observed TCP speed: " << maxObservedSpeed << " m/s (limit: " << limits.tcpSpeedMax << " m/s)" << std::endl;
+  std::cout << "Final position: [" << finalPos.transpose() << "] m" << std::endl;
+  std::cout << "Total steps: " << step << std::endl;
+
+  // Note: Per-axis Ruckig limits don't directly constrain the 3D speed norm,
+  // so observed speed can exceed the configured limit by ~15-20% (same as tests 1 & 2).
+  // Verify that the config struct produces the same behavior as setTcpLimits().
+  if (maxObservedSpeed <= limits.tcpSpeedMax * 1.25) {
+    std::cout << "PASS: TCP speed within expected range" << std::endl;
+  } else {
+    std::cout << "FAIL: TCP speed greatly exceeded configured limit" << std::endl;
+  }
+  std::cout << std::endl;
+}
+
 int main() {
   std::cout << "=== EEPoseTrajGen Testing ===" << std::endl;
   std::cout << "Testing end-effector pose trajectory generation with TCP constraints\n"
@@ -260,6 +317,8 @@ int main() {
   eeTrajgenTest1();
 
   eeTrajgenTest2();
+
+  eeTrajgenTest3_ConfigStruct();
 
   std::cout << "=== All EE trajectory tests completed ===" << std::endl;
   std::cout << "\nTest results exported as CSV files:" << std::endl;

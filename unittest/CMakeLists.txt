@@ -50,5 +50,6 @@ add_subdirectory(kinematics)
 add_subdirectory(trajectory)
 add_subdirectory(utility)
 add_subdirectory(fsm)
+add_subdirectory(recorder)
 
 message(STATUS "Motion Unit Tests configured successfully")
